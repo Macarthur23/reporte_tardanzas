@@ -3,154 +3,654 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Asistencia - Procesador de Reportes</title>
+    <title>Promart - Dashboard de Operaciones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .drop-zone { border: 2px dashed #007bff; border-radius: 15px; padding: 40px; text-align: center; background: white; transition: 0.3s; cursor: pointer; }
-        .drop-zone:hover { background: #e9ecef; }
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .status-badge { width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-right: 5px; }
+        :root {
+            --primary-color: #ff3b30;
+            --dark-sidebar: #1e2229;
+            --bg-light: #f8f9fa;
+            --card-radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: #333;
+        }
+
+        .wrapper { display: flex; width: 100%; min-height: 100vh; }
+
+        #sidebar {
+            width: 280px;
+            background: var(--dark-sidebar);
+            color: #fff;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 25px 20px;
+            background: #14171c;
+            border-bottom: 1px solid #2d333f;
+        }
+
+        #sidebar ul.components { padding: 15px 10px; }
+        #sidebar ul li { list-style: none; margin-bottom: 5px; }
+
+        #sidebar ul li button {
+            width: 100%;
+            text-align: left;
+            padding: 12px 15px;
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        #sidebar ul li button i { font-size: 1.2rem; margin-right: 12px; }
+        #sidebar ul li button:hover, #sidebar ul li button.active {
+            background: rgba(255, 255, 255, 0.08); color: #fff;
+        }
+        #sidebar ul li button.active { background: #ff3b30; color: white; }
+
+        #content { flex-grow: 1; padding: 30px; background: var(--bg-light); }
+
+        .main-card {
+            background: #fff;
+            border-radius: var(--card-radius);
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1; border-radius: var(--card-radius);
+            background: #fff; padding: 40px 20px; text-align: center; cursor: pointer;
+        }
+        .drop-zone:hover { border-color: #ff3b30; background: #fff5f5; }
+
+        .kpi-card {
+            background: #fff; border-radius: var(--card-radius); padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #edf2f7;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        .image-style-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .image-card-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-grow: 1;
+        }
+        .image-card-icon-container {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .image-card-info-block {
+            flex-grow: 1;
+            max-width: 65%;
+        }
+        .image-card-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .image-card-subtitle {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 2px 0 8px 0;
+        }
+        .image-card-progress-bg {
+            width: 100%;
+            height: 6px;
+            background-color: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .image-card-progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .image-card-right-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #111827;
+            text-align: right;
+            padding-left: 15px;
+        }
+
+        .avatar-circle {
+            width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0;
+            color: #4a5568; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 600; margin-right: 10px;
+        }
+
+        .chart-container { position: relative; width: 100%; max-width: 160px; margin: 0 auto; }
+
+        .custom-table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .table { margin-bottom: 0; }
+        .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-uppercase: true; font-size: 0.8rem; padding: 14px; }
+        .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
+        .badge-percentage { font-weight: 600; padding: 6px 12px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold">Reporte de Asistencia y Discrepancias</h1>
-        <p class="text-muted">Carga los 5 archivos Excel para generar el dashboard consolidado</p>
-    </div>
-
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-8">
-            <div id="dropZone" class="drop-zone">
-                <h4 class="text-primary">Arrastra los 5 archivos aquí</h4>
-                <p>O haz clic para seleccionarlos</p>
-                <input type="file" id="fileInput" multiple accept=".xlsx, .xls, .csv" style="display: none;">
-                <div id="fileList" class="mt-3 small text-muted"></div>
-            </div>
-            <div class="text-center mt-3">
-                <button id="btnProcesar" class="btn btn-success btn-lg shadow" disabled>Procesar Reportes</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="dashboard" style="display: none;">
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card card-custom p-3 text-center">
-                    <h6 class="text-muted">Personal Total</h6>
-                    <h2 id="txtTotal">0</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card card-custom p-3 text-center border-start border-danger border-5">
-                    <h6 class="text-muted">Tardanzas</h6>
-                    <h2 id="txtTardanzas" class="text-danger">0</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card card-custom p-3 text-center border-start border-warning border-5">
-                    <h6 class="text-muted">Omisiones</h6>
-                    <h2 id="txtOmisiones" class="text-warning">0</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card card-custom p-3 text-center border-start border-success border-5">
-                    <h6 class="text-muted">H. Extra Totales</h6>
-                    <h2 id="txtExtras" class="text-success">0h</h2>
-                </div>
-            </div>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="m-0 fw-bold text-white d-flex align-items-center">
+                <i class="bi bi-grid-1x2-fill text-danger me-2"></i> PROMART
+            </h5>
+            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
         </div>
 
-        <div class="row">
-            <div class="col-md-7">
-                <div class="card card-custom p-4">
-                    <h5>Cumplimiento por Área (%)</h5>
-                    <canvas id="chartCumplimiento"></canvas>
-                </div>
+        <ul class="components">
+            <li><button class="tab-nav-btn active" data-target="panel-carga"><i class="bi bi-cloud-upload"></i> Cargar Datos</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-dashboard" id="btnMenuDash" disabled><i class="bi bi-pie-chart"></i> Gráficos de Áreas</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-box-seam"></i> Personal Almacén</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Críticos (&lt;95%)</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-tardanzas-det" id="btnMenuTard" disabled><i class="bi bi-clock"></i> Tardanzas Personal</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-omisiones-det" id="btnMenuOmis" disabled><i class="bi bi-eraser"></i> Omisiones Marca</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-inasistencias-det" id="btnMenuInas" disabled><i class="bi bi-exclamation-octagon"></i> Inasistencias</button></li>
+        </ul>
+    </nav>
+
+    <div id="content">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold m-0" id="dinamicTitle">Módulo de Carga Integral</h4>
+                <p class="text-muted small m-0">Análisis y consolidación automatizada con módulos visuales rápidos.</p>
             </div>
-            <div class="col-md-5">
-                <div class="card card-custom p-4">
-                    <h5>Alertas Críticas</h5>
-                    <div id="listaAlertas" class="overflow-auto" style="max-height: 300px;">
+            <div id="fileStatusBadge" class="badge bg-secondary p-2 rounded-3">Esperando Archivo...</div>
+        </div>
+
+        <div id="kpiRow" class="row g-3 mb-4" style="display: none;">
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Críticos &lt;95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Omisiones Marca</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Inasistencias</span><h3 class="fw-bold m-0 mt-1 text-primary" id="kpiInasistencias">0</h3></div><div class="kpi-icon bg-primary-subtle text-primary"><i class="bi bi-geo-alt-fill"></i></div></div></div>
+        </div>
+
+        <div class="tab-content-custom">
+
+            <div class="panel-custom active-panel" id="panel-carga">
+                <div class="main-card">
+                    <h5 class="fw-bold mb-3 text-secondary">Importar Reporte de Asistencia</h5>
+                    <div id="dropZone" class="drop-zone">
+                        <i class="bi bi-file-earmark-bar-graph text-danger" style="font-size: 3.5rem;"></i>
+                        <h5 class="mt-3 fw-bold">Arrastra tu archivo unificado aquí</h5>
+                        <p class="text-muted small">Mapeo automático de DATA 1, DATA 2 y DATA 5</p>
+                        <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                        <div id="fileName" class="fw-bold text-danger mt-2"></div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button id="btnProcesar" class="btn btn-dark btn-lg px-5 shadow-sm" style="border-radius:10px;" disabled>Generar Dashboard</button>
                     </div>
                 </div>
             </div>
+
+            <div class="panel-custom d-none" id="panel-dashboard">
+                <div class="main-card">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill text-danger me-2"></i>Cumplimiento General por Áreas (DATA 1)</h5>
+                    <div class="row g-4" id="gridGraficos"></div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-almacen-det">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-primary-subtle text-danger"><i class="bi bi-people-fill"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Personal Total</p>
+                                    <p class="image-card-subtitle">Colaboradores Almacén</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-danger" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value" id="miniAlmTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Rendimiento Operación</p>
+                                    <p class="image-card-subtitle">Promedio Cumplimiento</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-success" id="barAlmPromedio" style="width: 0%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-success" id="miniAlmPromedio">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0">Lista Detallada de Personal Almacén</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyAlmacen" placeholder="Buscar por colaborador...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr><th>Área / Operación</th><th>DNI</th><th>Colaborador</th><th class="text-center">Cumplimiento</th></tr>
+                            </thead>
+                            <tbody id="tbodyAlmacen"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-criticos-det">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-danger-subtle text-danger"><i class="bi bi-shadow-lock-fill"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Alerta de Personal</p>
+                                    <p class="image-card-subtitle">Total de Casos Críticos</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-danger" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-danger" id="miniCritTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-building"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Foco de Atención</p>
+                                    <p class="image-card-subtitle" id="miniCritArea" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguna</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card border-start border-danger border-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-danger m-0">Personal por Debajo del Objetivo</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyCriticos" placeholder="Filtrar críticos...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-danger">
+                            <tr><th>Área Perteneciente</th><th>DNI</th><th>Nombre y Apellidos</th><th class="text-center">Cumplimiento Actual</th></tr>
+                            </thead>
+                            <tbody id="tbodyCriticos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-tardanzas-det">
+                <div class="main-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-warning m-0"><i class="bi bi-clock-fill me-2"></i>Reporte Analítico de Tardanzas</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyTardanzas" placeholder="Filtrar tardanzas...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Retraso Exacto</th></tr>
+                            </thead>
+                            <tbody id="tbodyTardanzas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-omisiones-det">
+                <div class="main-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-eraser-fill me-2"></i>Omisiones de Marca Detectadas</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyOmisiones" placeholder="Filtrar omisiones...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Marca Omitida</th></tr>
+                            </thead>
+                            <tbody id="tbodyOmisiones"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-inasistencias-det">
+                <div class="main-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-primary m-0"><i class="bi bi-x-octagon-fill me-2"></i>Faltas Injustificadas</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyInasistencias" placeholder="Filtrar inasistencias...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th class="text-center">Fecha Falta</th></tr>
+                            </thead>
+                            <tbody id="tbodyInasistencias"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
+    // Navegación
+    const navButtons = document.querySelectorAll('.tab-nav-btn');
+    const panels = document.querySelectorAll('.panel-custom');
+    const dinamicTitle = document.getElementById('dinamicTitle');
+
+    navButtons.forEach(btn => {
+        btn.onclick = () => {
+            navButtons.forEach(b => b.classList.remove('active'));
+            panels.forEach(p => p.classList.add('d-none'));
+
+            btn.classList.add('active');
+            const targetPanel = document.getElementById(btn.getAttribute('data-target'));
+            targetPanel.classList.remove('d-none');
+
+            dinamicTitle.innerText = btn.innerText.trim();
+        };
+    });
+
+    // Carga de archivo
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const btnProcesar = document.getElementById('btnProcesar');
-    const fileList = document.getElementById('fileList');
-    let archivosCargados = [];
+    const fileNameDisplay = document.getElementById('fileName');
 
-    // Manejo de Archivos
     dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => cargarArchivo(e.target.files[0]);
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#ff3b30"; };
+    dropZone.ondragleave = () => dropZone.style.borderColor = "#cbd5e1";
+    dropZone.ondrop = (e) => { e.preventDefault(); cargarArchivo(e.dataTransfer.files[0]); };
 
-    fileInput.onchange = (e) => manejarArchivos(e.target.files);
-
-    function manejarArchivos(files) {
-        archivosCargados = Array.from(files);
-        fileList.innerHTML = archivosCargados.map(f => `<li>${f.name}</li>`).join('');
-        btnProcesar.disabled = archivosCargados.length === 0;
+    function cargarArchivo(file) {
+        if (file) {
+            fileNameDisplay.innerText = "Archivo cargado: " + file.name;
+            btnProcesar.disabled = false;
+            document.getElementById('fileStatusBadge').className = "badge bg-success p-2 rounded-3";
+            document.getElementById('fileStatusBadge').innerText = "Listo para procesar";
+            window.archivoSeleccionado = file;
+        }
     }
 
-    btnProcesar.onclick = async () => {
-        const dataConsolidada = {};
+    btnProcesar.onclick = () => {
+        const file = window.archivoSeleccionado;
+        const reader = new FileReader();
 
-        for (const file of archivosCargados) {
-            const data = await leerExcel(file);
-            // Aquí iría la lógica de cruce por DNI/ID según tus columnas
-            // Por ahora simularemos el procesamiento para mostrar el Dashboard
-        }
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
 
-        mostrarDashboard();
+            let hojas = {};
+            workbook.SheetNames.forEach(name => {
+                let upper = name.toUpperCase().trim();
+                hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
+            });
+
+            let data1 = hojas["DATA 1"] || hojas["DATA1"] || [];
+            let data2 = hojas["DATA 2"] || hojas["DATA2"] || [];
+            let data5 = hojas["DATA 5"] || hojas["DATA5"] || [];
+
+            document.getElementById('btnMenuDash').disabled = false;
+            document.getElementById('btnMenuAlm').disabled = false;
+            document.getElementById('btnMenuCrit').disabled = false;
+            document.getElementById('btnMenuTard').disabled = false;
+            document.getElementById('btnMenuOmis').disabled = false;
+            document.getElementById('btnMenuInas').disabled = false;
+
+            document.getElementById('kpiRow').style.display = 'flex';
+
+            renderizarAnillosDATA1(data1);
+            procesarTablasDATA2(data2);
+            procesarIncidenciasDATA5(data5);
+
+            document.getElementById('btnMenuDash').click();
+        };
+        reader.readAsBinaryString(file);
     };
 
-    function leerExcel(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const workbook = XLSX.read(e.target.result, { type: 'binary' });
-                const sheetName = workbook.SheetNames[0];
-                resolve(XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]));
-            };
-            reader.readAsBinaryString(file);
+    function renderizarAnillosDATA1(data) {
+        const grid = document.getElementById('gridGraficos');
+        grid.innerHTML = "";
+        if(!data.length) return;
+
+        data.forEach((row, index) => {
+            let area = row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "";
+            let cumpli = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || "");
+
+            if(!area || area.includes("Total general") || area.startsWith("Etiquetas")) return;
+
+            let num = parseFloat(cumpli);
+            if (isNaN(num)) return;
+
+            let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
+            let restante = (100 - porcentaje).toFixed(1);
+
+            let colorHex = "#10b981";
+            let badgeClass = "bg-success-subtle text-success";
+            if (porcentaje < 95) { colorHex = "#ef4444"; badgeClass = "bg-danger-subtle text-danger"; }
+            else if (porcentaje < 98) { colorHex = "#f59e0b"; badgeClass = "bg-warning-subtle text-warning"; }
+
+            let cardHtml = `
+                <div class="col-md-4 col-lg-3">
+                    <div class="card p-3 border-0 shadow-sm text-center" style="border-radius:16px;">
+                        <span class="text-truncate d-block fw-bold text-dark mb-2" style="font-size:0.9rem;" title="${area}">${area}</span>
+                        <div class="chart-container">
+                            <canvas id="chartArea-${index}"></canvas>
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge ${badgeClass} badge-percentage">${porcentaje}%</span>
+                        </div>
+                    </div>
+                </div>`;
+
+            grid.insertAdjacentHTML('beforeend', cardHtml);
+
+            setTimeout(() => {
+                const ctx = document.getElementById(`chartArea-${index}`).getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [porcentaje, restante < 0 ? 0 : restante],
+                            backgroundColor: [colorHex, '#f1f5f9'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            }, 50);
         });
     }
 
-    function mostrarDashboard() {
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('txtTotal').innerText = "150"; // Ejemplo
-        document.getElementById('txtTardanzas').innerText = "12";
-        document.getElementById('txtOmisiones').innerText = "5";
-        document.getElementById('txtExtras').innerText = "42.5h";
+    function procesarTablasDATA2(data2) {
+        const tbodyAlmacen = document.getElementById('tbodyAlmacen');
+        const tbodyCriticos = document.getElementById('tbodyCriticos');
+        tbodyAlmacen.innerHTML = "";
+        tbodyCriticos.innerHTML = "";
 
-        renderChart();
-    }
+        let totalAlm = 0, sumaAlm = 0, criticosAlm = 0, totalCriticos = 0;
+        let conteoAreasCriticas = {};
 
-    function renderChart() {
-        const ctx = document.getElementById('chartCumplimiento').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Logística', 'Ventas', 'Admin', 'Sistemas', 'Caja'],
-                datasets: [{
-                    label: '% Cumplimiento',
-                    data: [92, 88, 95, 84, 90],
-                    backgroundColor: '#007bff'
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
+        data2.forEach(row => {
+            let dni = row["DNI"] || "";
+            let nombre = row["NOMBRE"] || "";
+            let area = row["AREA"] || "";
+            let cumpliRaw = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || 0);
+
+            if (!nombre || nombre.includes("Total general") || nombre.startsWith("Etiquetas")) return;
+
+            let num = parseFloat(cumpliRaw);
+            if (isNaN(num)) return;
+            let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
+            let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
+
+            let colorBadge = "bg-success";
+            if(porcentaje < 95) colorBadge = "bg-danger";
+            else if(porcentaje < 98) colorBadge = "bg-warning text-dark";
+
+            // Lógica Pestaña Almacén
+            if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
+                totalAlm++;
+                sumaAlm += parseFloat(porcentaje);
+                if (parseFloat(porcentaje) < 95) criticosAlm++;
+
+                tbodyAlmacen.innerHTML += `
+                    <tr>
+                        <td><span class="badge bg-light text-dark border">${area}</span></td>
+                        <td><code class="text-dark">${dni}</code></td>
+                        <td class="fw-semibold">
+                            <div class="avatar-circle">${iniciales}</div>${nombre}
+                        </td>
+                        <td class="text-center"><span class="badge ${colorBadge} px-3 py-2" style="border-radius:6px;">${porcentaje}%</span></td>
+                    </tr>`;
+            }
+
+            // Lógica Pestaña Críticos
+            if (parseFloat(porcentaje) < 95 && parseFloat(porcentaje) > 0) {
+                totalCriticos++;
+                conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
+
+                tbodyCriticos.innerHTML += `
+                    <tr>
+                        <td><span class="badge bg-light text-secondary">${area}</span></td>
+                        <td><code>${dni}</code></td>
+                        <td class="fw-semibold text-dark">
+                            <div class="avatar-circle bg-danger-subtle text-danger">${iniciales}</div>${nombre}
+                        </td>
+                        <td class="text-center"><span class="badge bg-danger px-3 py-2" style="border-radius:6px;">${porcentaje}%</span></td>
+                    </tr>`;
+            }
         });
+
+        // Alimentar Mini Tarjetas de Almacén
+        document.getElementById('miniAlmTotal').innerText = totalAlm;
+        let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
+        document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
+        document.getElementById('barAlmPromedio').style.width = promFinal + "%";
+
+        // Alimentar Mini Tarjetas de Críticos
+        document.getElementById('kpiCriticos').innerText = totalCriticos;
+        document.getElementById('miniCritTotal').innerText = totalCriticos;
+
+        let areaMasCritica = "Ninguna";
+        let maxAlertas = 0;
+        for (const [area, value] of Object.entries(conteoAreasCriticas)) {
+            if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
+        }
+        document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
     }
+
+    /* MODIFICADO ÚNICAMENTE: Ajuste de asignación limpia de áreas en incidencias */
+    function procesarIncidenciasDATA5(data) {
+        let lTardanzas = [], lOmisiones = [], lInasistencias = [];
+
+        data.forEach(row => {
+            const dni = row["DNI"] || "";
+            const nombre = row["NOMBRE"] || row["FULLNM"] || "";
+            const fecha = row["FECHA"] || "";
+
+            // Limpieza y validación inteligente del Área para evitar textos auxiliares como BAÑOS o GAS
+            let areaRaw = row["AREA"] || row["AREAS"] || "";
+            let seccion2 = row["SECCION2"] || row["SECCION"] || "";
+            let areaFinal = areaRaw;
+
+            // Si el campo AREA tiene la glosa de la tienda o es muy larga, limpiamos con la sección limpia secundaria
+            if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
+                if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
+                    areaFinal = seccion2;
+                }
+            }
+
+            let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
+            if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+                lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+            }
+
+            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+            if (omision && omision !== "00:00" && omision !== "0") {
+                lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+            }
+
+            let falta = row["Falta injus"] ? String(row["Falta injus"]).trim() : "";
+            if (falta && falta !== "00:00" && falta !== "0") {
+                lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
+            }
+        });
+
+        document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
+        document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
+        document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
+
+        document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td>${x.fecha}</td><td class="text-center"><span class="badge bg-warning-subtle text-warning fw-bold border border-warning px-2 py-1">${x.valor}</span></td></tr>`).join('');
+        document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td>${x.fecha}</td><td class="text-center"><span class="badge bg-light text-dark border px-2 py-1">${x.valor}</span></td></tr>`).join('');
+        document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td class="text-center"><span class="badge bg-primary-subtle text-primary border border-primary px-3">${x.fecha}</span></td></tr>`).join('');
+    }
+
+    document.querySelectorAll('.buscador').forEach(input => {
+        input.oninput = (e) => {
+            const query = e.target.value.toLowerCase();
+            const targetBody = document.getElementById(e.target.getAttribute('data-target'));
+            if(targetBody) {
+                Array.from(targetBody.getElementsByTagName('tr')).forEach(tr => {
+                    tr.style.display = tr.textContent.toLowerCase().includes(query) ? '' : 'none';
+                });
+            }
+        };
+    });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
