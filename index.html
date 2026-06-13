@@ -181,8 +181,8 @@
         <ul class="components">
             <li><button class="tab-nav-btn active" data-target="panel-carga"><i class="bi bi-cloud-upload"></i> Cargar Datos</button></li>
             <li><button class="tab-nav-btn" data-target="panel-dashboard" id="btnMenuDash" disabled><i class="bi bi-pie-chart"></i> Gráficos de Áreas</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-box-seam"></i> Personal Almacén</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Críticos (&lt;95%)</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-box-seam"></i> Cumplimiento Almacén</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Bajo Cumplimiento</button></li>
             <li><button class="tab-nav-btn" data-target="panel-tardanzas-det" id="btnMenuTard" disabled><i class="bi bi-clock"></i> Tardanzas Personal</button></li>
             <li><button class="tab-nav-btn" data-target="panel-omisiones-det" id="btnMenuOmis" disabled><i class="bi bi-eraser"></i> Omisiones Marca</button></li>
             <li><button class="tab-nav-btn" data-target="panel-inasistencias-det" id="btnMenuInas" disabled><i class="bi bi-exclamation-octagon"></i> Inasistencias</button></li>
@@ -200,7 +200,7 @@
         </div>
 
         <div id="kpiRow" class="row g-3 mb-4" style="display: none;">
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Críticos &lt;95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Bajo Cumplimiento</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
             <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
             <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Omisiones Marca</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
             <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Inasistencias</span><h3 class="fw-bold m-0 mt-1 text-primary" id="kpiInasistencias">0</h3></div><div class="kpi-icon bg-primary-subtle text-primary"><i class="bi bi-geo-alt-fill"></i></div></div></div>
@@ -269,7 +269,7 @@
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>Área / Operación</th><th>DNI</th><th>Colaborador</th><th class="text-center">Cumplimiento</th></tr>
+                            <tr><th>Área / Operación</th><th>DNI</th><th>Colaborador</th><th class="text-center">Porcentaje Cumplimiento</th></tr>
                             </thead>
                             <tbody id="tbodyAlmacen"></tbody>
                         </table>
@@ -315,7 +315,7 @@
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead class="table-danger">
-                            <tr><th>Área Perteneciente</th><th>DNI</th><th>Nombre y Apellidos</th><th class="text-center">Cumplimiento Actual</th></tr>
+                            <tr><th>Área Perteneciente</th><th>DNI</th><th>Nombre y Apellidos</th><th class="text-center">Cumplimiento Bajo</th></tr>
                             </thead>
                             <tbody id="tbodyCriticos"></tbody>
                         </table>
@@ -332,7 +332,7 @@
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Retraso Exacto</th></tr>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Tiempo de Tardanza</th></tr>
                             </thead>
                             <tbody id="tbodyTardanzas"></tbody>
                         </table>
@@ -349,7 +349,7 @@
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Marca Omitida</th></tr>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Tiempo de Marca Omitida</th></tr>
                             </thead>
                             <tbody id="tbodyOmisiones"></tbody>
                         </table>
@@ -366,7 +366,7 @@
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th class="text-center">Fecha Falta</th></tr>
+                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th class="text-center">Fecha Inasistencia</th></tr>
                             </thead>
                             <tbody id="tbodyInasistencias"></tbody>
                         </table>
@@ -456,187 +456,240 @@
     };
 
     function renderizarAnillosDATA1(data) {
-        const grid = document.getElementById('gridGraficos');
-        grid.innerHTML = "";
-        if(!data.length) return;
+    const grid = document.getElementById('gridGraficos');
+    grid.innerHTML = "";
+    if(!data.length) return;
 
-        data.forEach((row, index) => {
-            let area = row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "";
-            let cumpli = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || "");
+    // Cambiamos la estructura del grid para que use filas completas y limpias
+    let contenedorHtml = `<div class="col-12"><div class="row g-3">`;
 
-            if(!area || area.includes("Total general") || area.startsWith("Etiquetas")) return;
+    data.forEach((row, index) => {
+        let area = row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "";
+        let cumpli = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || "");
 
-            let num = parseFloat(cumpli);
-            if (isNaN(num)) return;
+        if(!area || area.includes("Total general") || area.startsWith("Etiquetas") || area.toUpperCase().includes("REPORTE")) return;
 
-            let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
-            let restante = (100 - porcentaje).toFixed(1);
+        let num = parseFloat(cumpli);
+        if (isNaN(num)) return;
 
-            let colorHex = "#10b981";
-            let badgeClass = "bg-success-subtle text-success";
-            if (porcentaje < 95) { colorHex = "#ef4444"; badgeClass = "bg-danger-subtle text-danger"; }
-            else if (porcentaje < 98) { colorHex = "#f59e0b"; badgeClass = "bg-warning-subtle text-warning"; }
+        let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
+        let valorPorcentaje = parseFloat(porcentaje);
 
-            let cardHtml = `
-                <div class="col-md-4 col-lg-3">
-                    <div class="card p-3 border-0 shadow-sm text-center" style="border-radius:16px;">
-                        <span class="text-truncate d-block fw-bold text-dark mb-2" style="font-size:0.9rem;" title="${area}">${area}</span>
-                        <div class="chart-container">
-                            <canvas id="chartArea-${index}"></canvas>
+        // Definición de colores según tus rangos oficiales
+        let colorBarra = "bg-success";
+        let textClass = "text-success";
+        let semaforoEmoji = "🟢";
+
+        if (valorPorcentaje < 95.0) {
+            colorBarra = "bg-danger";
+            textClass = "text-danger";
+            semaforoEmoji = "🔴";
+        }
+        else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
+            colorBarra = "bg-warning";
+            textClass = "text-warning-emphasis";
+            semaforoEmoji = "🟡";
+        }
+
+        // Diseño ultra compacto en formato de barra horizontal inteligente
+        contenedorHtml += `
+            <div class="col-md-6 col-lg-4">
+                <div class="p-2 bg-white border rounded-3 shadow-sm d-flex align-items-center justify-content-between" style="height: 52px; border-color: #e2e8f0 !important;">
+                    <div class="flex-grow-1 min-w-0 me-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-truncate fw-semibold text-dark small" style="font-size: 0.85rem;" title="${area}">${area}</span>
+                            <span class="fw-bold ${textClass} small" style="font-size: 0.85rem;">${semaforoEmoji} ${porcentaje}%</span>
                         </div>
-                        <div class="mt-2">
-                            <span class="badge ${badgeClass} badge-percentage">${porcentaje}%</span>
+                        <div class="progress" style="height: 6px; background-color: #f1f5f9; border-radius: 10px;">
+                            <div class="progress-bar ${colorBarra}" role="progressbar" style="width: ${valorPorcentaje > 100 ? 100 : valorPorcentaje}%; border-radius: 10px;"></div>
                         </div>
                     </div>
-                </div>`;
+                </div>
+            </div>`;
+    });
 
-            grid.insertAdjacentHTML('beforeend', cardHtml);
-
-            setTimeout(() => {
-                const ctx = document.getElementById(`chartArea-${index}`).getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: [porcentaje, restante < 0 ? 0 : restante],
-                            backgroundColor: [colorHex, '#f1f5f9'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        cutout: '75%',
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
-                    }
-                });
-            }, 50);
-        });
-    }
+    contenedorHtml += `</div></div>`;
+    grid.insertAdjacentHTML('beforeend', contenedorHtml);
+}
 
     function procesarTablasDATA2(data2) {
-        const tbodyAlmacen = document.getElementById('tbodyAlmacen');
-        const tbodyCriticos = document.getElementById('tbodyCriticos');
-        tbodyAlmacen.innerHTML = "";
-        tbodyCriticos.innerHTML = "";
+    const tbodyAlmacen = document.getElementById('tbodyAlmacen');
+    const tbodyCriticos = document.getElementById('tbodyCriticos');
+    tbodyAlmacen.innerHTML = "";
+    tbodyCriticos.innerHTML = "";
 
-        let totalAlm = 0, sumaAlm = 0, criticosAlm = 0, totalCriticos = 0;
-        let conteoAreasCriticas = {};
+    let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
+    let conteoAreasCriticas = {};
 
-        data2.forEach(row => {
-            let dni = row["DNI"] || "";
-            let nombre = row["NOMBRE"] || "";
-            let area = row["AREA"] || "";
-            let cumpliRaw = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || 0);
+    data2.forEach(row => {
+        let dni = row["DNI"] || "";
+        let nombre = row["NOMBRE"] || "";
+        let area = row["AREA"] || "";
+        let cumpliRaw = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || 0);
 
-            if (!nombre || nombre.includes("Total general") || nombre.startsWith("Etiquetas")) return;
+        if (!nombre || nombre.includes("Total general") || nombre.startsWith("Etiquetas") || nombre.toUpperCase().includes("DETALLE DE")) return;
 
-            let num = parseFloat(cumpliRaw);
-            if (isNaN(num)) return;
-            let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
-            let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
+        let num = parseFloat(cumpliRaw);
+        if (isNaN(num)) return;
+        let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
+        let valorPorcentaje = parseFloat(porcentaje);
+        let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
 
-            let colorBadge = "bg-success";
-            if(porcentaje < 95) colorBadge = "bg-danger";
-            else if(porcentaje < 98) colorBadge = "bg-warning text-dark";
+        // Lógica del Semáforo Dinámico 🔴 🟡 🟢
+        let textColor = "text-success";
+        let semaforoEmoji = "🟢";
 
-            // Lógica Pestaña Almacén
-            if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
-                totalAlm++;
-                sumaAlm += parseFloat(porcentaje);
-                if (parseFloat(porcentaje) < 95) criticosAlm++;
-
-                tbodyAlmacen.innerHTML += `
-                    <tr>
-                        <td><span class="badge bg-light text-dark border">${area}</span></td>
-                        <td><code class="text-dark">${dni}</code></td>
-                        <td class="fw-semibold">
-                            <div class="avatar-circle">${iniciales}</div>${nombre}
-                        </td>
-                        <td class="text-center"><span class="badge ${colorBadge} px-3 py-2" style="border-radius:6px;">${porcentaje}%</span></td>
-                    </tr>`;
-            }
-
-            // Lógica Pestaña Críticos
-            if (parseFloat(porcentaje) < 95 && parseFloat(porcentaje) > 0) {
-                totalCriticos++;
-                conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
-
-                tbodyCriticos.innerHTML += `
-                    <tr>
-                        <td><span class="badge bg-light text-secondary">${area}</span></td>
-                        <td><code>${dni}</code></td>
-                        <td class="fw-semibold text-dark">
-                            <div class="avatar-circle bg-danger-subtle text-danger">${iniciales}</div>${nombre}
-                        </td>
-                        <td class="text-center"><span class="badge bg-danger px-3 py-2" style="border-radius:6px;">${porcentaje}%</span></td>
-                    </tr>`;
-            }
-        });
-
-        // Alimentar Mini Tarjetas de Almacén
-        document.getElementById('miniAlmTotal').innerText = totalAlm;
-        let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
-        document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
-        document.getElementById('barAlmPromedio').style.width = promFinal + "%";
-
-        // Alimentar Mini Tarjetas de Críticos
-        document.getElementById('kpiCriticos').innerText = totalCriticos;
-        document.getElementById('miniCritTotal').innerText = totalCriticos;
-
-        let areaMasCritica = "Ninguna";
-        let maxAlertas = 0;
-        for (const [area, value] of Object.entries(conteoAreasCriticas)) {
-            if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
+        if (valorPorcentaje < 95.0) {
+            textColor = "text-danger";
+            semaforoEmoji = "🔴";
         }
-        document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
+        else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
+            textColor = "text-warning-emphasis";
+            semaforoEmoji = "🟡";
+        }
+
+        // Celda de cumplimiento ultra-compacta
+        let celdaSemaforoHtml = `
+            <div class="d-flex align-items-center justify-content-center fw-bold ${textColor}" style="font-size: 0.82rem; gap: 4px;">
+                <span>${semaforoEmoji}</span>
+                <span>${porcentaje}%</span>
+            </div>`;
+
+        // Lógica Pestaña Almacén
+        if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
+            totalAlm++;
+            sumaAlm += valorPorcentaje;
+
+            tbodyAlmacen.innerHTML += `
+                <tr style="height: 34px;">
+                    <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${area}</span></td>
+                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${dni}</small></td>
+                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
+                        <div class="avatar-circle" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${iniciales}</div>${nombre}
+                    </td>
+                    <td class="text-center" style="padding: 4px 10px;">${celdaSemaforoHtml}</td>
+                </tr>`;
+        }
+
+        // Lógica Pestaña Bajo Cumplimiento
+        if (valorPorcentaje < 95.0 && valorPorcentaje > 0) {
+            totalCriticos++;
+            conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
+
+            tbodyCriticos.innerHTML += `
+                <tr style="height: 34px;">
+                    <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${area}</span></td>
+                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${dni}</small></td>
+                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
+                        <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${iniciales}</div>${nombre}
+                    </td>
+                    <td class="text-center" style="padding: 4px 10px;">${celdaSemaforoHtml}</td>
+                </tr>`;
+        }
+    });
+
+    // Alimentar Módulos de KPI Almacén
+    document.getElementById('miniAlmTotal').innerText = totalAlm;
+    let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
+    document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
+
+    // Alimentar Módulos de KPI Bajo Cumplimiento
+    document.getElementById('kpiCriticos').innerText = totalCriticos;
+    document.getElementById('miniCritTotal').innerText = totalCriticos;
+
+    let areaMasCritica = "Ninguna";
+    let maxAlertas = 0;
+    for (const [area, value] of Object.entries(conteoAreasCriticas)) {
+        if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
     }
+    document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
+}
 
     /* MODIFICADO ÚNICAMENTE: Ajuste de asignación limpia de áreas en incidencias */
     function procesarIncidenciasDATA5(data) {
-        let lTardanzas = [], lOmisiones = [], lInasistencias = [];
+    let lTardanzas = [], lOmisiones = [], lInasistencias = [];
 
-        data.forEach(row => {
-            const dni = row["DNI"] || "";
-            const nombre = row["NOMBRE"] || row["FULLNM"] || "";
-            const fecha = row["FECHA"] || "";
+    data.forEach(row => {
+        const dni = row["DNI"] || "";
+        const nombre = row["NOMBRE"] || row["FULLNM"] || "";
+        const fecha = row["FECHA"] || "";
+        if(!dni || String(dni).includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) return;
 
-            // Limpieza y validación inteligente del Área para evitar textos auxiliares como BAÑOS o GAS
-            let areaRaw = row["AREA"] || row["AREAS"] || "";
-            let seccion2 = row["SECCION2"] || row["SECCION"] || "";
-            let areaFinal = areaRaw;
+        let areaRaw = row["AREA"] || row["AREAS"] || "";
+        let seccion2 = row["SECCION2"] || row["SECCION"] || "";
+        let areaFinal = areaRaw;
 
-            // Si el campo AREA tiene la glosa de la tienda o es muy larga, limpiamos con la sección limpia secundaria
-            if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
-                if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
-                    areaFinal = seccion2;
-                }
+        if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
+            if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
+                areaFinal = seccion2;
             }
+        }
 
-            let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
-            if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-                lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
-            }
+        // Capturar Tardanzas
+        let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
+        if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+            lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+        }
 
-            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
-            if (omision && omision !== "00:00" && omision !== "0") {
-                lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
-            }
+        // Capturar Omisiones
+        let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+        if (omision && omision !== "00:00" && omision !== "0") {
+            lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+        }
 
-            let falta = row["Falta injus"] ? String(row["Falta injus"]).trim() : "";
-            if (falta && falta !== "00:00" && falta !== "0") {
-                lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
-            }
-        });
+        // Capturar Inasistencias
+        let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
+        let faltaStr = String(falta).trim();
+        if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
+            lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
+        }
+    });
 
-        document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
-        document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
-        document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
+    // Inyectar contadores superiores
+    document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
+    document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
+    document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
 
-        document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td>${x.fecha}</td><td class="text-center"><span class="badge bg-warning-subtle text-warning fw-bold border border-warning px-2 py-1">${x.valor}</span></td></tr>`).join('');
-        document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td>${x.fecha}</td><td class="text-center"><span class="badge bg-light text-dark border px-2 py-1">${x.valor}</span></td></tr>`).join('');
-        document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `<tr><td>${x.dni}</td><td class="fw-semibold">${x.nombre}</td><td><span class="badge bg-light text-dark border">${x.area}</span></td><td class="text-center"><span class="badge bg-primary-subtle text-primary border border-primary px-3">${x.fecha}</span></td></tr>`).join('');
-    }
+    // RENDERIZADO ULTRA-COMPACTO DE TABLAS (Reducción Visual)
+
+    // 1. Tabla de Tardanzas
+    document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `
+        <tr style="height: 34px;">
+            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+            <td class="text-center" style="padding: 4px 10px;">
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏱️ ${x.valor}</span>
+            </td>
+        </tr>
+    `).join('');
+
+    // 2. Tabla de Omisiones
+    document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `
+        <tr style="height: 34px;">
+            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+            <td class="text-center" style="padding: 4px 10px;">
+                <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
+            </td>
+        </tr>
+    `).join('');
+
+    // 3. Tabla de Inasistencias
+    document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `
+        <tr style="height: 34px;">
+            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+            <td class="text-center" style="padding: 4px 10px;">
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2" style="font-size: 0.75rem; padding: 2px 6px;">⚠️ ${x.fecha}</span>
+            </td>
+        </tr>
+    `).join('');
+}
 
     document.querySelectorAll('.buscador').forEach(input => {
         input.oninput = (e) => {
