@@ -64,7 +64,7 @@
         }
         #sidebar ul li button.active { background: #ff3b30; color: white; }
 
-        #content { flex-grow: 1; padding: 30px; background: var(--bg-light); }
+        #content { flex-grow: 1; padding: 30px; background: var(--bg-light); overflow-x: hidden; }
 
         .main-card {
             background: #fff;
@@ -162,9 +162,8 @@
 
         .custom-table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
         .table { margin-bottom: 0; }
-        .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-uppercase: true; font-size: 0.8rem; padding: 14px; }
+        .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 14px; }
         .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
-        .badge-percentage { font-weight: 600; padding: 6px 12px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -175,7 +174,7 @@
             <h5 class="m-0 fw-bold text-white d-flex align-items-center">
                 <i class="bi bi-grid-1x2-fill text-danger me-2"></i> PROMART
             </h5>
-            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
+            <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
         </div>
 
         <ul class="components">
@@ -226,7 +225,7 @@
 
             <div class="panel-custom d-none" id="panel-dashboard">
                 <div class="main-card">
-                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill text-danger me-2"></i>Cumplimiento General por Áreas (DATA 1)</h5>
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill text-danger me-2"></i>CUMPLIMIENTO POR ÁREAS</h5>
                     <div class="row g-4" id="gridGraficos"></div>
                 </div>
             </div>
@@ -263,76 +262,136 @@
 
                 <div class="main-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold m-0">Lista Detallada de Personal Almacén</h5>
+                        <h5 class="fw-bold m-0">REPORTE DE CUMPLIMIENTO ALMACÉN</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyAlmacen" placeholder="Buscar por colaborador...">
                     </div>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🎨 Filtrar por Semáforo:</div>
+                        <select id="filtroSemaforoAlm" class="form-select form-select-sm" style="width: 160px;" onchange="aplicarFiltrosAlmacen()">
+                            <option value="TODOS">(Mostrar Todos)</option>
+                            <option value="🔴">🔴 Solo Rojos (&lt; 95%)</option>
+                            <option value="🟡">🟡 Solo Amarillos (95% - 98.5%)</option>
+                            <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar por %:</div>
+                        <select id="ordenPrecioAlm" class="form-select form-select-sm" style="width: 190px;" onchange="aplicarFiltrosAlmacen()">
+                            <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
+                            <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                        </select>
+                    </div>
+
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>Área / Operación</th><th>DNI</th><th>Colaborador</th><th class="text-center">Porcentaje Cumplimiento</th></tr>
+                            <tr>
+                                <th>Área / Operación</th>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th class="text-center">Porcentaje Cumplimiento</th>
+                            </tr>
                             </thead>
                             <tbody id="tbodyAlmacen"></tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-
-            <div class="panel-custom d-none" id="panel-criticos-det">
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="image-style-card">
-                            <div class="image-card-left">
-                                <div class="image-card-icon-container bg-danger-subtle text-danger"><i class="bi bi-shadow-lock-fill"></i></div>
-                                <div class="image-card-info-block">
-                                    <p class="image-card-title">Alerta de Personal</p>
-                                    <p class="image-card-subtitle">Total de Casos Críticos</p>
-                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-danger" style="width: 100%;"></div></div>
-                                </div>
+            </div> <div class="panel-custom d-none" id="panel-criticos-det">
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="image-style-card">
+                        <div class="image-card-left">
+                            <div class="image-card-icon-container bg-danger-subtle text-danger"><i class="bi bi-shield-lock-fill"></i></div>
+                            <div class="image-card-info-block">
+                                <p class="image-card-title">Alerta de Personal</p>
+                                <p class="image-card-subtitle">Total de Casos Críticos</p>
+                                <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-danger" style="width: 100%;"></div></div>
                             </div>
-                            <div class="image-card-right-value text-danger" id="miniCritTotal">0</div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="image-style-card">
-                            <div class="image-card-left">
-                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-building"></i></div>
-                                <div class="image-card-info-block">
-                                    <p class="image-card-title">Foco de Atención</p>
-                                    <p class="image-card-subtitle" id="miniCritArea" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguna</p>
-                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
-                                </div>
-                            </div>
-                            <div class="image-card-right-value text-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
-                        </div>
+                        <div class="image-card-right-value text-danger" id="miniCritTotal">0</div>
                     </div>
                 </div>
-
-                <div class="main-card border-start border-danger border-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-danger m-0">Personal por Debajo del Objetivo</h5>
-                        <input type="text" class="form-control w-25 buscador" data-target="tbodyCriticos" placeholder="Filtrar críticos...">
-                    </div>
-                    <div class="custom-table-container">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-danger">
-                            <tr><th>Área Perteneciente</th><th>DNI</th><th>Nombre y Apellidos</th><th class="text-center">Cumplimiento Bajo</th></tr>
-                            </thead>
-                            <tbody id="tbodyCriticos"></tbody>
-                        </table>
+                <div class="col-md-6">
+                    <div class="image-style-card">
+                        <div class="image-card-left">
+                            <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-building"></i></div>
+                            <div class="image-card-info-block">
+                                <p class="image-card-title">Foco de Atención</p>
+                                <p class="image-card-subtitle" id="miniCritArea" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguna</p>
+                                <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="image-card-right-value text-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
                     </div>
                 </div>
             </div>
+
+            <div class="main-card border-start border-danger border-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-danger m-0">COLABORADORES CON CUMPLIMIENTO MENOR AL 95%</h5>
+                    <input type="text" class="form-control w-25 buscador" data-target="tbodyCriticos" placeholder="Filtrar críticos...">
+                </div>
+                <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                    <div class="small fw-semibold text-muted me-1">🎨 Filtrar por Semáforo:</div>
+                    <select id="filtroSemaforoCrit" class="form-select form-select-sm" style="width: 160px;" onchange="aplicarFiltrosCriticos()">
+                        <option value="TODOS">(Mostrar Todos)</option>
+                        <option value="🔴">🔴 Solo Rojos (&lt; 95%)</option>
+                        <option value="🟡">🟡 Solo Amarillos (95% - 98.5%)</option>
+                        <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
+                    </select>
+                    <div class="small fw-semibold text-muted ms-2 me-1">🏢 Filtrar Área:</div>
+                    <select id="filtroAreaCrit" class="form-select form-select-sm" style="width: 180px;" onchange="aplicarFiltrosCriticos()">
+                        <option value="TODOS">(Todas las Áreas)</option>
+                    </select>
+                    <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar por %:</div>
+                    <select id="ordenPrecioCrit" class="form-select form-select-sm" style="width: 190px;" onchange="aplicarFiltrosCriticos()">
+                        <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
+                        <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                    </select>
+                </div>
+                <div class="custom-table-container">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-danger">
+                        <tr>
+                            <th>Área Perteneciente</th>
+                            <th>DNI</th>
+                            <th>Nombre y Apellidos</th>
+                            <th class="text-center">Cumplimiento Bajo</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbodyCriticos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
             <div class="panel-custom d-none" id="panel-tardanzas-det">
                 <div class="main-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-warning m-0"><i class="bi bi-clock-fill me-2"></i>Reporte Analítico de Tardanzas</h5>
+                        <h5 class="fw-bold text-warning m-0"><i class="bi bi-clock-fill me-2"></i>REPORTE DE TARDANZAS</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyTardanzas" placeholder="Filtrar tardanzas...">
+                    </div>
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
+                        <select id="filtroAreaTard" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="TODOS">(Todas las Áreas)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
+                        <select id="filtroFechaTard" class="form-select form-select-sm" style="width: 150px;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="TODOS">(Todas las Fechas)</option>
+                        </select>
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Tiempo de Tardanza</th></tr>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Tiempo de Tardanza</th>
+                            </tr>
                             </thead>
                             <tbody id="tbodyTardanzas"></tbody>
                         </table>
@@ -343,13 +402,30 @@
             <div class="panel-custom d-none" id="panel-omisiones-det">
                 <div class="main-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-eraser-fill me-2"></i>Omisiones de Marca Detectadas</h5>
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-eraser-fill me-2"></i>REPORTE OMISIÓN DE MARCAJES</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyOmisiones" placeholder="Filtrar omisiones...">
+                    </div>
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
+                        <select id="filtroAreaOmis" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarOmisiones()">
+                            <option value="TODOS">(Todas las Áreas)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
+                        <select id="filtroFechaOmis" class="form-select form-select-sm" style="width: 150px;" onchange="filtrarYRenderizarOmisiones()">
+                            <option value="TODOS">(Todas las Fechas)</option>
+                        </select>
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th>Fecha</th><th class="text-center">Tiempo de Marca Omitida</th></tr>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Tiempo de Marca Omitida</th>
+                            </tr>
                             </thead>
                             <tbody id="tbodyOmisiones"></tbody>
                         </table>
@@ -360,13 +436,18 @@
             <div class="panel-custom d-none" id="panel-inasistencias-det">
                 <div class="main-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-primary m-0"><i class="bi bi-x-octagon-fill me-2"></i>Faltas Injustificadas</h5>
+                        <h5 class="fw-bold text-primary m-0"><i class="bi bi-x-octagon-fill me-2"></i>REPORTE DE INASISTENCIAS</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyInasistencias" placeholder="Filtrar inasistencias...">
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
-                            <tr><th>DNI</th><th>Colaborador</th><th>Área</th><th class="text-center">Fecha Inasistencia</th></tr>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th class="text-center">Fecha Inasistencia</th>
+                            </tr>
                             </thead>
                             <tbody id="tbodyInasistencias"></tbody>
                         </table>
@@ -374,12 +455,16 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-</div>
+        </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Navegación
+    // Variables globales para almacenar los datos limpios y permitir el filtrado reactivo
+    let datosAlmacenGlobal = [];
+    let datosCriticosGlobal = [];
+    let datosTardanzasGlobal = [];
+    let datosOmisionesGlobal = [];
+
+    // Navegación entre pestañas laterales
     const navButtons = document.querySelectorAll('.tab-nav-btn');
     const panels = document.querySelectorAll('.panel-custom');
     const dinamicTitle = document.getElementById('dinamicTitle');
@@ -391,13 +476,15 @@
 
             btn.classList.add('active');
             const targetPanel = document.getElementById(btn.getAttribute('data-target'));
-            targetPanel.classList.remove('d-none');
+            if (targetPanel) {
+                targetPanel.classList.remove('d-none');
+            }
 
             dinamicTitle.innerText = btn.innerText.trim();
         };
     });
 
-    // Carga de archivo
+    // Carga de archivo Excel (Drag and Drop o Selección Directa)
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const btnProcesar = document.getElementById('btnProcesar');
@@ -419,6 +506,7 @@
         }
     }
 
+    // Procesamiento del Libro de Excel al dar Clic en "Generar Dashboard"
     btnProcesar.onclick = () => {
         const file = window.archivoSeleccionado;
         const reader = new FileReader();
@@ -437,6 +525,7 @@
             let data2 = hojas["DATA 2"] || hojas["DATA2"] || [];
             let data5 = hojas["DATA 5"] || hojas["DATA5"] || [];
 
+            // Habilitar los botones de navegación del Sidebar
             document.getElementById('btnMenuDash').disabled = false;
             document.getElementById('btnMenuAlm').disabled = false;
             document.getElementById('btnMenuCrit').disabled = false;
@@ -444,82 +533,100 @@
             document.getElementById('btnMenuOmis').disabled = false;
             document.getElementById('btnMenuInas').disabled = false;
 
+            // Mostrar el bloque superior de indicadores KPIs
             document.getElementById('kpiRow').style.display = 'flex';
 
+            // Ejecutar el renderizado modular de datos
             renderizarAnillosDATA1(data1);
             procesarTablasDATA2(data2);
             procesarIncidenciasDATA5(data5);
 
+            // Redirigir automáticamente a la pestaña de Gráficos/Resúmenes
             document.getElementById('btnMenuDash').click();
         };
         reader.readAsBinaryString(file);
     };
 
+    // Renderizado Ejecutivo de Tarjetas de Progreso (DATA 1)
     function renderizarAnillosDATA1(data) {
-    const grid = document.getElementById('gridGraficos');
-    grid.innerHTML = "";
-    if(!data.length) return;
+        const grid = document.getElementById('gridGraficos');
+        grid.innerHTML = "";
+        if(!data.length) return;
 
-    // Cambiamos la estructura del grid para que use filas completas y limpias
-    let contenedorHtml = `<div class="col-12"><div class="row g-3">`;
+        let areasProcesadas = [];
 
-    data.forEach((row, index) => {
-        let area = row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "";
-        let cumpli = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || "");
+        data.forEach((row) => {
+            let area = row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "";
+            let cumpli = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || "");
 
-        if(!area || area.includes("Total general") || area.startsWith("Etiquetas") || area.toUpperCase().includes("REPORTE")) return;
+            if(!area || area.includes("Total general") || area.startsWith("Etiquetas") || area.toUpperCase().includes("REPORTE")) return;
 
-        let num = parseFloat(cumpli);
-        if (isNaN(num)) return;
+            let num = parseFloat(cumpli);
+            if (isNaN(num)) return;
 
-        let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
-        let valorPorcentaje = parseFloat(porcentaje);
+            let porcentajeNum = num <= 1 ? num * 100 : num;
 
-        // Definición de colores según tus rangos oficiales
-        let colorBarra = "bg-success";
-        let textClass = "text-success";
-        let semaforoEmoji = "🟢";
+            areasProcesadas.push({
+                row: row,
+                area: area,
+                valorPorcentaje: porcentajeNum,
+                porcentajeStr: porcentajeNum.toFixed(1)
+            });
+        });
 
-        if (valorPorcentaje < 95.0) {
-            colorBarra = "bg-danger";
-            textClass = "text-danger";
-            semaforoEmoji = "🔴";
-        }
-        else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
-            colorBarra = "bg-warning";
-            textClass = "text-warning-emphasis";
-            semaforoEmoji = "🟡";
-        }
+        // Ordenar las tarjetas de mayor a menor cumplimiento por defecto
+        areasProcesadas.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
 
-        // Diseño ultra compacto en formato de barra horizontal inteligente
-        contenedorHtml += `
-            <div class="col-md-6 col-lg-4">
-                <div class="p-2 bg-white border rounded-3 shadow-sm d-flex align-items-center justify-content-between" style="height: 52px; border-color: #e2e8f0 !important;">
-                    <div class="flex-grow-1 min-w-0 me-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-truncate fw-semibold text-dark small" style="font-size: 0.85rem;" title="${area}">${area}</span>
-                            <span class="fw-bold ${textClass} small" style="font-size: 0.85rem;">${semaforoEmoji} ${porcentaje}%</span>
-                        </div>
-                        <div class="progress" style="height: 6px; background-color: #f1f5f9; border-radius: 10px;">
-                            <div class="progress-bar ${colorBarra}" role="progressbar" style="width: ${valorPorcentaje > 100 ? 100 : valorPorcentaje}%; border-radius: 10px;"></div>
+        let contenedorHtml = `<div class="col-12"><div class="row g-3">`;
+
+        areasProcesadas.forEach((item) => {
+            let area = item.area;
+            let porcentaje = item.porcentajeStr;
+            let valorPorcentaje = item.valorPorcentaje;
+
+            let colorBarra = "bg-success";
+            let textClass = "text-success";
+            let semaforoEmoji = "🟢";
+
+            if (valorPorcentaje < 95.0) {
+                colorBarra = "bg-danger";
+                textClass = "text-danger";
+                semaforoEmoji = "🔴";
+            }
+            else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
+                colorBarra = "bg-warning";
+                textClass = "text-warning-emphasis";
+                semaforoEmoji = "🟡";
+            }
+
+            contenedorHtml += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-2 bg-white border rounded-3 shadow-sm d-flex align-items-center justify-content-between" style="height: 52px; border-color: #e2e8f0 !important;">
+                        <div class="flex-grow-1 min-w-0 me-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-truncate fw-semibold text-dark small" style="font-size: 0.85rem;" title="${area}">${area}</span>
+                                <span class="fw-bold ${textClass} small" style="font-size: 0.85rem;">${semaforoEmoji} ${porcentaje}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #f1f5f9; border-radius: 10px;">
+                                <div class="progress-bar ${colorBarra}" role="progressbar" style="width: ${valorPorcentaje > 100 ? 100 : valorPorcentaje}%; border-radius: 10px;"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>`;
-    });
+                </div>`;
+        });
 
-    contenedorHtml += `</div></div>`;
-    grid.insertAdjacentHTML('beforeend', contenedorHtml);
-}
+        contenedorHtml += `</div></div>`;
+        grid.insertAdjacentHTML('beforeend', contenedorHtml);
+    }
 
+    // Mapeo, Filtros y Acumuladores de Colaboradores (DATA 2)
     function procesarTablasDATA2(data2) {
-    const tbodyAlmacen = document.getElementById('tbodyAlmacen');
-    const tbodyCriticos = document.getElementById('tbodyCriticos');
-    tbodyAlmacen.innerHTML = "";
-    tbodyCriticos.innerHTML = "";
+    datosAlmacenGlobal = [];
+    datosCriticosGlobal = [];
 
     let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
     let conteoAreasCriticas = {};
+    let areasUnicasCrit = new Set(); // Para el nuevo selector
 
     data2.forEach(row => {
         let dni = row["DNI"] || "";
@@ -535,7 +642,6 @@
         let valorPorcentaje = parseFloat(porcentaje);
         let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
 
-        // Lógica del Semáforo Dinámico 🔴 🟡 🟢
         let textColor = "text-success";
         let semaforoEmoji = "🟢";
 
@@ -548,52 +654,35 @@
             semaforoEmoji = "🟡";
         }
 
-        // Celda de cumplimiento ultra-compacta
-        let celdaSemaforoHtml = `
-            <div class="d-flex align-items-center justify-content-center fw-bold ${textColor}" style="font-size: 0.82rem; gap: 4px;">
-                <span>${semaforoEmoji}</span>
-                <span>${porcentaje}%</span>
-            </div>`;
+        let objetoPersona = { dni, nombre, area, porcentaje, valorPorcentaje, iniciales, textColor, semaforoEmoji };
 
-        // Lógica Pestaña Almacén
         if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
             totalAlm++;
             sumaAlm += valorPorcentaje;
-
-            tbodyAlmacen.innerHTML += `
-                <tr style="height: 34px;">
-                    <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${area}</span></td>
-                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${dni}</small></td>
-                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
-                        <div class="avatar-circle" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${iniciales}</div>${nombre}
-                    </td>
-                    <td class="text-center" style="padding: 4px 10px;">${celdaSemaforoHtml}</td>
-                </tr>`;
+            datosAlmacenGlobal.push(objetoPersona);
         }
 
-        // Lógica Pestaña Bajo Cumplimiento
         if (valorPorcentaje < 95.0 && valorPorcentaje > 0) {
             totalCriticos++;
             conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
-
-            tbodyCriticos.innerHTML += `
-                <tr style="height: 34px;">
-                    <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${area}</span></td>
-                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${dni}</small></td>
-                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
-                        <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${iniciales}</div>${nombre}
-                    </td>
-                    <td class="text-center" style="padding: 4px 10px;">${celdaSemaforoHtml}</td>
-                </tr>`;
+            datosCriticosGlobal.push(objetoPersona);
+            if(area) areasUnicasCrit.add(area); // Guardar área crítica
         }
     });
 
-    // Alimentar Módulos de KPI Almacén
+    // Rellenar dinámicamente el selector de áreas críticas
+    const selectAreaCrit = document.getElementById('filtroAreaCrit');
+    if (selectAreaCrit) {
+        selectAreaCrit.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
+        Array.from(areasUnicasCrit).sort().forEach(a => {
+            selectAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
+        });
+    }
+
     document.getElementById('miniAlmTotal').innerText = totalAlm;
     let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
     document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
 
-    // Alimentar Módulos de KPI Bajo Cumplimiento
     document.getElementById('kpiCriticos').innerText = totalCriticos;
     document.getElementById('miniCritTotal').innerText = totalCriticos;
 
@@ -603,98 +692,209 @@
         if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
     }
     document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
+
+    if(document.getElementById('filtroSemaforoAlm')) document.getElementById('filtroSemaforoAlm').value = "TODOS";
+    if(document.getElementById('ordenPrecioAlm')) document.getElementById('ordenPrecioAlm').value = "MAYOR_MENOR";
+    if(document.getElementById('filtroSemaforoCrit')) document.getElementById('filtroSemaforoCrit').value = "TODOS";
+    if(document.getElementById('filtroAreaCrit')) document.getElementById('filtroAreaCrit').value = "TODOS";
+    if(document.getElementById('ordenPrecioCrit')) document.getElementById('ordenPrecioCrit').value = "MAYOR_MENOR";
+
+    aplicarFiltrosAlmacen();
+    aplicarFiltrosCriticos();
 }
 
-    /* MODIFICADO ÚNICAMENTE: Ajuste de asignación limpia de áreas en incidencias */
-    function procesarIncidenciasDATA5(data) {
-    let lTardanzas = [], lOmisiones = [], lInasistencias = [];
+    // Filtrado y Ordenamiento Inteligente de Personal Almacén
+    function aplicarFiltrosAlmacen() {
+        const colorSeleccionado = document.getElementById('filtroSemaforoAlm')?.value || "TODOS";
+        const ordenSeleccionado = document.getElementById('ordenPrecioAlm')?.value || "MAYOR_MENOR";
+        const tbodyAlmacen = document.getElementById('tbodyAlmacen');
 
-    data.forEach(row => {
-        const dni = row["DNI"] || "";
-        const nombre = row["NOMBRE"] || row["FULLNM"] || "";
-        const fecha = row["FECHA"] || "";
-        if(!dni || String(dni).includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) return;
+        if (!tbodyAlmacen) return;
+        tbodyAlmacen.innerHTML = "";
 
-        let areaRaw = row["AREA"] || row["AREAS"] || "";
-        let seccion2 = row["SECCION2"] || row["SECCION"] || "";
-        let areaFinal = areaRaw;
-
-        if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
-            if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
-                areaFinal = seccion2;
-            }
+        let datosFiltrados = [...datosAlmacenGlobal];
+        if (colorSeleccionado !== "TODOS") {
+            datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
         }
 
-        // Capturar Tardanzas
-        let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
-        if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-            lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+        if (ordenSeleccionado === "MAYOR_MENOR") {
+            datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+        } else {
+            datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
         }
 
-        // Capturar Omisiones
-        let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
-        if (omision && omision !== "00:00" && omision !== "0") {
-            lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
-        }
+        datosFiltrados.forEach(x => {
+            tbodyAlmacen.innerHTML += `
+                <tr style="height: 34px;">
+                    <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
+                        <div class="avatar-circle" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
+                    </td>
+                    <td class="text-center" style="padding: 4px 10px;">
+                        <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
+                            <span>${x.semaforoEmoji}</span>
+                            <span>${x.porcentaje}%</span>
+                        </div>
+                    </td>
+                </tr>`;
+        });
 
-        // Capturar Inasistencias
-        let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
-        let faltaStr = String(falta).trim();
-        if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-            lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
-        }
+        ejecutarBuscadorTextoPlano('tbodyAlmacen');
+    }
+
+    // Renderizado de Casos de Bajo Cumplimiento
+    // Función Reactiva para la pestaña de Bajo Cumplimiento (CORREGIDA)
+function aplicarFiltrosCriticos() {
+    const colorSeleccionado = document.getElementById('filtroSemaforoCrit')?.value || "TODOS";
+    const areaSeleccionada = document.getElementById('filtroAreaCrit')?.value || "TODOS";
+    const ordenSeleccionado = document.getElementById('ordenPrecioCrit')?.value || "MAYOR_MENOR";
+    const tbodyCriticos = document.getElementById('tbodyCriticos');
+
+    if (!tbodyCriticos) return;
+    tbodyCriticos.innerHTML = "";
+
+    let datosFiltrados = [...datosCriticosGlobal];
+
+    // 1. Filtrar por color de Semáforo
+    if (colorSeleccionado !== "TODOS") {
+        datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
+    }
+
+    // 2. Filtrar por Área específica
+    if (areaSeleccionada !== "TODOS") {
+        datosFiltrados = datosFiltrados.filter(p => p.area === areaSeleccionada);
+    }
+
+    // 3. Ordenar por Porcentaje
+    if (ordenSeleccionado === "MAYOR_MENOR") {
+        datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+    } else {
+        datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
+    }
+
+    datosFiltrados.forEach(x => {
+        tbodyCriticos.innerHTML += `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
+                    <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
+                </td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
+                        <span>${x.semaforoEmoji}</span>
+                        <span>${x.porcentaje}%</span>
+                    </div>
+                </td>
+            </tr>`;
     });
 
-    // Inyectar contadores superiores
-    document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
-    document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
-    document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
-
-    // RENDERIZADO ULTRA-COMPACTO DE TABLAS (Reducción Visual)
-
-    // 1. Tabla de Tardanzas
-    document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `
-        <tr style="height: 34px;">
-            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
-            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
-            <td class="text-center" style="padding: 4px 10px;">
-                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏱️ ${x.valor}</span>
-            </td>
-        </tr>
-    `).join('');
-
-    // 2. Tabla de Omisiones
-    document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `
-        <tr style="height: 34px;">
-            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
-            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
-            <td class="text-center" style="padding: 4px 10px;">
-                <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
-            </td>
-        </tr>
-    `).join('');
-
-    // 3. Tabla de Inasistencias
-    document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `
-        <tr style="height: 34px;">
-            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
-            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-            <td class="text-center" style="padding: 4px 10px;">
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2" style="font-size: 0.75rem; padding: 2px 6px;">⚠️ ${x.fecha}</span>
-            </td>
-        </tr>
-    `).join('');
+    ejecutarBuscadorTextoPlano('tbodyCriticos');
 }
 
+    // Auxiliar de sincronización para mantener activo el texto del buscador tras filtrar por selectores
+    function ejecutarBuscadorTextoPlano(targetId) {
+        const buscadorInput = document.querySelector(`.buscador[data-target="${targetId}"]`);
+        if (!buscadorInput || !buscadorInput.value) return;
+
+        const query = buscadorInput.value.toLowerCase();
+        const targetBody = document.getElementById(targetId);
+        if(targetBody) {
+            Array.from(targetBody.getElementsByTagName('tr')).forEach(tr => {
+                tr.style.display = tr.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+    }
+
+    // Extracción Analítica de Incidencias (DATA 5)
+    function procesarIncidenciasDATA5(data) {
+        let lTardanzas = [], lOmisiones = [], lInasistencias = [];
+
+        data.forEach(row => {
+            const dni = row["DNI"] || "";
+            const nombre = row["NOMBRE"] || row["FULLNM"] || "";
+            const fecha = row["FECHA"] || "";
+            if(!dni || String(dni).includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) return;
+
+            let areaRaw = row["AREA"] || row["AREAS"] || "";
+            let seccion2 = row["SECCION2"] || row["SECCION"] || "";
+            let areaFinal = areaRaw;
+
+            if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
+                if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
+                    areaFinal = seccion2;
+                }
+            }
+
+            let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
+            if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+                lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+            }
+
+            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+            if (omision && omision !== "00:00" && omision !== "0") {
+                lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+            }
+
+            let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
+            let faltaStr = String(falta).trim();
+            if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
+                lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
+            }
+        });
+
+        // Actualizar Contadores Numéricos en los Indicadores Superiores
+        document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
+        document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
+        document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
+
+        // Inyectar Tabla de Tardanzas
+        document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏱️ ${x.valor}</span>
+                </td>
+            </tr>
+        `).join('');
+
+        // Inyectar Tabla de Omisiones
+        document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
+                </td>
+            </tr>
+        `).join('');
+
+        // Inyectar Tabla de Inasistencias
+        document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2" style="font-size: 0.75rem; padding: 2px 6px;">⚠️ ${x.fecha}</span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Capturador del Buscador en tiempo real por texto
     document.querySelectorAll('.buscador').forEach(input => {
         input.oninput = (e) => {
             const query = e.target.value.toLowerCase();
-            const targetBody = document.getElementById(e.target.getAttribute('data-target'));
+            const targetId = e.target.getAttribute('data-target');
+            const targetBody = document.getElementById(targetId);
+
             if(targetBody) {
                 Array.from(targetBody.getElementsByTagName('tr')).forEach(tr => {
                     tr.style.display = tr.textContent.toLowerCase().includes(query) ? '' : 'none';
@@ -703,7 +903,3 @@
         };
     });
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
