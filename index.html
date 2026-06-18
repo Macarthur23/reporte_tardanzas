@@ -373,13 +373,19 @@
                     </div>
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
-                        <select id="filtroAreaTard" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
+                        <select id="filtroAreaTard" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarTardanzas()">
                             <option value="TODOS">(Todas las Áreas)</option>
                         </select>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
-                        <select id="filtroFechaTard" class="form-select form-select-sm" style="width: 150px;" onchange="filtrarYRenderizarTardanzas()">
+                        <select id="filtroFechaTard" class="form-select form-select-sm" style="width: 140px;" onchange="filtrarYRenderizarTardanzas()">
                             <option value="TODOS">(Todas las Fechas)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
+                        <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="MAYOR_MENOR">Más Tardanza ↓</option>
+                            <option value="MENOR_MAYOR">Menos Tardanza ↑</option>
                         </select>
                     </div>
                     <div class="custom-table-container">
@@ -407,13 +413,19 @@
                     </div>
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
-                        <select id="filtroAreaOmis" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarOmisiones()">
+                        <select id="filtroAreaOmis" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarOmisiones()">
                             <option value="TODOS">(Todas las Áreas)</option>
                         </select>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
-                        <select id="filtroFechaOmis" class="form-select form-select-sm" style="width: 150px;" onchange="filtrarYRenderizarOmisiones()">
+                        <select id="filtroFechaOmis" class="form-select form-select-sm" style="width: 140px;" onchange="filtrarYRenderizarOmisiones()">
                             <option value="TODOS">(Todas las Fechas)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
+                        <select id="ordenTiempoOmis" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarOmisiones()">
+                            <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
+                            <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
                         </select>
                     </div>
                     <div class="custom-table-container">
@@ -434,14 +446,30 @@
             </div>
 
             <div class="panel-custom d-none" id="panel-inasistencias-det">
-                <div class="main-card">
+                <div class="main-card border-start border-danger border-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-primary m-0"><i class="bi bi-x-octagon-fill me-2"></i>REPORTE DE INASISTENCIAS</h5>
+                        <h5 class="fw-bold text-danger m-0">
+                            <i class="bi bi-geo-alt-fill me-2"></i>REPORTE DE INASISTENCIA
+                        </h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyInasistencias" placeholder="Filtrar inasistencias...">
                     </div>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
+                        <select id="filtroAreaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
+                            <option value="TODOS">(Todas las Áreas)</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📅 Ordenar Fecha:</div>
+                        <select id="ordenFechaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
+                            <option value="RECIENTE_ANTIGUO">Más Recientes primero ↓</option>
+                            <option value="ANTIGUO_RECIENTE">Más Antiguas primero ↑</option>
+                        </select>
+                    </div>
+
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
-                            <thead>
+                            <thead class="table-danger">
                             <tr>
                                 <th>DNI</th>
                                 <th>Colaborador</th>
@@ -463,6 +491,28 @@
     let datosCriticosGlobal = [];
     let datosTardanzasGlobal = [];
     let datosOmisionesGlobal = [];
+    let datosInasistenciasGlobal = [];
+
+    // Función de apoyo para convertir "HH:MM" a un número entero de minutos
+    function convertirHoraAMinutos(tiempoStr) {
+        if (!tiempoStr) return 0;
+        const partes = tiempoStr.split(':');
+        if (partes.length < 2) return parseInt(tiempoStr, 10) || 0;
+        const horas = parseInt(partes[0], 10) || 0;
+        const minutos = parseInt(partes[1], 10) || 0;
+        return (horas * 60) + minutos;
+    }
+
+    // Función de apoyo para parsear fechas "DD/MM/AAAA" para ordenamiento preciso
+    function mapearFechaObjeto(fechaStr) {
+        if (!fechaStr) return 0;
+        const partes = fechaStr.split('/');
+        if (partes.length === 3) {
+            // Retorna un formato YYYYMMDD numérico ideal para comparar magnitudes
+            return parseInt(partes[2] + partes[1] + partes[0], 10);
+        }
+        return 0;
+    }
 
     // Navegación entre pestañas laterales
     const navButtons = document.querySelectorAll('.tab-nav-btn');
@@ -621,87 +671,87 @@
 
     // Mapeo, Filtros y Acumuladores de Colaboradores (DATA 2)
     function procesarTablasDATA2(data2) {
-    datosAlmacenGlobal = [];
-    datosCriticosGlobal = [];
+        datosAlmacenGlobal = [];
+        datosCriticosGlobal = [];
 
-    let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
-    let conteoAreasCriticas = {};
-    let areasUnicasCrit = new Set(); // Para el nuevo selector
+        let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
+        let conteoAreasCriticas = {};
+        let areasUnicasCrit = new Set(); // Para el nuevo selector
 
-    data2.forEach(row => {
-        let dni = row["DNI"] || "";
-        let nombre = row["NOMBRE"] || "";
-        let area = row["AREA"] || "";
-        let cumpliRaw = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || 0);
+        data2.forEach(row => {
+            let dni = row["DNI"] || "";
+            let nombre = row["NOMBRE"] || "";
+            let area = row["AREA"] || "";
+            let cumpliRaw = row["% DE CUMPLIMIENTO"] !== undefined ? row["% DE CUMPLIMIENTO"] : (row["CUMPLIMIENTO"] || 0);
 
-        if (!nombre || nombre.includes("Total general") || nombre.startsWith("Etiquetas") || nombre.toUpperCase().includes("DETALLE DE")) return;
+            if (!nombre || nombre.includes("Total general") || nombre.startsWith("Etiquetas") || nombre.toUpperCase().includes("DETALLE DE")) return;
 
-        let num = parseFloat(cumpliRaw);
-        if (isNaN(num)) return;
-        let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
-        let valorPorcentaje = parseFloat(porcentaje);
-        let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
+            let num = parseFloat(cumpliRaw);
+            if (isNaN(num)) return;
+            let porcentaje = num <= 1 ? (num * 100).toFixed(1) : num.toFixed(1);
+            let valorPorcentaje = parseFloat(porcentaje);
+            let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
 
-        let textColor = "text-success";
-        let semaforoEmoji = "🟢";
+            let textColor = "text-success";
+            let semaforoEmoji = "🟢";
 
-        if (valorPorcentaje < 95.0) {
-            textColor = "text-danger";
-            semaforoEmoji = "🔴";
-        }
-        else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
-            textColor = "text-warning-emphasis";
-            semaforoEmoji = "🟡";
-        }
+            if (valorPorcentaje < 95.0) {
+                textColor = "text-danger";
+                semaforoEmoji = "🔴";
+            }
+            else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
+                textColor = "text-warning-emphasis";
+                semaforoEmoji = "🟡";
+            }
 
-        let objetoPersona = { dni, nombre, area, porcentaje, valorPorcentaje, iniciales, textColor, semaforoEmoji };
+            let objetoPersona = { dni, nombre, area, porcentaje, valorPorcentaje, iniciales, textColor, semaforoEmoji };
 
-        if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
-            totalAlm++;
-            sumaAlm += valorPorcentaje;
-            datosAlmacenGlobal.push(objetoPersona);
-        }
+            if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
+                totalAlm++;
+                sumaAlm += valorPorcentaje;
+                datosAlmacenGlobal.push(objetoPersona);
+            }
 
-        if (valorPorcentaje < 95.0 && valorPorcentaje > 0) {
-            totalCriticos++;
-            conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
-            datosCriticosGlobal.push(objetoPersona);
-            if(area) areasUnicasCrit.add(area); // Guardar área crítica
-        }
-    });
-
-    // Rellenar dinámicamente el selector de áreas críticas
-    const selectAreaCrit = document.getElementById('filtroAreaCrit');
-    if (selectAreaCrit) {
-        selectAreaCrit.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
-        Array.from(areasUnicasCrit).sort().forEach(a => {
-            selectAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
+            if (valorPorcentaje < 95.0 && valorPorcentaje > 0) {
+                totalCriticos++;
+                conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
+                datosCriticosGlobal.push(objetoPersona);
+                if(area) areasUnicasCrit.add(area); // Guardar área crítica
+            }
         });
+
+        // Rellenar dinámicamente el selector de áreas críticas
+        const selectAreaCrit = document.getElementById('filtroAreaCrit');
+        if (selectAreaCrit) {
+            selectAreaCrit.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
+            Array.from(areasUnicasCrit).sort().forEach(a => {
+                selectAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
+            });
+        }
+
+        document.getElementById('miniAlmTotal').innerText = totalAlm;
+        let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
+        document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
+
+        document.getElementById('kpiCriticos').innerText = totalCriticos;
+        document.getElementById('miniCritTotal').innerText = totalCriticos;
+
+        let areaMasCritica = "Ninguna";
+        let maxAlertas = 0;
+        for (const [area, value] of Object.entries(conteoAreasCriticas)) {
+            if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
+        }
+        document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
+
+        if(document.getElementById('filtroSemaforoAlm')) document.getElementById('filtroSemaforoAlm').value = "TODOS";
+        if(document.getElementById('ordenPrecioAlm')) document.getElementById('ordenPrecioAlm').value = "MAYOR_MENOR";
+        if(document.getElementById('filtroSemaforoCrit')) document.getElementById('filtroSemaforoCrit').value = "TODOS";
+        if(document.getElementById('filtroAreaCrit')) document.getElementById('filtroAreaCrit').value = "TODOS";
+        if(document.getElementById('ordenPrecioCrit')) document.getElementById('ordenPrecioCrit').value = "MAYOR_MENOR";
+
+        aplicarFiltrosAlmacen();
+        aplicarFiltrosCriticos();
     }
-
-    document.getElementById('miniAlmTotal').innerText = totalAlm;
-    let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
-    document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
-
-    document.getElementById('kpiCriticos').innerText = totalCriticos;
-    document.getElementById('miniCritTotal').innerText = totalCriticos;
-
-    let areaMasCritica = "Ninguna";
-    let maxAlertas = 0;
-    for (const [area, value] of Object.entries(conteoAreasCriticas)) {
-        if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
-    }
-    document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
-
-    if(document.getElementById('filtroSemaforoAlm')) document.getElementById('filtroSemaforoAlm').value = "TODOS";
-    if(document.getElementById('ordenPrecioAlm')) document.getElementById('ordenPrecioAlm').value = "MAYOR_MENOR";
-    if(document.getElementById('filtroSemaforoCrit')) document.getElementById('filtroSemaforoCrit').value = "TODOS";
-    if(document.getElementById('filtroAreaCrit')) document.getElementById('filtroAreaCrit').value = "TODOS";
-    if(document.getElementById('ordenPrecioCrit')) document.getElementById('ordenPrecioCrit').value = "MAYOR_MENOR";
-
-    aplicarFiltrosAlmacen();
-    aplicarFiltrosCriticos();
-}
 
     // Filtrado y Ordenamiento Inteligente de Personal Almacén
     function aplicarFiltrosAlmacen() {
@@ -744,54 +794,53 @@
     }
 
     // Renderizado de Casos de Bajo Cumplimiento
-    // Función Reactiva para la pestaña de Bajo Cumplimiento (CORREGIDA)
-function aplicarFiltrosCriticos() {
-    const colorSeleccionado = document.getElementById('filtroSemaforoCrit')?.value || "TODOS";
-    const areaSeleccionada = document.getElementById('filtroAreaCrit')?.value || "TODOS";
-    const ordenSeleccionado = document.getElementById('ordenPrecioCrit')?.value || "MAYOR_MENOR";
-    const tbodyCriticos = document.getElementById('tbodyCriticos');
+    function aplicarFiltrosCriticos() {
+        const colorSeleccionado = document.getElementById('filtroSemaforoCrit')?.value || "TODOS";
+        const areaSeleccionada = document.getElementById('filtroAreaCrit')?.value || "TODOS";
+        const ordenSeleccionado = document.getElementById('ordenPrecioCrit')?.value || "MAYOR_MENOR";
+        const tbodyCriticos = document.getElementById('tbodyCriticos');
 
-    if (!tbodyCriticos) return;
-    tbodyCriticos.innerHTML = "";
+        if (!tbodyCriticos) return;
+        tbodyCriticos.innerHTML = "";
 
-    let datosFiltrados = [...datosCriticosGlobal];
+        let datosFiltrados = [...datosCriticosGlobal];
 
-    // 1. Filtrar por color de Semáforo
-    if (colorSeleccionado !== "TODOS") {
-        datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
+        // 1. Filtrar por color de Semáforo
+        if (colorSeleccionado !== "TODOS") {
+            datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
+        }
+
+        // 2. Filtrar por Área específica
+        if (areaSeleccionada !== "TODOS") {
+            datosFiltrados = datosFiltrados.filter(p => p.area === areaSeleccionada);
+        }
+
+        // 3. Ordenar por Porcentaje
+        if (ordenSeleccionado === "MAYOR_MENOR") {
+            datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+        } else {
+            datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
+        }
+
+        datosFiltrados.forEach(x => {
+            tbodyCriticos.innerHTML += `
+                <tr style="height: 34px;">
+                    <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
+                        <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
+                    </td>
+                    <td class="text-center" style="padding: 4px 10px;">
+                        <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
+                            <span>${x.semaforoEmoji}</span>
+                            <span>${x.porcentaje}%</span>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+        ejecutarBuscadorTextoPlano('tbodyCriticos');
     }
-
-    // 2. Filtrar por Área específica
-    if (areaSeleccionada !== "TODOS") {
-        datosFiltrados = datosFiltrados.filter(p => p.area === areaSeleccionada);
-    }
-
-    // 3. Ordenar por Porcentaje
-    if (ordenSeleccionado === "MAYOR_MENOR") {
-        datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
-    } else {
-        datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
-    }
-
-    datosFiltrados.forEach(x => {
-        tbodyCriticos.innerHTML += `
-            <tr style="height: 34px;">
-                <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
-                    <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
-                </td>
-                <td class="text-center" style="padding: 4px 10px;">
-                    <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
-                        <span>${x.semaforoEmoji}</span>
-                        <span>${x.porcentaje}%</span>
-                    </div>
-                </td>
-            </tr>`;
-    });
-
-    ejecutarBuscadorTextoPlano('tbodyCriticos');
-}
 
     // Auxiliar de sincronización para mantener activo el texto del buscador tras filtrar por selectores
     function ejecutarBuscadorTextoPlano(targetId) {
@@ -809,7 +858,15 @@ function aplicarFiltrosCriticos() {
 
     // Extracción Analítica de Incidencias (DATA 5)
     function procesarIncidenciasDATA5(data) {
-        let lTardanzas = [], lOmisiones = [], lInasistencias = [];
+        datosTardanzasGlobal = [];
+        datosOmisionesGlobal = [];
+        datosInasistenciasGlobal = [];
+
+        let areasTardanzas = new Set();
+        let fechasTardanzas = new Set();
+        let areasOmisiones = new Set();
+        let fechasOmisiones = new Set();
+        let areasInasistencias = new Set();
 
         data.forEach(row => {
             const dni = row["DNI"] || "";
@@ -829,28 +886,93 @@ function aplicarFiltrosCriticos() {
 
             let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
             if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-                lTardanzas.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+                datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+                if (areaFinal) areasTardanzas.add(areaFinal);
+                if (fecha) fechasTardanzas.add(fecha);
             }
 
             let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
             if (omision && omision !== "00:00" && omision !== "0") {
-                lOmisiones.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+                datosOmisionesGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+                if (areaFinal) areasOmisiones.add(areaFinal);
+                if (fecha) fechasOmisiones.add(fecha);
             }
 
             let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
             let faltaStr = String(falta).trim();
             if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-                lInasistencias.push({ dni, nombre, area: areaFinal, fecha });
+                datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha });
+                if (areaFinal) areasInasistencias.add(areaFinal);
             }
         });
 
-        // Actualizar Contadores Numéricos en los Indicadores Superiores
-        document.getElementById('kpiTardanzas').innerText = lTardanzas.length;
-        document.getElementById('kpiOmisiones').innerText = lOmisiones.length;
-        document.getElementById('kpiInasistencias').innerText = lInasistencias.length;
+        // Actualizar Contadores Numéricos
+        document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
+        document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
+        document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
 
-        // Inyectar Tabla de Tardanzas
-        document.getElementById('tbodyTardanzas').innerHTML = lTardanzas.map(x => `
+        // Configurar selectores de Tardanzas
+        const selAreaTard = document.getElementById('filtroAreaTard');
+        const selFechaTard = document.getElementById('filtroFechaTard');
+        if (selAreaTard) {
+            selAreaTard.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
+            Array.from(areasTardanzas).sort().forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
+        }
+        if (selFechaTard) {
+            selFechaTard.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
+            Array.from(fechasTardanzas).sort().forEach(f => selFechaTard.innerHTML += `<option value="${f}">${f}</option>`);
+        }
+
+        // Configurar selectores de Omisiones
+        const selAreaOmis = document.getElementById('filtroAreaOmis');
+        const selFechaOmis = document.getElementById('filtroFechaOmis');
+        if (selAreaOmis) {
+            selAreaOmis.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
+            Array.from(areasOmisiones).sort().forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
+        }
+        if (selFechaOmis) {
+            selFechaOmis.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
+            Array.from(fechasOmisiones).sort().forEach(f => selFechaOmis.innerHTML += `<option value="${f}">${f}</option>`);
+        }
+
+        // Configurar selector de Inasistencias
+        const selAreaInas = document.getElementById('filtroAreaInas');
+        if (selAreaInas) {
+            selAreaInas.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
+            Array.from(areasInasistencias).sort().forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
+        }
+
+        // Valores iniciales por defecto para los selectores de ordenación
+        if(document.getElementById('ordenTiempoTard')) document.getElementById('ordenTiempoTard').value = "MAYOR_MENOR";
+        if(document.getElementById('ordenTiempoOmis')) document.getElementById('ordenTiempoOmis').value = "MAYOR_MENOR";
+        if(document.getElementById('ordenFechaInas')) document.getElementById('ordenFechaInas').value = "RECIENTE_ANTIGUO";
+
+        // Dibujar datos con el ordenamiento matemático aplicado
+        filtrarYRenderizarTardanzas();
+        filtrarYRenderizarOmisiones();
+        filtrarYRenderizarInasistencias();
+    }
+
+    // 1. FILTRAR Y ORDENAR TARDANZAS POR TIEMPO REAL
+    function filtrarYRenderizarTardanzas() {
+        const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
+        const fechaSel = document.getElementById('filtroFechaTard')?.value || "TODOS";
+        const ordenSel = document.getElementById('ordenTiempoTard')?.value || "MAYOR_MENOR";
+        const tbody = document.getElementById('tbodyTardanzas');
+        if (!tbody) return;
+
+        let filtrados = [...datosTardanzasGlobal];
+        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
+        if (fechaSel !== "TODOS") filtrados = filtrados.filter(x => x.fecha === fechaSel);
+
+        // Ordenación por minutos totales calculados
+        if (ordenSel === "MAYOR_MENOR") {
+            filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
+        } else {
+            filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
+        }
+
+        tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
                 <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
@@ -861,9 +983,29 @@ function aplicarFiltrosCriticos() {
                 </td>
             </tr>
         `).join('');
+        ejecutarBuscadorTextoPlano('tbodyTardanzas');
+    }
 
-        // Inyectar Tabla de Omisiones
-        document.getElementById('tbodyOmisiones').innerHTML = lOmisiones.map(x => `
+    // 2. FILTRAR Y ORDENAR OMISIONES POR TIEMPO REAL
+    function filtrarYRenderizarOmisiones() {
+        const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
+        const fechaSel = document.getElementById('filtroFechaOmis')?.value || "TODOS";
+        const ordenSel = document.getElementById('ordenTiempoOmis')?.value || "MAYOR_MENOR";
+        const tbody = document.getElementById('tbodyOmisiones');
+        if (!tbody) return;
+
+        let filtrados = [...datosOmisionesGlobal];
+        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
+        if (fechaSel !== "TODOS") filtrados = filtrados.filter(x => x.fecha === fechaSel);
+
+        // Ordenación por minutos totales calculados
+        if (ordenSel === "MAYOR_MENOR") {
+            filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
+        } else {
+            filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
+        }
+
+        tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
                 <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
@@ -874,9 +1016,27 @@ function aplicarFiltrosCriticos() {
                 </td>
             </tr>
         `).join('');
+        ejecutarBuscadorTextoPlano('tbodyOmisiones');
+    }
 
-        // Inyectar Tabla de Inasistencias
-        document.getElementById('tbodyInasistencias').innerHTML = lInasistencias.map(x => `
+    // 3. FILTRAR Y ORDENAR INASISTENCIAS POR CRONOLOGÍA
+    function filtrarYRenderizarInasistencias() {
+        const areaSel = document.getElementById('filtroAreaInas')?.value || "TODOS";
+        const ordenSel = document.getElementById('ordenFechaInas')?.value || "RECIENTE_ANTIGUO";
+        const tbody = document.getElementById('tbodyInasistencias');
+        if (!tbody) return;
+
+        let filtrados = [...datosInasistenciasGlobal];
+        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
+
+        // Ordenación por valor numérico de fecha calculada (YYYYMMDD)
+        if (ordenSel === "RECIENTE_ANTIGUO") {
+            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
+        } else {
+            filtrados.sort((a, b) => mapearFechaObjeto(a.fecha) - mapearFechaObjeto(b.fecha));
+        }
+
+        tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
                 <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
@@ -886,6 +1046,7 @@ function aplicarFiltrosCriticos() {
                 </td>
             </tr>
         `).join('');
+        ejecutarBuscadorTextoPlano('tbodyInasistencias');
     }
 
     // Capturador del Buscador en tiempo real por texto
