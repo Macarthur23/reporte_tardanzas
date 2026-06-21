@@ -884,16 +884,25 @@
                 }
             }
 
+            // Identificación de la Jornada Laboral (TIPO)
+            let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
+            let tipoEtiqueta = "";
+            if (tipoRaw === "EMP") {
+                tipoEtiqueta = `<span class="badge bg-info text-dark ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; background-color: #e0f2fe !important; border: 1px solid #bae6fd;">FT</span>`;
+            } else if (tipoRaw === "PRT" || tipoRaw === "PTM") {
+                tipoEtiqueta = `<span class="badge text-purple ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; color: #6b21a8 !important; background-color: #f3e8ff !important; border: 1px solid #e9d5ff;">PT</span>`;
+            }
+
             let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
             if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-                datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza });
+                datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
                 if (areaFinal) areasTardanzas.add(areaFinal);
                 if (fecha) fechasTardanzas.add(fecha);
             }
 
             let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
             if (omision && omision !== "00:00" && omision !== "0") {
-                datosOmisionesGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: omision });
+                datosOmisionesGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: omision, tipoEtiqueta });
                 if (areaFinal) areasOmisiones.add(areaFinal);
                 if (fecha) fechasOmisiones.add(fecha);
             }
@@ -901,7 +910,7 @@
             let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
             let faltaStr = String(falta).trim();
             if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-                datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha });
+                datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
                 if (areaFinal) areasInasistencias.add(areaFinal);
             }
         });
@@ -975,7 +984,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px;">
@@ -1008,7 +1017,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px;">
@@ -1039,7 +1048,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td class="text-center" style="padding: 4px 10px;">
                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2" style="font-size: 0.75rem; padding: 2px 6px;">⚠️ ${x.fecha}</span>
