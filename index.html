@@ -193,16 +193,26 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="fw-bold m-0" id="dinamicTitle">Módulo de Carga Integral</h4>
-                <p class="text-muted small m-0">Análisis y consolidación automatizada con módulos visuales rápidos.</p>
+                <p class="text-muted small m-0">Reporte de Discrepancia Tienda.</p>
             </div>
             <div id="fileStatusBadge" class="badge bg-secondary p-2 rounded-3">Esperando Archivo...</div>
         </div>
 
         <div id="kpiRow" class="row g-3 mb-4" style="display: none;">
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Bajo Cumplimiento</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Colaboradores menor al 95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
             <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Omisiones Marca</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Inasistencias</span><h3 class="fw-bold m-0 mt-1 text-primary" id="kpiInasistencias">0</h3></div><div class="kpi-icon bg-primary-subtle text-primary"><i class="bi bi-geo-alt-fill"></i></div></div></div>
+            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Omision de Marcajes</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
+            <div class="col-md-3">
+                <div class="kpi-card">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Total Inasistencias</span>
+                        <h3 class="fw-bold m-0 mt-1 text-danger" id="kpiInasistencias">0</h3>
+                    </div>
+                    <div class="kpi-icon bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="tab-content-custom">
@@ -217,8 +227,14 @@
                         <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
                         <div id="fileName" class="fw-bold text-danger mt-2"></div>
                     </div>
-                    <div class="text-center mt-4">
-                        <button id="btnProcesar" class="btn btn-dark btn-lg px-5 shadow-sm" style="border-radius:10px;" disabled>Generar Dashboard</button>
+
+                    <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                        <button id="btnProcesar" class="btn btn-dark btn-lg px-5 shadow-sm" style="border-radius:10px;" disabled>
+                            Generar Dashboard
+                        </button>
+                        <button id="btnReiniciarFirebase" class="btn btn-outline-danger btn-lg px-4 shadow-sm" style="border-radius:10px;">
+                            🗑️ Reiniciar Historial
+                        </button>
                     </div>
                 </div>
             </div>
@@ -382,10 +398,11 @@
                             <option value="TODOS">(Todas las Fechas)</option>
                         </select>
 
-                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
-                        <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarTardanzas()">
+                        <div class="d-flex align-items-center gap-2">📈 Ordenar Tiempo:</div>
+                        <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarTardanzas()">
                             <option value="MAYOR_MENOR">Más Tardanza ↓</option>
                             <option value="MENOR_MAYOR">Menos Tardanza ↑</option>
+                            <option value="FECHA_RECIENTE">Próxima a Lejana 📅</option>
                         </select>
                     </div>
                     <div class="custom-table-container">
@@ -422,11 +439,12 @@
                             <option value="TODOS">(Todas las Fechas)</option>
                         </select>
 
-                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
-                        <select id="ordenTiempoOmis" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarOmisiones()">
-                            <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
-                            <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
-                        </select>
+                        <div class="d-flex align-items-center gap-2">📈 Ordenar Tiempo:</div>
+                        <select id="ordenTiempoOmis" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarOmisiones()">
+                        <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
+                        <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
+                        <option value="FECHA_RECIENTE">Próxima a Lejana 📅</option>
+                    </select>
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
@@ -485,7 +503,24 @@
 
         </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Configuración oficial de tu proyecto en Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUA9AZFV1qSCCeKNw2F3w2B-zmaWmHuRA",
+        authDomain: "promart-asistencia-dashboard.firebaseapp.com",
+        projectId: "promart-asistencia-dashboard",
+        storageBucket: "promart-asistencia-dashboard.firebasestorage.app",
+        messagingSenderId: "263838062896",
+        appId: "1:263838062896:web:136f42e7c3d16362de10f5"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     // Variables globales para almacenar los datos limpios y permitir el filtrado reactivo
     let datosAlmacenGlobal = [];
     let datosCriticosGlobal = [];
@@ -508,7 +543,6 @@
         if (!fechaStr) return 0;
         const partes = fechaStr.split('/');
         if (partes.length === 3) {
-            // Retorna un formato YYYYMMDD numérico ideal para comparar magnitudes
             return parseInt(partes[2] + partes[1] + partes[0], 10);
         }
         return 0;
@@ -540,11 +574,14 @@
     const btnProcesar = document.getElementById('btnProcesar');
     const fileNameDisplay = document.getElementById('fileName');
 
-    dropZone.onclick = () => fileInput.click();
-    fileInput.onchange = (e) => cargarArchivo(e.target.files[0]);
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#ff3b30"; };
-    dropZone.ondragleave = () => dropZone.style.borderColor = "#cbd5e1";
-    dropZone.ondrop = (e) => { e.preventDefault(); cargarArchivo(e.dataTransfer.files[0]); };
+    if (dropZone) dropZone.onclick = () => fileInput.click();
+    if (fileInput) fileInput.onchange = (e) => cargarArchivo(e.target.files[0]);
+
+    if (dropZone) {
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#ff3b30"; };
+        dropZone.ondragleave = () => dropZone.style.borderColor = "#cbd5e1";
+        dropZone.ondrop = (e) => { e.preventDefault(); cargarArchivo(e.dataTransfer.files[0]); };
+    }
 
     function cargarArchivo(file) {
         if (file) {
@@ -557,49 +594,55 @@
     }
 
     // Procesamiento del Libro de Excel al dar Clic en "Generar Dashboard"
-    btnProcesar.onclick = () => {
-        const file = window.archivoSeleccionado;
-        const reader = new FileReader();
+    if (btnProcesar) {
+        btnProcesar.onclick = () => {
+            const file = window.archivoSeleccionado;
+            const reader = new FileReader();
 
-        reader.onload = (e) => {
-            const data = e.target.result;
-            const workbook = XLSX.read(data, { type: 'binary' });
+            reader.onload = async (e) => {
+                const data = e.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
 
-            let hojas = {};
-            workbook.SheetNames.forEach(name => {
-                let upper = name.toUpperCase().trim();
-                hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
-            });
+                let hojas = {};
+                workbook.SheetNames.forEach(name => {
+                    let upper = name.toUpperCase().trim();
+                    hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
+                });
 
-            let data1 = hojas["DATA 1"] || hojas["DATA1"] || [];
-            let data2 = hojas["DATA 2"] || hojas["DATA2"] || [];
-            let data5 = hojas["DATA 5"] || hojas["DATA5"] || [];
+                let data1 = hojas["DATA 1"] || hojas["DATA1"] || [];
+                let data2 = hojas["DATA 2"] || hojas["DATA2"] || [];
+                let data5 = hojas["DATA 5"] || hojas["DATA5"] || [];
 
-            // Habilitar los botones de navegación del Sidebar
-            document.getElementById('btnMenuDash').disabled = false;
-            document.getElementById('btnMenuAlm').disabled = false;
-            document.getElementById('btnMenuCrit').disabled = false;
-            document.getElementById('btnMenuTard').disabled = false;
-            document.getElementById('btnMenuOmis').disabled = false;
-            document.getElementById('btnMenuInas').disabled = false;
+                btnProcesar.disabled = true;
+                btnProcesar.innerText = "Validando archivo en Firebase...";
 
-            // Mostrar el bloque superior de indicadores KPIs
-            document.getElementById('kpiRow').style.display = 'flex';
+                // Habilitar botones laterales
+                document.getElementById('btnMenuDash').disabled = false;
+                document.getElementById('btnMenuAlm').disabled = false;
+                document.getElementById('btnMenuCrit').disabled = false;
+                document.getElementById('btnMenuTard').disabled = false;
+                document.getElementById('btnMenuOmis').disabled = false;
+                document.getElementById('btnMenuInas').disabled = false;
 
-            // Ejecutar el renderizado modular de datos
-            renderizarAnillosDATA1(data1);
-            procesarTablasDATA2(data2);
-            procesarIncidenciasDATA5(data5);
+                document.getElementById('kpiRow').style.display = 'flex';
 
-            // Redirigir automáticamente a la pestaña de Gráficos/Resúmenes
-            document.getElementById('btnMenuDash').click();
+                renderizarAnillosDATA1(data1);
+                procesarTablasDATA2(data2);
+                await procesarIncidenciasDATA5(data5, file.name);
+
+                btnProcesar.disabled = false;
+                btnProcesar.innerText = "Generar Dashboard";
+                document.getElementById('btnMenuDash').click();
+            };
+            reader.readAsBinaryString(file);
         };
-        reader.readAsBinaryString(file);
-    };
+    }
 
     // Renderizado Ejecutivo de Tarjetas de Progreso (DATA 1)
+    // Renderizado Ejecutivo de Tarjetas de Progreso (DATA 1) - CORREGIDO COLOR DE PUNTO
     function renderizarAnillosDATA1(data) {
         const grid = document.getElementById('gridGraficos');
+        if (!grid) return;
         grid.innerHTML = "";
         if(!data.length) return;
 
@@ -624,7 +667,6 @@
             });
         });
 
-        // Ordenar las tarjetas de mayor a menor cumplimiento por defecto
         areasProcesadas.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
 
         let contenedorHtml = `<div class="col-12"><div class="row g-3">`;
@@ -636,17 +678,17 @@
 
             let colorBarra = "bg-success";
             let textClass = "text-success";
-            let semaforoEmoji = "🟢";
+            let puntoEmoji = "🟢"; // Por defecto verde
 
             if (valorPorcentaje < 95.0) {
                 colorBarra = "bg-danger";
                 textClass = "text-danger";
-                semaforoEmoji = "🔴";
+                puntoEmoji = "🔴"; // Sincronizado a rojo
             }
             else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
                 colorBarra = "bg-warning";
                 textClass = "text-warning-emphasis";
-                semaforoEmoji = "🟡";
+                puntoEmoji = "🟡"; // Sincronizado a amarillo
             }
 
             contenedorHtml += `
@@ -655,7 +697,7 @@
                         <div class="flex-grow-1 min-w-0 me-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="text-truncate fw-semibold text-dark small" style="font-size: 0.85rem;" title="${area}">${area}</span>
-                                <span class="fw-bold ${textClass} small" style="font-size: 0.85rem;">${semaforoEmoji} ${porcentaje}%</span>
+                                <span class="fw-bold ${textClass} small" style="font-size: 0.85rem;">${puntoEmoji} ${porcentaje}%</span>
                             </div>
                             <div class="progress" style="height: 6px; background-color: #f1f5f9; border-radius: 10px;">
                                 <div class="progress-bar ${colorBarra}" role="progressbar" style="width: ${valorPorcentaje > 100 ? 100 : valorPorcentaje}%; border-radius: 10px;"></div>
@@ -676,7 +718,7 @@
 
         let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
         let conteoAreasCriticas = {};
-        let areasUnicasCrit = new Set(); // Para el nuevo selector
+        let areasUnicasCrit = new Set();
 
         data2.forEach(row => {
             let dni = row["DNI"] || "";
@@ -716,32 +758,35 @@
                 totalCriticos++;
                 conteoAreasCriticas[area] = (conteoAreasCriticas[area] || 0) + 1;
                 datosCriticosGlobal.push(objetoPersona);
-                if(area) areasUnicasCrit.add(area); // Guardar área crítica
+                if(area) areasUnicasCrit.add(area);
             }
         });
 
-        // Rellenar dinámicamente el selector de áreas críticas
-        const selectAreaCrit = document.getElementById('filtroAreaCrit');
-        if (selectAreaCrit) {
-            selectAreaCrit.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
-            Array.from(areasUnicasCrit).sort().forEach(a => {
-                selectAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
+        // CORREGIDO: Se añade la opción ORDEN_AZ y se mapea usando areasUnicasCrit de la A a la Z
+        const selAreaCrit = document.getElementById('filtroAreaCrit');
+        if (selAreaCrit) {
+            selAreaCrit.innerHTML = `
+                <option value="TODOS">(Todas las Áreas)</option>
+                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
+            `;
+            Array.from(areasUnicasCrit).sort((a, b) => a.localeCompare(b)).forEach(a => {
+                selAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
             });
         }
 
-        document.getElementById('miniAlmTotal').innerText = totalAlm;
+        if(document.getElementById('miniAlmTotal')) document.getElementById('miniAlmTotal').innerText = totalAlm;
         let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
-        document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
+        if(document.getElementById('miniAlmPromedio')) document.getElementById('miniAlmPromedio').innerText = promFinal + "%";
 
-        document.getElementById('kpiCriticos').innerText = totalCriticos;
-        document.getElementById('miniCritTotal').innerText = totalCriticos;
+        if(document.getElementById('kpiCriticos')) document.getElementById('kpiCriticos').innerText = totalCriticos;
+        if(document.getElementById('miniCritTotal')) document.getElementById('miniCritTotal').innerText = totalCriticos;
 
         let areaMasCritica = "Ninguna";
         let maxAlertas = 0;
         for (const [area, value] of Object.entries(conteoAreasCriticas)) {
             if (value > maxAlertas) { maxAlertas = value; areaMasCritica = area; }
         }
-        document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
+        if(document.getElementById('miniCritArea')) document.getElementById('miniCritArea').innerText = areaMasCritica + " (" + maxAlertas + " Alertas)";
 
         if(document.getElementById('filtroSemaforoAlm')) document.getElementById('filtroSemaforoAlm').value = "TODOS";
         if(document.getElementById('ordenPrecioAlm')) document.getElementById('ordenPrecioAlm').value = "MAYOR_MENOR";
@@ -753,7 +798,6 @@
         aplicarFiltrosCriticos();
     }
 
-    // Filtrado y Ordenamiento Inteligente de Personal Almacén
     function aplicarFiltrosAlmacen() {
         const colorSeleccionado = document.getElementById('filtroSemaforoAlm')?.value || "TODOS";
         const ordenSeleccionado = document.getElementById('ordenPrecioAlm')?.value || "MAYOR_MENOR";
@@ -789,11 +833,9 @@
                     </td>
                 </tr>`;
         });
-
         ejecutarBuscadorTextoPlano('tbodyAlmacen');
     }
 
-    // Renderizado de Casos de Bajo Cumplimiento
     function aplicarFiltrosCriticos() {
         const colorSeleccionado = document.getElementById('filtroSemaforoCrit')?.value || "TODOS";
         const areaSeleccionada = document.getElementById('filtroAreaCrit')?.value || "TODOS";
@@ -805,21 +847,25 @@
 
         let datosFiltrados = [...datosCriticosGlobal];
 
-        // 1. Filtrar por color de Semáforo
+        // 1. Filtrar por semáforo primero (Mantiene el filtro activo)
         if (colorSeleccionado !== "TODOS") {
             datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
         }
 
-        // 2. Filtrar por Área específica
-        if (areaSeleccionada !== "TODOS") {
+        // 2. Filtrar por área (si es un área específica)
+        if (areaSeleccionada !== "TODOS" && areaSeleccionada !== "ORDEN_AZ") {
             datosFiltrados = datosFiltrados.filter(p => p.area === areaSeleccionada);
         }
 
-        // 3. Ordenar por Porcentaje
-        if (ordenSeleccionado === "MAYOR_MENOR") {
-            datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+        // 3. Aplicar ordenamiento final respetando la selección
+        if (areaSeleccionada === "ORDEN_AZ") {
+            datosFiltrados.sort((a, b) => a.area.localeCompare(b.area));
         } else {
-            datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
+            if (ordenSeleccionado === "MAYOR_MENOR") {
+                datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+            } else {
+                datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
+            }
         }
 
         datosFiltrados.forEach(x => {
@@ -838,11 +884,9 @@
                     </td>
                 </tr>`;
         });
-
         ejecutarBuscadorTextoPlano('tbodyCriticos');
     }
 
-    // Auxiliar de sincronización para mantener activo el texto del buscador tras filtrar por selectores
     function ejecutarBuscadorTextoPlano(targetId) {
         const buscadorInput = document.querySelector(`.buscador[data-target="${targetId}"]`);
         if (!buscadorInput || !buscadorInput.value) return;
@@ -857,7 +901,7 @@
     }
 
     // Extracción Analítica de Incidencias (DATA 5)
-    function procesarIncidenciasDATA5(data) {
+    async function procesarIncidenciasDATA5(data, nombreArchivo) {
         datosTardanzasGlobal = [];
         datosOmisionesGlobal = [];
         datosInasistenciasGlobal = [];
@@ -868,11 +912,55 @@
         let fechasOmisiones = new Set();
         let areasInasistencias = new Set();
 
+        const archivoId = nombreArchivo.replace(/[\.\#\$\[\]\/]/g, "_");
+        let archivoYaProcesado = false;
+
+        try {
+            const archivoSnap = await getDoc(doc(db, "archivos_procesados", archivoId));
+            if (archivoSnap.exists()) {
+                archivoYaProcesado = true;
+                alert(`⚠️ El archivo "${nombreArchivo}" ya fue registrado anteriormente.\n\nSe generará el reporte visual, pero NO se sumarán omisiones repetidas al historial.`);
+            }
+        } catch (e) {
+            console.error("Error validando duplicados:", e);
+        }
+
+        let omisionesExcelActual = [];
         data.forEach(row => {
-            const dni = row["DNI"] || "";
+            const dni = String(row["DNI"] || "").trim();
+            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+            if (dni && omision && omision !== "00:00" && omision !== "0" && !dni.includes("FECHA:")) {
+                omisionesExcelActual.push(row);
+            }
+        });
+
+        let conteoFrecuenciaExcel = {};
+        omisionesExcelActual.forEach(row => {
+            const dni = String(row["DNI"] || "").trim();
+            conteoFrecuenciaExcel[dni] = (conteoFrecuenciaExcel[dni] || 0) + 1;
+        });
+
+        if (!archivoYaProcesado && Object.keys(conteoFrecuenciaExcel).length > 0) {
+            try {
+                await setDoc(doc(db, "archivos_procesados", archivoId), {
+                    procesadoEl: new Date().toISOString(),
+                    nombreOriginal: nombreArchivo
+                });
+
+                for (const [dni, incremento] of Object.entries(conteoFrecuenciaExcel)) {
+                    const docRef = doc(db, "omisiones_historicas", dni);
+                    await setDoc(docRef, { totalOmisiones: increment(incremento) }, { merge: true });
+                }
+            } catch (error) {
+                console.error("Error al escribir omisiones:", error);
+            }
+        }
+
+        for (const row of data) {
+            const dni = String(row["DNI"] || "").trim();
             const nombre = row["NOMBRE"] || row["FULLNM"] || "";
             const fecha = row["FECHA"] || "";
-            if(!dni || String(dni).includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) return;
+            if(!dni || dni.includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) continue;
 
             let areaRaw = row["AREA"] || row["AREAS"] || "";
             let seccion2 = row["SECCION2"] || row["SECCION"] || "";
@@ -884,7 +972,6 @@
                 }
             }
 
-            // Identificación de la Jornada Laboral (TIPO)
             let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
             let tipoEtiqueta = "";
             if (tipoRaw === "EMP") {
@@ -895,6 +982,7 @@
 
             let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
             if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+                // CORREGIDO: Se guardaba como "text: nombre", ahora se guarda como "nombre"
                 datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
                 if (areaFinal) areasTardanzas.add(areaFinal);
                 if (fecha) fechasTardanzas.add(fecha);
@@ -902,7 +990,25 @@
 
             let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
             if (omision && omision !== "00:00" && omision !== "0") {
-                datosOmisionesGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: omision, tipoEtiqueta });
+                let totalAcumuladoHistorico = 1;
+                try {
+                    const docSnap = await getDoc(doc(db, "omisiones_historicas", dni));
+                    if (docSnap.exists()) {
+                        totalAcumuladoHistorico = docSnap.data().totalOmisiones || 1;
+                    }
+                } catch (e) {
+                    console.error("Error leyendo contador:", e);
+                }
+
+                datosOmisionesGlobal.push({
+                    dni,
+                    nombre,
+                    area: areaFinal,
+                    fecha,
+                    valor: omision,
+                    tipoEtiqueta,
+                    totalOmisiones: totalAcumuladoHistorico
+                });
                 if (areaFinal) areasOmisiones.add(areaFinal);
                 if (fecha) fechasOmisiones.add(fecha);
             }
@@ -913,56 +1019,59 @@
                 datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
                 if (areaFinal) areasInasistencias.add(areaFinal);
             }
-        });
+        }
 
-        // Actualizar Contadores Numéricos
-        document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
-        document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
-        document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
+        if(document.getElementById('kpiTardanzas')) document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
+        if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
+        if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
 
-        // Configurar selectores de Tardanzas
+        // --- CONFIGURACIÓN DE SELECTORES DE FILTROS CON OPCIÓN DE ORDENACIÓN DE A a Z ---
         const selAreaTard = document.getElementById('filtroAreaTard');
         const selFechaTard = document.getElementById('filtroFechaTard');
         if (selAreaTard) {
-            selAreaTard.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
-            Array.from(areasTardanzas).sort().forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
+            selAreaTard.innerHTML = `
+                <option value="TODOS">(Todas las Áreas)</option>
+                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
+            `;
+            Array.from(areasTardanzas).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
         }
         if (selFechaTard) {
             selFechaTard.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
             Array.from(fechasTardanzas).sort().forEach(f => selFechaTard.innerHTML += `<option value="${f}">${f}</option>`);
         }
 
-        // Configurar selectores de Omisiones
         const selAreaOmis = document.getElementById('filtroAreaOmis');
         const selFechaOmis = document.getElementById('filtroFechaOmis');
         if (selAreaOmis) {
-            selAreaOmis.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
-            Array.from(areasOmisiones).sort().forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
+            selAreaOmis.innerHTML = `
+                <option value="TODOS">(Todas las Áreas)</option>
+                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
+            `;
+            Array.from(areasOmisiones).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
         }
         if (selFechaOmis) {
             selFechaOmis.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
             Array.from(fechasOmisiones).sort().forEach(f => selFechaOmis.innerHTML += `<option value="${f}">${f}</option>`);
         }
 
-        // Configurar selector de Inasistencias
         const selAreaInas = document.getElementById('filtroAreaInas');
         if (selAreaInas) {
-            selAreaInas.innerHTML = '<option value="TODOS">(Todas las Áreas)</option>';
-            Array.from(areasInasistencias).sort().forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
+            selAreaInas.innerHTML = `
+                <option value="TODOS">(Todas las Áreas)</option>
+                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
+            `;
+            Array.from(areasInasistencias).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
         }
 
-        // Valores iniciales por defecto para los selectores de ordenación
         if(document.getElementById('ordenTiempoTard')) document.getElementById('ordenTiempoTard').value = "MAYOR_MENOR";
         if(document.getElementById('ordenTiempoOmis')) document.getElementById('ordenTiempoOmis').value = "MAYOR_MENOR";
         if(document.getElementById('ordenFechaInas')) document.getElementById('ordenFechaInas').value = "RECIENTE_ANTIGUO";
 
-        // Dibujar datos con el ordenamiento matemático aplicado
         filtrarYRenderizarTardanzas();
         filtrarYRenderizarOmisiones();
         filtrarYRenderizarInasistencias();
     }
 
-    // 1. FILTRAR Y ORDENAR TARDANZAS POR TIEMPO REAL
     function filtrarYRenderizarTardanzas() {
         const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
         const fechaSel = document.getElementById('filtroFechaTard')?.value || "TODOS";
@@ -971,14 +1080,29 @@
         if (!tbody) return;
 
         let filtrados = [...datosTardanzasGlobal];
-        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
-        if (fechaSel !== "TODOS") filtrados = filtrados.filter(x => x.fecha === fechaSel);
 
-        // Ordenación por minutos totales calculados
-        if (ordenSel === "MAYOR_MENOR") {
-            filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
+        // 1. FILTRAR por Fecha primero (si hay una fecha específica seleccionada)
+        if (fechaSel !== "TODOS") {
+            filtrados = filtrados.filter(x => x.fecha === fechaSel);
+        }
+
+        // 2. FILTRAR por Área (Solo si es un área específica real)
+        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
+            filtrados = filtrados.filter(x => x.area === areaSel);
+        }
+
+        // 3. APLICAR EL ORDENAMIENTO SELECCIONADO
+        if (areaSel === "ORDEN_AZ") {
+            filtrados.sort((a, b) => a.area.localeCompare(b.area));
+        } else if (ordenSel === "FECHA_RECIENTE") {
+            // Ordena de la fecha más próxima (reciente) a la más lejana (antigua)
+            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
         } else {
-            filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
+            if (ordenSel === "MAYOR_MENOR") {
+                filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
+            } else {
+                filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
+            }
         }
 
         tbody.innerHTML = filtrados.map(x => `
@@ -995,7 +1119,6 @@
         ejecutarBuscadorTextoPlano('tbodyTardanzas');
     }
 
-    // 2. FILTRAR Y ORDENAR OMISIONES POR TIEMPO REAL
     function filtrarYRenderizarOmisiones() {
         const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
         const fechaSel = document.getElementById('filtroFechaOmis')?.value || "TODOS";
@@ -1004,31 +1127,52 @@
         if (!tbody) return;
 
         let filtrados = [...datosOmisionesGlobal];
-        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
-        if (fechaSel !== "TODOS") filtrados = filtrados.filter(x => x.fecha === fechaSel);
 
-        // Ordenación por minutos totales calculados
-        if (ordenSel === "MAYOR_MENOR") {
-            filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
-        } else {
-            filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
+        // 1. FILTRAR por Fecha primero (si hay una fecha específica seleccionada)
+        if (fechaSel !== "TODOS") {
+            filtrados = filtrados.filter(x => x.fecha === fechaSel);
         }
 
-        tbody.innerHTML = filtrados.map(x => `
-            <tr style="height: 34px;">
-                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
-                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
-                <td class="text-center" style="padding: 4px 10px;">
-                    <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
-                </td>
-            </tr>
-        `).join('');
+        // 2. FILTRAR por Área (Solo si es un área específica real)
+        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
+            filtrados = filtrados.filter(x => x.area === areaSel);
+        }
+
+        // 3. APLICAR EL ORDENAMIENTO SELECCIONADO
+        if (areaSel === "ORDEN_AZ") {
+            filtrados.sort((a, b) => a.area.localeCompare(b.area));
+        } else if (ordenSel === "FECHA_RECIENTE") {
+            // Ordena de la fecha más próxima (reciente) a la más lejana (antigua)
+            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
+        } else {
+            if (ordenSel === "MAYOR_MENOR") {
+                filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
+            } else {
+                filtrados.sort((a, b) => convertirHoraAMinutos(a.fecha) - convertirHoraAMinutos(b.fecha));
+            }
+        }
+
+        tbody.innerHTML = filtrados.map(x => {
+            let alertaContador = "";
+            if (x.totalOmisiones > 1) {
+                alertaContador = `<span class="badge bg-danger-subtle text-danger ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 5px; border: 1px solid #fca5a5;">Historial: x${x.totalOmisiones}</span>`;
+            }
+
+            return `
+                <tr style="height: 34px;">
+                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${alertaContador}</td>
+                    <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                    <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+                    <td class="text-center" style="padding: 4px 10px;">
+                        <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
         ejecutarBuscadorTextoPlano('tbodyOmisiones');
     }
 
-    // 3. FILTRAR Y ORDENAR INASISTENCIAS POR CRONOLOGÍA
     function filtrarYRenderizarInasistencias() {
         const areaSel = document.getElementById('filtroAreaInas')?.value || "TODOS";
         const ordenSel = document.getElementById('ordenFechaInas')?.value || "RECIENTE_ANTIGUO";
@@ -1036,13 +1180,21 @@
         if (!tbody) return;
 
         let filtrados = [...datosInasistenciasGlobal];
-        if (areaSel !== "TODOS") filtrados = filtrados.filter(x => x.area === areaSel);
 
-        // Ordenación por valor numérico de fecha calculada (YYYYMMDD)
-        if (ordenSel === "RECIENTE_ANTIGUO") {
-            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
+        // 1. Filtrar por Área (si es un área específica)
+        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
+            filtrados = filtrados.filter(x => x.area === areaSel);
+        }
+
+        // 2. Aplicar ordenamiento final
+        if (areaSel === "ORDEN_AZ") {
+            filtrados.sort((a, b) => a.area.localeCompare(b.area));
         } else {
-            filtrados.sort((a, b) => mapearFechaObjeto(a.fecha) - mapearFechaObjeto(b.fecha));
+            if (ordenSel === "RECIENTE_ANTIGUO") {
+                filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
+            } else {
+                filtrados.sort((a, b) => mapearFechaObjeto(a.fecha) - mapearFechaObjeto(b.fecha));
+            }
         }
 
         tbody.innerHTML = filtrados.map(x => `
@@ -1058,7 +1210,37 @@
         ejecutarBuscadorTextoPlano('tbodyInasistencias');
     }
 
-    // Capturador del Buscador en tiempo real por texto
+    // Acción del Botón de Reinicio Total
+    const btnReiniciar = document.getElementById('btnReiniciarFirebase');
+    if (btnReiniciar) {
+        btnReiniciar.onclick = async () => {
+            const seguro = confirm("⚠️ ¿ESTÁS COMPLETAMENTE SEGURA?\n\nEsta acción eliminará de forma PERMANENTE todo el historial acumulativo de omisiones y los nombres de archivos registrados en la nube. No se puede deshacer.");
+            if (!seguro) return;
+
+            btnReiniciar.disabled = true;
+            btnReiniciar.innerText = "Limpiando Nube...";
+
+            try {
+                const omisionesSnap = await getDocs(collection(db, "omisiones_historicas"));
+                const promesasOmisiones = omisionesSnap.docs.map(docSnapshot => deleteDoc(doc(db, "omisiones_historicas", docSnapshot.id)));
+                await Promise.all(promesasOmisiones);
+
+                const archivosSnap = await getDocs(collection(db, "archivos_procesados"));
+                const promesasArchivos = archivosSnap.docs.map(docSnapshot => deleteDoc(doc(db, "archivos_procesados", docSnapshot.id)));
+                await Promise.all(promesasArchivos);
+
+                alert("✅ Base de datos reseteada con éxito. Firebase está completamente limpio.");
+                location.reload();
+            } catch (error) {
+                console.error("Error al reiniciar la base de datos:", error);
+                alert("Ocurrió un error al intentar vaciar los datos.");
+                btnReiniciar.disabled = false;
+                btnReiniciar.innerText = "🗑️ Reiniciar Historial";
+            }
+        };
+    }
+
+    // Buscadores reactivos
     document.querySelectorAll('.buscador').forEach(input => {
         input.oninput = (e) => {
             const query = e.target.value.toLowerCase();
@@ -1072,4 +1254,11 @@
             }
         };
     });
+
+    // Mapeos globales
+    window.aplicarFiltrosAlmacen = aplicarFiltrosAlmacen;
+    window.aplicarFiltrosCriticos = aplicarFiltrosCriticos;
+    window.filtrarYRenderizarTardanzas = filtrarYRenderizarTardanzas;
+    window.filtrarYRenderizarOmisiones = filtrarYRenderizarOmisiones;
+    window.filtrarYRenderizarInasistencias = filtrarYRenderizarInasistencias;
 </script>
