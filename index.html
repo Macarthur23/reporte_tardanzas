@@ -14,7 +14,10 @@
         :root {
             /* Se cambió el color rojo (#ff3b30) por el naranja oficial (#FF6B00) */
             --primary-color: #FF6B00;
-            --dark-sidebar: #1e2229;
+            /* 🟠 MODIFICADO: El fondo del sidebar ahora es el naranja oficial corporativo */
+            --orange-sidebar: #FF6B00;
+            /* 🟠 MODIFICADO: El header del sidebar usa un naranja ligeramente más oscuro para dar profundidad */
+            --orange-header: #E05E00;
             --bg-light: #f8f9fa;
             --card-radius: 16px;
         }
@@ -29,7 +32,8 @@
 
         #sidebar {
             width: 280px;
-            background: var(--dark-sidebar);
+            /* 🟠 MODIFICADO: Cambiado de var(--dark-sidebar) a var(--orange-sidebar) */
+            background: var(--orange-sidebar);
             color: #fff;
             transition: all 0.3s;
             flex-shrink: 0;
@@ -37,8 +41,9 @@
 
         #sidebar .sidebar-header {
             padding: 25px 20px;
-            background: #14171c;
-            border-bottom: 1px solid #2d333f;
+            /* 🟠 MODIFICADO: Ajustado para que combine armónicamente con el nuevo fondo */
+            background: var(--orange-header);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         #sidebar ul.components { padding: 15px 10px; }
@@ -50,7 +55,8 @@
             padding: 12px 15px;
             background: none;
             border: none;
-            color: #a0aec0;
+            /* 🟠 MODIFICADO: Texto en blanco con ligera opacidad para que resalte sobre el fondo naranja */
+            color: rgba(255, 255, 255, 0.85);
             font-size: 0.95rem;
             font-weight: 500;
             border-radius: 10px;
@@ -60,12 +66,22 @@
         }
 
         #sidebar ul li button i { font-size: 1.2rem; margin-right: 12px; }
-        #sidebar ul li button:hover, #sidebar ul li button.active {
-            background: rgba(255, 255, 255, 0.08); color: #fff;
+
+        /* 🟠 MODIFICADO: El comportamiento Hover cambia para contrastar con el fondo naranja */
+        #sidebar ul li button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
         }
-        /* El hover ahora usa un destello sutil naranja en las letras */
-        #sidebar ul li button:hover i { color: var(--primary-color); }
-        #sidebar ul li button.active { background: var(--primary-color); color: white; }
+        #sidebar ul li button:hover i { color: #fff; }
+
+        /* 🟠 MODIFICADO: Inversión del botón ACTIVO para que resalte perfectamente (Fondo Blanco - Texto Naranja) */
+        #sidebar ul li button.active {
+            background: #ffffff !important;
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        #sidebar ul li button.active i { color: var(--primary-color) !important; }
 
         #content { flex-grow: 1; padding: 30px; background: var(--bg-light); overflow-x: hidden; }
 
@@ -396,6 +412,7 @@
                         <h5 class="fw-bold text-warning m-0"><i class="bi bi-clock-fill me-2"></i>REPORTE DE TARDANZAS</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyTardanzas" placeholder="Filtrar tardanzas...">
                     </div>
+
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <select id="filtroAreaTard" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarTardanzas()">
@@ -403,17 +420,20 @@
                         </select>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
-                        <select id="filtroFechaTard" class="form-select form-select-sm" style="width: 140px;" onchange="filtrarYRenderizarTardanzas()">
-                            <option value="TODOS">(Todas las Fechas)</option>
+                        <select id="filtroFechaTardCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="FECHA_RECIENTE">Más Próxima a Lejana</option>
+                            <option value="FECHA_ANTIGUA">Más Lejana a Próxima</option>
                         </select>
 
-                        <div class="d-flex align-items-center gap-2">📈 Ordenar Tiempo:</div>
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
                         <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
                             <option value="MAYOR_MENOR">Más Tardanza ↓</option>
                             <option value="MENOR_MAYOR">Menos Tardanza ↑</option>
-                            <option value="FECHA_RECIENTE">Próxima a Lejana 📅</option>
                         </select>
                     </div>
+
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
                             <thead>
@@ -444,16 +464,18 @@
                         </select>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
-                        <select id="filtroFechaOmis" class="form-select form-select-sm" style="width: 140px;" onchange="filtrarYRenderizarOmisiones()">
-                            <option value="TODOS">(Todas las Fechas)</option>
+                        <select id="filtroFechaOmisCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarOmisiones()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="FECHA_RECIENTE">Más Próxima a Lejana</option>
+                            <option value="FECHA_ANTIGUA">Más Lejana a Próxima</option>
                         </select>
 
-                        <div class="d-flex align-items-center gap-2">📈 Ordenar Tiempo:</div>
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
                         <select id="ordenTiempoOmis" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarOmisiones()">
-                        <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
-                        <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
-                        <option value="FECHA_RECIENTE">Próxima a Lejana 📅</option>
-                    </select>
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
+                            <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
+                        </select>
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
@@ -1014,7 +1036,6 @@ if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase
         // Si es una tardanza normal y lógica (menor a 4 horas), se queda aquí
         datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
         if (areaFinal) areasTardanzas.add(areaFinal);
-        if (fecha) fechasTardanzas.add(fecha);
     }
 }
 
@@ -1108,106 +1129,116 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
         filtrarYRenderizarInasistencias();
     }
 
-    function filtrarYRenderizarTardanzas() {
-        const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
-        const fechaSel = document.getElementById('filtroFechaTard')?.value || "TODOS";
-        const ordenSel = document.getElementById('ordenTiempoTard')?.value || "MAYOR_MENOR";
-        const tbody = document.getElementById('tbodyTardanzas');
-        if (!tbody) return;
+   function filtrarYRenderizarTardanzas() {
+    const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
+    const fechaCronologiaSel = document.getElementById('filtroFechaTardCronologia')?.value || "NINGUNO";
+    const ordenTiempoSel = document.getElementById('ordenTiempoTard')?.value || "NINGUNO";
+    const tbody = document.getElementById('tbodyTardanzas');
+    if (!tbody) return;
 
-        let filtrados = [...datosTardanzasGlobal];
+    let filtrados = [...datosTardanzasGlobal];
 
-        // 1. FILTRAR por Fecha primero (si hay una fecha específica seleccionada)
-        if (fechaSel !== "TODOS") {
-            filtrados = filtrados.filter(x => x.fecha === fechaSel);
-        }
-
-        // 2. FILTRAR por Área (Solo si es un área específica real)
-        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
-            filtrados = filtrados.filter(x => x.area === areaSel);
-        }
-
-        // 3. APLICAR EL ORDENAMIENTO SELECCIONADO
-        if (areaSel === "ORDEN_AZ") {
-            filtrados.sort((a, b) => a.area.localeCompare(b.area));
-        } else if (ordenSel === "FECHA_RECIENTE") {
-            // Ordena de la fecha más próxima (reciente) a la más lejana (antigua)
-            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
-        } else {
-            if (ordenSel === "MAYOR_MENOR") {
-                filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
-            } else {
-                filtrados.sort((a, b) => convertirHoraAMinutos(a.valor) - convertirHoraAMinutos(b.valor));
-            }
-        }
-
-        tbody.innerHTML = filtrados.map(x => `
-            <tr style="height: 34px;">
-                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
-                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
-                <td class="text-center" style="padding: 4px 10px;">
-                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏱️ ${x.valor}</span>
-                </td>
-            </tr>
-        `).join('');
-        ejecutarBuscadorTextoPlano('tbodyTardanzas');
+    // 1. FILTRAR POR ÁREA
+    if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
+        filtrados = filtrados.filter(x => x.area === areaSel);
     }
+
+    // 2. ORDENAMIENTO EN CASCADA COMBINADO
+    if (areaSel === "ORDEN_AZ") {
+        filtrados.sort((a, b) => a.area.localeCompare(b.area));
+    } else {
+        filtrados.sort((a, b) => {
+            const fechaA = mapearFechaObjeto(a.fecha);
+            const fechaB = mapearFechaObjeto(b.fecha);
+
+            // 📅 PASO A: Si el filtro de fecha está ACTIVO y las fechas son distintas, ordena por Fecha
+            if (fechaCronologiaSel !== "NINGUNO" && fechaA !== fechaB) {
+                return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
+            }
+
+            // 📈 PASO B: Si las fechas son iguales O el filtro de fecha está en "NINGUNO", ordena por Tiempo
+            if (ordenTiempoSel !== "NINGUNO") {
+                const minutesA = convertirHoraAMinutos(a.valor);
+                const minutesB = convertirHoraAMinutos(b.valor);
+
+                if (minutesA !== minutesB) {
+                    return ordenTiempoSel === "MAYOR_MENOR" ? minutesB - minutesA : minutesA - minutesB;
+                }
+            }
+
+            return 0;
+        });
+    }
+
+    // 3. RENDERIZAR EN LA TABLA
+    tbody.innerHTML = filtrados.map(x => `
+        <tr style="height: 34px;">
+            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+            <td class="text-center" style="padding: 4px 10px;">
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏱️ ${x.valor}</span>
+            </td>
+        </tr>
+    `).join('');
+
+    ejecutarBuscadorTextoPlano('tbodyTardanzas');
+}
 
     function filtrarYRenderizarOmisiones() {
-        const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
-        const fechaSel = document.getElementById('filtroFechaOmis')?.value || "TODOS";
-        const ordenSel = document.getElementById('ordenTiempoOmis')?.value || "MAYOR_MENOR";
-        const tbody = document.getElementById('tbodyOmisiones');
-        if (!tbody) return;
+    const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
+    const fechaCronologiaSel = document.getElementById('filtroFechaOmisCronologia')?.value || "NINGUNO";
+    const ordenTiempoSel = document.getElementById('ordenTiempoOmis')?.value || "NINGUNO";
+    const tbody = document.getElementById('tbodyOmisiones');
+    if (!tbody) return;
 
-        let filtrados = [...datosOmisionesGlobal];
+    let filtrados = [...datosOmisionesGlobal];
 
-        // 1. FILTRAR por Fecha primero (si hay una fecha específica seleccionada)
-        if (fechaSel !== "TODOS") {
-            filtrados = filtrados.filter(x => x.fecha === fechaSel);
-        }
-
-        // 2. FILTRAR por Área (Solo si es un área específica real)
-        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
-            filtrados = filtrados.filter(x => x.area === areaSel);
-        }
-
-        // 3. APLICAR EL ORDENAMIENTO SELECCIONADO
-        if (areaSel === "ORDEN_AZ") {
-            filtrados.sort((a, b) => a.area.localeCompare(b.area));
-        } else if (ordenSel === "FECHA_RECIENTE") {
-            // Ordena de la fecha más próxima (reciente) a la más lejana (antigua)
-            filtrados.sort((a, b) => mapearFechaObjeto(b.fecha) - mapearFechaObjeto(a.fecha));
-        } else {
-            if (ordenSel === "MAYOR_MENOR") {
-                filtrados.sort((a, b) => convertirHoraAMinutos(b.valor) - convertirHoraAMinutos(a.valor));
-            } else {
-                filtrados.sort((a, b) => convertirHoraAMinutos(a.fecha) - convertirHoraAMinutos(b.fecha));
-            }
-        }
-
-        tbody.innerHTML = filtrados.map(x => {
-            let alertaContador = "";
-            if (x.totalOmisiones > 1) {
-                alertaContador = `<span class="badge bg-danger-subtle text-danger ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 5px; border: 1px solid #fca5a5;">Historial: x${x.totalOmisiones}</span>`;
-            }
-
-            return `
-                <tr style="height: 34px;">
-                    <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                    <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${alertaContador}</td>
-                    <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
-                    <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
-                    <td class="text-center" style="padding: 4px 10px;">
-                        <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-        ejecutarBuscadorTextoPlano('tbodyOmisiones');
+    // 1. FILTRAR POR ÁREA
+    if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
+        filtrados = filtrados.filter(x => x.area === areaSel);
     }
+
+    // 2. ORDENAMIENTO EN CASCADA COMBINADO
+    if (areaSel === "ORDEN_AZ") {
+        filtrados.sort((a, b) => a.area.localeCompare(b.area));
+    } else {
+        filtrados.sort((a, b) => {
+            // 📅 PASO A: Comparar por Fechas Primero
+            const fechaA = mapearFechaObjeto(a.fecha);
+            const fechaB = mapearFechaObjeto(b.fecha);
+
+            if (fechaA !== fechaB && fechaCronologiaSel !== "NINGUNO") {
+                return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
+            }
+
+            // 📈 PASO B: Si las fechas son iguales (o el filtro de fecha está desactivado), desempatar por Tiempo
+            if (ordenTiempoSel !== "NINGUNO") {
+                const minutosA = convertirHoraAMinutos(a.valor);
+                const minutosB = convertirHoraAMinutos(b.valor);
+                return ordenTiempoSel === "MAYOR_MENOR" ? minutosB - minutosA : minutosA - minutosB;
+            }
+
+            return 0; // Si no hay criterios activos, mantener el orden original
+        });
+    }
+
+    // 3. RENDERIZAR EN LA TABLA
+    tbody.innerHTML = filtrados.map(x => `
+        <tr style="height: 34px;">
+            <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+            <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+            <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+            <td class="text-center" style="padding: 4px 10px;">
+                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold border border-danger-subtle" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
+            </td>
+        </tr>
+    `).join('');
+
+    ejecutarBuscadorTextoPlano('tbodyOmisiones');
+}
 
     function filtrarYRenderizarInasistencias() {
         const areaSel = document.getElementById('filtroAreaInas')?.value || "TODOS";
