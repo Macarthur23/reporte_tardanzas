@@ -12,7 +12,8 @@
 
     <style>
         :root {
-            --primary-color: #ff3b30;
+            /* Se cambió el color rojo (#ff3b30) por el naranja oficial (#FF6B00) */
+            --primary-color: #FF6B00;
             --dark-sidebar: #1e2229;
             --bg-light: #f8f9fa;
             --card-radius: 16px;
@@ -62,7 +63,9 @@
         #sidebar ul li button:hover, #sidebar ul li button.active {
             background: rgba(255, 255, 255, 0.08); color: #fff;
         }
-        #sidebar ul li button.active { background: #ff3b30; color: white; }
+        /* El hover ahora usa un destello sutil naranja en las letras */
+        #sidebar ul li button:hover i { color: var(--primary-color); }
+        #sidebar ul li button.active { background: var(--primary-color); color: white; }
 
         #content { flex-grow: 1; padding: 30px; background: var(--bg-light); overflow-x: hidden; }
 
@@ -79,7 +82,8 @@
             border: 2px dashed #cbd5e1; border-radius: var(--card-radius);
             background: #fff; padding: 40px 20px; text-align: center; cursor: pointer;
         }
-        .drop-zone:hover { border-color: #ff3b30; background: #fff5f5; }
+        /* Ahora la zona de arrastre se ilumina en naranja al pasar el mouse */
+        .drop-zone:hover { border-color: var(--primary-color); background: #fff9f5; }
 
         .kpi-card {
             background: #fff; border-radius: var(--card-radius); padding: 20px;
@@ -164,6 +168,11 @@
         .table { margin-bottom: 0; }
         .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 14px; }
         .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
+
+        /* Forzamos que las utilidades text-danger de Bootstrap apunten a nuestro naranja */
+        .text-danger { color: var(--primary-color) !important; }
+        .btn-outline-danger { color: var(--primary-color) !important; border-color: var(--primary-color) !important; }
+        .btn-outline-danger:hover { background-color: var(--primary-color) !important; color: #fff !important; }
     </style>
 </head>
 <body>
@@ -981,49 +990,76 @@
             }
 
             let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
-            if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-                // CORREGIDO: Se guardaba como "text: nombre", ahora se guarda como "nombre"
-                datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
-                if (areaFinal) areasTardanzas.add(areaFinal);
-                if (fecha) fechasTardanzas.add(fecha);
-            }
+if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+
+    // 🚨 NUEVA LOGICA: Convertimos el tiempo a minutos para evaluar el caso
+    let minutosTardanza = convertirHoraAMinutos(tardanza);
+
+    if (minutosTardanza > 240) {
+        // Si supera las 4 horas, se quita de Tardanzas y se guarda en Omisiones
+        datosOmisionesGlobal.push({
+            dni,
+            nombre,
+            area: areaFinal,
+            fecha,
+            valor: `Falta Marcaje (${tardanza})`, // Avisa visualmente qué pasó
+            totalOmisiones: 1
+        });
+
+        // También registramos el área y fecha en los selectores de Omisiones para que no se pierdan
+        if (areaFinal) areasOmisiones.add(areaFinal); // Asegúrate si tu set se llama areasOmisiones
+        if (fecha) fechasOmisiones.add(fecha);       // Asegúrate si tu set se llama fechasOmisiones
+
+    } else {
+        // Si es una tardanza normal y lógica (menor a 4 horas), se queda aquí
+        datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
+        if (areaFinal) areasTardanzas.add(areaFinal);
+        if (fecha) fechasTardanzas.add(fecha);
+    }
+}
 
             let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
-            if (omision && omision !== "00:00" && omision !== "0") {
-                let totalAcumuladoHistorico = 1;
-                try {
-                    const docSnap = await getDoc(doc(db, "omisiones_historicas", dni));
-                    if (docSnap.exists()) {
-                        totalAcumuladoHistorico = docSnap.data().totalOmisiones || 1;
-                    }
-                } catch (e) {
-                    console.error("Error leyendo contador:", e);
-                }
-
-                datosOmisionesGlobal.push({
-                    dni,
-                    nombre,
-                    area: areaFinal,
-                    fecha,
-                    valor: omision,
-                    tipoEtiqueta,
-                    totalOmisiones: totalAcumuladoHistorico
-                });
-                if (areaFinal) areasOmisiones.add(areaFinal);
-                if (fecha) fechasOmisiones.add(fecha);
+    if (omision && omision !== "00:00" && omision !== "0") {
+        let totalAcumuladoHistorico = 1;
+        try {
+            const docSnap = await getDoc(doc(db, "omisiones_historicas", dni));
+            if (docSnap.exists()) {
+                totalAcumuladoHistorico = docSnap.data().totalOmisiones || 1;
             }
-
-            let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
-            let faltaStr = String(falta).trim();
-            if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-                datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
-                if (areaFinal) areasInasistencias.add(areaFinal);
-            }
+        } catch (e) {
+            console.error("Error leyendo contador:", e);
         }
 
-        if(document.getElementById('kpiTardanzas')) document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
-        if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
-        if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
+        datosOmisionesGlobal.push({
+            dni,
+            nombre,
+            area: areaFinal,
+            fecha,
+            valor: omision,
+            tipoEtiqueta,
+            totalOmisiones: totalAcumuladoHistorico
+        });
+        if (areaFinal) areasOmisiones.add(areaFinal);
+        if (fecha) fechasOmisiones.add(fecha);
+    }
+
+    // ========================================================
+    // 3. PROCESAR INASISTENCIAS (Tu código base)
+    // ========================================================
+    let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
+    let faltaStr = String(falta).trim();
+    if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
+        datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
+        if (areaFinal) areasInasistencias.add(areaFinal);
+    }
+} // Aquí termina el bucle forEach de las filas
+
+// ========================================================
+// 4. ACTUALIZACIÓN DE CONTADORES KPI (Tu código base)
+// ========================================================
+if(document.getElementById('kpiTardanzas')) document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
+if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
+if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
 
         // --- CONFIGURACIÓN DE SELECTORES DE FILTROS CON OPCIÓN DE ORDENACIÓN DE A a Z ---
         const selAreaTard = document.getElementById('filtroAreaTard');
