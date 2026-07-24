@@ -422,15 +422,15 @@
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
                         <select id="filtroFechaTardCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
                             <option value="NINGUNO">-- Seleccionar Orden --</option>
-                            <option value="FECHA_RECIENTE">Más Próxima a Lejana</option>
-                            <option value="FECHA_ANTIGUA">Más Lejana a Próxima</option>
+                            <option value="FECHA_RECIENTE">Más Reciente</option>
+                            <option value="FECHA_ANTIGUA">Más Antiguo</option>
                         </select>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
-                        <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarTardanzas()">
+                        <select id="ordenTiempoTard" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
                             <option value="NINGUNO">-- Seleccionar Orden --</option>
-                            <option value="MAYOR_MENOR">Más Tardanza ↓</option>
-                            <option value="MENOR_MAYOR">Menos Tardanza ↑</option>
+                            <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
+                            <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
                         </select>
                     </div>
 
@@ -466,15 +466,8 @@
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
                         <select id="filtroFechaOmisCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarOmisiones()">
                             <option value="NINGUNO">-- Seleccionar Orden --</option>
-                            <option value="FECHA_RECIENTE">Más Próxima a Lejana</option>
-                            <option value="FECHA_ANTIGUA">Más Lejana a Próxima</option>
-                        </select>
-
-                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Tiempo:</div>
-                        <select id="ordenTiempoOmis" class="form-select form-select-sm" style="width: auto;" onchange="filtrarYRenderizarOmisiones()">
-                            <option value="NINGUNO">-- Seleccionar Orden --</option>
-                            <option value="MAYOR_MENOR">Más Tiempo Omitido ↓</option>
-                            <option value="MENOR_MAYOR">Menos Tiempo Omitido ↑</option>
+                            <option value="FECHA_RECIENTE">Más Reciente</option>
+                            <option value="FECHA_ANTIGUA">Más Antiguo</option>
                         </select>
                     </div>
                     <div class="custom-table-container">
@@ -511,8 +504,8 @@
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Ordenar Fecha:</div>
                         <select id="ordenFechaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
-                            <option value="RECIENTE_ANTIGUO">Más Recientes primero ↓</option>
-                            <option value="ANTIGUO_RECIENTE">Más Antiguas primero ↑</option>
+                            <option value="RECIENTE_ANTIGUO">Más Reciente ↓</option>
+                            <option value="ANTIGUO_RECIENTE">Más Antiguo ↑</option>
                         </select>
                     </div>
 
@@ -932,202 +925,198 @@
     }
 
     // Extracción Analítica de Incidencias (DATA 5)
-    async function procesarIncidenciasDATA5(data, nombreArchivo) {
-        datosTardanzasGlobal = [];
-        datosOmisionesGlobal = [];
-        datosInasistenciasGlobal = [];
+async function procesarIncidenciasDATA5(data, nombreArchivo) {
+    datosTardanzasGlobal = [];
+    datosOmisionesGlobal = [];
+    datosInasistenciasGlobal = [];
 
-        let areasTardanzas = new Set();
-        let fechasTardanzas = new Set();
-        let areasOmisiones = new Set();
-        let fechasOmisiones = new Set();
-        let areasInasistencias = new Set();
+    let areasTardanzas = new Set();
+    let fechasTardanzas = new Set();
+    let areasOmisiones = new Set();
+    let fechasOmisiones = new Set();
+    let areasInasistencias = new Set();
 
-        const archivoId = nombreArchivo.replace(/[\.\#\$\[\]\/]/g, "_");
-        let archivoYaProcesado = false;
+    const archivoId = nombreArchivo.replace(/[\.\#\$\[\]\/]/g, "_");
+    let archivoYaProcesado = false;
 
+    try {
+        const archivoSnap = await getDoc(doc(db, "archivos_procesados", archivoId));
+        if (archivoSnap.exists()) {
+            archivoYaProcesado = true;
+            alert(`⚠️ El archivo "${nombreArchivo}" ya fue registrado anteriormente.\n\nSe generará el reporte visual, pero NO se sumarán omisiones repetidas al historial.`);
+        }
+    } catch (e) {
+        console.error("Error validando duplicados:", e);
+    }
+
+    let omisionesExcelActual = [];
+    data.forEach(row => {
+        const dni = String(row["DNI"] || "").trim();
+        let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+        if (dni && omision && omision !== "00:00" && omision !== "0" && !dni.includes("FECHA:")) {
+            omisionesExcelActual.push(row);
+        }
+    });
+
+    let conteoFrecuenciaExcel = {};
+    omisionesExcelActual.forEach(row => {
+        const dni = String(row["DNI"] || "").trim();
+        conteoFrecuenciaExcel[dni] = (conteoFrecuenciaExcel[dni] || 0) + 1;
+    });
+
+    if (!archivoYaProcesado && Object.keys(conteoFrecuenciaExcel).length > 0) {
         try {
-            const archivoSnap = await getDoc(doc(db, "archivos_procesados", archivoId));
-            if (archivoSnap.exists()) {
-                archivoYaProcesado = true;
-                alert(`⚠️ El archivo "${nombreArchivo}" ya fue registrado anteriormente.\n\nSe generará el reporte visual, pero NO se sumarán omisiones repetidas al historial.`);
+            await setDoc(doc(db, "archivos_procesados", archivoId), {
+                procesadoEl: new Date().toISOString(),
+                nombreOriginal: nombreArchivo
+            });
+
+            for (const [dni, incremento] of Object.entries(conteoFrecuenciaExcel)) {
+                const docRef = doc(db, "omisiones_historicas", dni);
+                await setDoc(docRef, { totalOmisiones: increment(incremento) }, { merge: true });
             }
-        } catch (e) {
-            console.error("Error validando duplicados:", e);
+        } catch (error) {
+            console.error("Error al escribir omisiones:", error);
+        }
+    }
+
+    for (const row of data) {
+        const dni = String(row["DNI"] || "").trim();
+        const nombre = row["NOMBRE"] || row["FULLNM"] || "";
+        const fecha = row["FECHA"] || "";
+        if(!dni || dni.includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) continue;
+
+        let areaRaw = row["AREA"] || row["AREAS"] || "";
+        let seccion2 = row["SECCION2"] || row["SECCION"] || "";
+        let areaFinal = areaRaw;
+
+        if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
+            if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
+                areaFinal = seccion2;
+            }
         }
 
-        let omisionesExcelActual = [];
-        data.forEach(row => {
-            const dni = String(row["DNI"] || "").trim();
-            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
-            if (dni && omision && omision !== "00:00" && omision !== "0" && !dni.includes("FECHA:")) {
-                omisionesExcelActual.push(row);
+        let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
+        let tipoEtiqueta = "";
+        if (tipoRaw === "EMP") {
+            tipoEtiqueta = `<span class="badge bg-info text-dark ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; background-color: #e0f2fe !important; border: 1px solid #bae6fd;">FT</span>`;
+        } else if (tipoRaw === "PRT" || tipoRaw === "PTM") {
+            tipoEtiqueta = `<span class="badge text-purple ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; color: #6b21a8 !important; background-color: #f3e8ff !important; border: 1px solid #e9d5ff;">PT</span>`;
+        }
+
+        // ========================================================
+        // 1. PROCESAR TARDANZAS (Con reglas de tolerancia y refrigerio)
+        // ========================================================
+        let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
+        let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
+        let tieneOmision = (omision && omision !== "00:00" && omision !== "0");
+
+        let concepto = String(row["CONCEPTO"] || row["TIPO MARCACION"] || row["MOTIVO"] || "").toUpperCase();
+        let esRefrigerio = concepto.includes("REFRIGERIO") || concepto.includes("ALMUERZO") || concepto.includes("SALIDA");
+
+        if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
+            let minutosTardanza = convertirHoraAMinutos(tardanza);
+
+            // Mayor a 5 min y no es etiqueta de refrigerio
+            if (minutosTardanza > 5 && !esRefrigerio) {
+                if (minutosTardanza > 240) {
+                    // Si supera las 4 horas, pasa a Omisiones como Falta de Marcaje
+                    datosOmisionesGlobal.push({
+                        dni,
+                        nombre,
+                        area: areaFinal,
+                        fecha,
+                        valor: `Falta Marcaje (${tardanza})`,
+                        tipoEtiqueta,
+                        totalOmisiones: 1
+                    });
+                    if (areaFinal) areasOmisiones.add(areaFinal);
+                    if (fecha) fechasOmisiones.add(fecha);
+                }
+                else if (!tieneOmision) {
+                    // Solo es tardanza real de ingreso si NO hay omisión de marcación en el día
+                    datosTardanzasGlobal.push({
+                        dni,
+                        nombre,
+                        area: areaFinal,
+                        fecha,
+                        valor: tardanza,
+                        tipoEtiqueta
+                    });
+                    if (areaFinal) areasTardanzas.add(areaFinal);
+                    if (fecha) fechasTardanzas.add(fecha);
+                }
             }
-        });
+        }
 
-        let conteoFrecuenciaExcel = {};
-        omisionesExcelActual.forEach(row => {
-            const dni = String(row["DNI"] || "").trim();
-            conteoFrecuenciaExcel[dni] = (conteoFrecuenciaExcel[dni] || 0) + 1;
-        });
-
-        if (!archivoYaProcesado && Object.keys(conteoFrecuenciaExcel).length > 0) {
+        // ========================================================
+        // 2. PROCESAR OMISIONES (Lectura directa e independiente del Excel)
+        // ========================================================
+        if (tieneOmision) {
+            let totalAcumuladoHistorico = 1;
             try {
-                await setDoc(doc(db, "archivos_procesados", archivoId), {
-                    procesadoEl: new Date().toISOString(),
-                    nombreOriginal: nombreArchivo
-                });
-
-                for (const [dni, incremento] of Object.entries(conteoFrecuenciaExcel)) {
-                    const docRef = doc(db, "omisiones_historicas", dni);
-                    await setDoc(docRef, { totalOmisiones: increment(incremento) }, { merge: true });
+                const docSnap = await getDoc(doc(db, "omisiones_historicas", dni));
+                if (docSnap.exists()) {
+                    totalAcumuladoHistorico = docSnap.data().totalOmisiones || 1;
                 }
-            } catch (error) {
-                console.error("Error al escribir omisiones:", error);
+            } catch (e) {
+                console.error("Error leyendo contador:", e);
             }
+
+            datosOmisionesGlobal.push({
+                dni,
+                nombre,
+                area: areaFinal,
+                fecha,
+                valor: omision,
+                tipoEtiqueta,
+                totalOmisiones: totalAcumuladoHistorico
+            });
+            if (areaFinal) areasOmisiones.add(areaFinal);
+            if (fecha) fechasOmisiones.add(fecha);
         }
 
-        for (const row of data) {
-            const dni = String(row["DNI"] || "").trim();
-            const nombre = row["NOMBRE"] || row["FULLNM"] || "";
-            const fecha = row["FECHA"] || "";
-            if(!dni || dni.includes("FECHA:") || String(nombre).toUpperCase().includes("INFORME")) continue;
+        // ========================================================
+        // 3. PROCESAR INASISTENCIAS
+        // ========================================================
+        let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
+        let faltaStr = String(falta).trim();
+        if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
+            datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
+            if (areaFinal) areasInasistencias.add(areaFinal);
+        }
+    } // Fin bucle for
 
-            let areaRaw = row["AREA"] || row["AREAS"] || "";
-            let seccion2 = row["SECCION2"] || row["SECCION"] || "";
-            let areaFinal = areaRaw;
+    // ========================================================
+    // 4. ACTUALIZAR CONTADORES Y RENDERIZAR
+    // ========================================================
+    if(document.getElementById('kpiTardanzas')) document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
+    if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
+    if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
 
-            if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
-                if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
-                    areaFinal = seccion2;
-                }
-            }
-
-            let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
-            let tipoEtiqueta = "";
-            if (tipoRaw === "EMP") {
-                tipoEtiqueta = `<span class="badge bg-info text-dark ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; background-color: #e0f2fe !important; border: 1px solid #bae6fd;">FT</span>`;
-            } else if (tipoRaw === "PRT" || tipoRaw === "PTM") {
-                tipoEtiqueta = `<span class="badge text-purple ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; color: #6b21a8 !important; background-color: #f3e8ff !important; border: 1px solid #e9d5ff;">PT</span>`;
-            }
-
-            let tardanza = row["Tardanza"] ? String(row["Tardanza"]).trim() : "";
-if (tardanza && tardanza !== "00:00" && tardanza !== "0" && tardanza.toLowerCase() !== "bien") {
-
-    // 🚨 NUEVA LOGICA: Convertimos el tiempo a minutos para evaluar el caso
-    let minutosTardanza = convertirHoraAMinutos(tardanza);
-
-    if (minutosTardanza > 240) {
-        // Si supera las 4 horas, se quita de Tardanzas y se guarda en Omisiones
-        datosOmisionesGlobal.push({
-            dni,
-            nombre,
-            area: areaFinal,
-            fecha,
-            valor: `Falta Marcaje (${tardanza})`, // Avisa visualmente qué pasó
-            totalOmisiones: 1
-        });
-
-        // También registramos el área y fecha en los selectores de Omisiones para que no se pierdan
-        if (areaFinal) areasOmisiones.add(areaFinal); // Asegúrate si tu set se llama areasOmisiones
-        if (fecha) fechasOmisiones.add(fecha);       // Asegúrate si tu set se llama fechasOmisiones
-
-    } else {
-        // Si es una tardanza normal y lógica (menor a 4 horas), se queda aquí
-        datosTardanzasGlobal.push({ dni, nombre, area: areaFinal, fecha, valor: tardanza, tipoEtiqueta });
-        if (areaFinal) areasTardanzas.add(areaFinal);
+    // Configurar Selectores
+    const selAreaTard = document.getElementById('filtroAreaTard');
+    if (selAreaTard) {
+        selAreaTard.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
+        Array.from(areasTardanzas).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
     }
+
+    const selAreaOmis = document.getElementById('filtroAreaOmis');
+    if (selAreaOmis) {
+        selAreaOmis.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
+        Array.from(areasOmisiones).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
+    }
+
+    const selAreaInas = document.getElementById('filtroAreaInas');
+    if (selAreaInas) {
+        selAreaInas.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
+        Array.from(areasInasistencias).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
+    }
+
+    filtrarYRenderizarTardanzas();
+    filtrarYRenderizarOmisiones();
+    filtrarYRenderizarInasistencias();
 }
-
-            let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
-    if (omision && omision !== "00:00" && omision !== "0") {
-        let totalAcumuladoHistorico = 1;
-        try {
-            const docSnap = await getDoc(doc(db, "omisiones_historicas", dni));
-            if (docSnap.exists()) {
-                totalAcumuladoHistorico = docSnap.data().totalOmisiones || 1;
-            }
-        } catch (e) {
-            console.error("Error leyendo contador:", e);
-        }
-
-        datosOmisionesGlobal.push({
-            dni,
-            nombre,
-            area: areaFinal,
-            fecha,
-            valor: omision,
-            tipoEtiqueta,
-            totalOmisiones: totalAcumuladoHistorico
-        });
-        if (areaFinal) areasOmisiones.add(areaFinal);
-        if (fecha) fechasOmisiones.add(fecha);
-    }
-
-    // ========================================================
-    // 3. PROCESAR INASISTENCIAS (Tu código base)
-    // ========================================================
-    let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
-    let faltaStr = String(falta).trim();
-    if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-        datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
-        if (areaFinal) areasInasistencias.add(areaFinal);
-    }
-} // Aquí termina el bucle forEach de las filas
-
-// ========================================================
-// 4. ACTUALIZACIÓN DE CONTADORES KPI (Tu código base)
-// ========================================================
-if(document.getElementById('kpiTardanzas')) document.getElementById('kpiTardanzas').innerText = datosTardanzasGlobal.length;
-if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
-if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
-
-        // --- CONFIGURACIÓN DE SELECTORES DE FILTROS CON OPCIÓN DE ORDENACIÓN DE A a Z ---
-        const selAreaTard = document.getElementById('filtroAreaTard');
-        const selFechaTard = document.getElementById('filtroFechaTard');
-        if (selAreaTard) {
-            selAreaTard.innerHTML = `
-                <option value="TODOS">(Todas las Áreas)</option>
-                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
-            `;
-            Array.from(areasTardanzas).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
-        }
-        if (selFechaTard) {
-            selFechaTard.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
-            Array.from(fechasTardanzas).sort().forEach(f => selFechaTard.innerHTML += `<option value="${f}">${f}</option>`);
-        }
-
-        const selAreaOmis = document.getElementById('filtroAreaOmis');
-        const selFechaOmis = document.getElementById('filtroFechaOmis');
-        if (selAreaOmis) {
-            selAreaOmis.innerHTML = `
-                <option value="TODOS">(Todas las Áreas)</option>
-                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
-            `;
-            Array.from(areasOmisiones).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
-        }
-        if (selFechaOmis) {
-            selFechaOmis.innerHTML = '<option value="TODOS">(Todas las Fechas)</option>';
-            Array.from(fechasOmisiones).sort().forEach(f => selFechaOmis.innerHTML += `<option value="${f}">${f}</option>`);
-        }
-
-        const selAreaInas = document.getElementById('filtroAreaInas');
-        if (selAreaInas) {
-            selAreaInas.innerHTML = `
-                <option value="TODOS">(Todas las Áreas)</option>
-                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
-            `;
-            Array.from(areasInasistencias).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
-        }
-
-        if(document.getElementById('ordenTiempoTard')) document.getElementById('ordenTiempoTard').value = "MAYOR_MENOR";
-        if(document.getElementById('ordenTiempoOmis')) document.getElementById('ordenTiempoOmis').value = "MAYOR_MENOR";
-        if(document.getElementById('ordenFechaInas')) document.getElementById('ordenFechaInas').value = "RECIENTE_ANTIGUO";
-
-        filtrarYRenderizarTardanzas();
-        filtrarYRenderizarOmisiones();
-        filtrarYRenderizarInasistencias();
-    }
 
    function filtrarYRenderizarTardanzas() {
     const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
@@ -1186,10 +1175,9 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
     ejecutarBuscadorTextoPlano('tbodyTardanzas');
 }
 
-    function filtrarYRenderizarOmisiones() {
+   function filtrarYRenderizarOmisiones() {
     const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
     const fechaCronologiaSel = document.getElementById('filtroFechaOmisCronologia')?.value || "NINGUNO";
-    const ordenTiempoSel = document.getElementById('ordenTiempoOmis')?.value || "NINGUNO";
     const tbody = document.getElementById('tbodyOmisiones');
     if (!tbody) return;
 
@@ -1200,27 +1188,14 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
         filtrados = filtrados.filter(x => x.area === areaSel);
     }
 
-    // 2. ORDENAMIENTO EN CASCADA COMBINADO
+    // 2. ORDENAMIENTO (Área o Fecha)
     if (areaSel === "ORDEN_AZ") {
         filtrados.sort((a, b) => a.area.localeCompare(b.area));
-    } else {
+    } else if (fechaCronologiaSel !== "NINGUNO") {
         filtrados.sort((a, b) => {
-            // 📅 PASO A: Comparar por Fechas Primero
             const fechaA = mapearFechaObjeto(a.fecha);
             const fechaB = mapearFechaObjeto(b.fecha);
-
-            if (fechaA !== fechaB && fechaCronologiaSel !== "NINGUNO") {
-                return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
-            }
-
-            // 📈 PASO B: Si las fechas son iguales (o el filtro de fecha está desactivado), desempatar por Tiempo
-            if (ordenTiempoSel !== "NINGUNO") {
-                const minutosA = convertirHoraAMinutos(a.valor);
-                const minutosB = convertirHoraAMinutos(b.valor);
-                return ordenTiempoSel === "MAYOR_MENOR" ? minutosB - minutosA : minutosA - minutosB;
-            }
-
-            return 0; // Si no hay criterios activos, mantener el orden original
+            return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
         });
     }
 
@@ -1228,11 +1203,11 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
     tbody.innerHTML = filtrados.map(x => `
         <tr style="height: 34px;">
             <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+            <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta || ''}</td>
             <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
             <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
             <td class="text-center" style="padding: 4px 10px;">
-                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold border border-danger-subtle" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido (${x.valor})</span>
+                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold border border-danger-subtle" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido</span>
             </td>
         </tr>
     `).join('');
@@ -1307,7 +1282,7 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
         };
     }
 
-    // Buscadores reactivos
+
     document.querySelectorAll('.buscador').forEach(input => {
         input.oninput = (e) => {
             const query = e.target.value.toLowerCase();
@@ -1322,7 +1297,7 @@ if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInas
         };
     });
 
-    // Mapeos globales
+
     window.aplicarFiltrosAlmacen = aplicarFiltrosAlmacen;
     window.aplicarFiltrosCriticos = aplicarFiltrosCriticos;
     window.filtrarYRenderizarTardanzas = filtrarYRenderizarTardanzas;
