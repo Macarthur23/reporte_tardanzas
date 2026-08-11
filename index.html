@@ -189,6 +189,33 @@
         .text-danger { color: var(--primary-color) !important; }
         .btn-outline-danger { color: var(--primary-color) !important; border-color: var(--primary-color) !important; }
         .btn-outline-danger:hover { background-color: var(--primary-color) !important; color: #fff !important; }
+
+        /* ===== NUEVO: Dropdown multi-selección de Áreas ===== */
+        .multi-area-btn {
+            width: 220px;
+            background: #fff;
+            border: 1px solid #ced4da;
+            font-size: 0.875rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .multi-area-menu {
+            max-height: 280px;
+            overflow-y: auto;
+            width: 260px;
+        }
+        .multi-area-menu .form-check {
+            padding-left: 1.75em;
+        }
+        .multi-area-menu .form-check-label {
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .multi-area-menu .multi-area-item:hover {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -199,7 +226,7 @@
             <h5 class="m-0 fw-bold text-white d-flex align-items-center">
                 <i class="bi bi-grid-1x2-fill text-danger me-2"></i> PROMART
             </h5>
-            <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
+            <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Reporte de Discrepancias</small>
         </div>
 
         <ul class="components">
@@ -210,6 +237,8 @@
             <li><button class="tab-nav-btn" data-target="panel-tardanzas-det" id="btnMenuTard" disabled><i class="bi bi-clock"></i> Reporte de Tardanzas</button></li>
             <li><button class="tab-nav-btn" data-target="panel-omisiones-det" id="btnMenuOmis" disabled><i class="bi bi-eraser"></i> Reporte Omision de Marcajes</button></li>
             <li><button class="tab-nav-btn" data-target="panel-inasistencias-det" id="btnMenuInas" disabled><i class="bi bi-exclamation-octagon"></i> Reporte de Inasistencias</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-refrigerio-det" id="btnMenuRefrig" disabled><i class="bi bi-cup-hot"></i> Reporte Exceso de Refrigerio</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-turno-det" id="btnMenuTurno" disabled><i class="bi bi-hourglass-split"></i> Reporte de Exceso de Turno</button></li>
         </ul>
     </nav>
 
@@ -381,9 +410,12 @@
                         <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
                     </select>
                     <div class="small fw-semibold text-muted ms-2 me-1">🏢 Filtrar Área:</div>
-                    <select id="filtroAreaCrit" class="form-select form-select-sm" style="width: 180px;" onchange="aplicarFiltrosCriticos()">
-                        <option value="TODOS">(Todas las Áreas)</option>
-                    </select>
+                    <div class="dropdown">
+                        <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_crit" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <span id="filtroAreaBtnTexto_crit">(Todas las Áreas)</span>
+                        </button>
+                        <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_crit" aria-labelledby="filtroAreaDrop_crit"></ul>
+                    </div>
                     <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar por %:</div>
                     <select id="ordenPrecioCrit" class="form-select form-select-sm" style="width: 190px;" onchange="aplicarFiltrosCriticos()">
                         <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
@@ -415,9 +447,12 @@
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
-                        <select id="filtroAreaTard" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarTardanzas()">
-                            <option value="TODOS">(Todas las Áreas)</option>
-                        </select>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_tard" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_tard">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_tard" aria-labelledby="filtroAreaDrop_tard"></ul>
+                        </div>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
                         <select id="filtroFechaTardCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTardanzas()">
@@ -459,9 +494,12 @@
                     </div>
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
-                        <select id="filtroAreaOmis" class="form-select form-select-sm" style="width: 170px;" onchange="filtrarYRenderizarOmisiones()">
-                            <option value="TODOS">(Todas las Áreas)</option>
-                        </select>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_omis" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_omis">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_omis" aria-labelledby="filtroAreaDrop_omis"></ul>
+                        </div>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
                         <select id="filtroFechaOmisCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarOmisiones()">
@@ -498,9 +536,12 @@
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
-                        <select id="filtroAreaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
-                            <option value="TODOS">(Todas las Áreas)</option>
-                        </select>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_inas" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_inas">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_inas" aria-labelledby="filtroAreaDrop_inas"></ul>
+                        </div>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📅 Ordenar Fecha:</div>
                         <select id="ordenFechaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
@@ -520,6 +561,164 @@
                             </tr>
                             </thead>
                             <tbody id="tbodyInasistencias"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-refrigerio-det">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-cup-hot-fill"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Alerta de Break</p>
+                                    <p class="image-card-subtitle">Total de Casos con Exceso</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-warning" id="miniRefrigTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-building"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Foco de Atención</p>
+                                    <p class="image-card-subtitle" id="miniRefrigArea" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguna</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card border-start border-warning border-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-warning-emphasis m-0"><i class="bi bi-cup-hot-fill me-2"></i>REPORTE EXCESO DE REFRIGERIO</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyRefrigerio" placeholder="Filtrar exceso de refrigerio...">
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_refrig" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_refrig">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_refrig" aria-labelledby="filtroAreaDrop_refrig"></ul>
+                        </div>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
+                        <select id="filtroFechaRefrigCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarRefrigerio()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="FECHA_RECIENTE">Más Reciente</option>
+                            <option value="FECHA_ANTIGUA">Más Antiguo</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Exceso:</div>
+                        <select id="ordenExcesoRefrig" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarRefrigerio()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
+                            <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                        </select>
+                    </div>
+
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Salida Refrigerio</th>
+                                <th class="text-center">Regreso Refrigerio</th>
+                                <th class="text-center">Exceso</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyRefrigerio"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-turno-det">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Alerta de Turno</p>
+                                    <p class="image-card-subtitle">Total de Casos con Exceso</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-warning" id="miniTurnoTotal">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="image-style-card">
+                            <div class="image-card-left">
+                                <div class="image-card-icon-container bg-warning-subtle text-warning"><i class="bi bi-building"></i></div>
+                                <div class="image-card-info-block">
+                                    <p class="image-card-title">Foco de Atención</p>
+                                    <p class="image-card-subtitle" id="miniTurnoArea" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguna</p>
+                                    <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-warning" style="width: 100%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="image-card-right-value text-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card border-start border-warning border-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-warning-emphasis m-0"><i class="bi bi-hourglass-split me-2"></i>REPORTE DE EXCESO DE TURNO</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyTurno" placeholder="Filtrar exceso de turno...">
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_turno" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_turno">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_turno" aria-labelledby="filtroAreaDrop_turno"></ul>
+                        </div>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📅 Filtrar Fecha:</div>
+                        <select id="filtroFechaTurnoCronologia" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTurno()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="FECHA_RECIENTE">Más Reciente</option>
+                            <option value="FECHA_ANTIGUA">Más Antiguo</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar Exceso:</div>
+                        <select id="ordenExcesoTurno" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarTurno()">
+                            <option value="NINGUNO">-- Seleccionar Orden --</option>
+                            <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
+                            <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                        </select>
+                    </div>
+
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Marc. Ingreso</th>
+                                <th class="text-center">Marc. Salida</th>
+                                <th class="text-center">Exceso</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyTurno"></tbody>
                         </table>
                     </div>
                 </div>
@@ -551,6 +750,8 @@
     let datosTardanzasGlobal = [];
     let datosOmisionesGlobal = [];
     let datosInasistenciasGlobal = [];
+    let datosRefrigerioGlobal = [];
+    let datosTurnoGlobal = [];
 
     // Función de apoyo para convertir "HH:MM" a un número entero de minutos
     function convertirHoraAMinutos(tiempoStr) {
@@ -560,6 +761,14 @@
         const horas = parseInt(partes[0], 10) || 0;
         const minutos = parseInt(partes[1], 10) || 0;
         return (horas * 60) + minutos;
+    }
+
+    // Función de apoyo para convertir un número de minutos a texto "HH:MM"
+    function convertirMinutosAHora(mins) {
+        if (!mins || mins < 0) mins = 0;
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
     }
 
     // Función de apoyo para parsear fechas "DD/MM/AAAA" para ordenamiento preciso
@@ -647,6 +856,8 @@
                 document.getElementById('btnMenuTard').disabled = false;
                 document.getElementById('btnMenuOmis').disabled = false;
                 document.getElementById('btnMenuInas').disabled = false;
+                document.getElementById('btnMenuRefrig').disabled = false;
+                document.getElementById('btnMenuTurno').disabled = false;
 
                 document.getElementById('kpiRow').style.display = 'flex';
 
@@ -786,17 +997,8 @@
             }
         });
 
-        // CORREGIDO: Se añade la opción ORDEN_AZ y se mapea usando areasUnicasCrit de la A a la Z
-        const selAreaCrit = document.getElementById('filtroAreaCrit');
-        if (selAreaCrit) {
-            selAreaCrit.innerHTML = `
-                <option value="TODOS">(Todas las Áreas)</option>
-                <option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>
-            `;
-            Array.from(areasUnicasCrit).sort((a, b) => a.localeCompare(b)).forEach(a => {
-                selAreaCrit.innerHTML += `<option value="${a}">${a}</option>`;
-            });
-        }
+        // Poblar el nuevo dropdown multi-selección de áreas críticas
+        construirMenuMultiArea('crit', areasUnicasCrit, aplicarFiltrosCriticos);
 
         if(document.getElementById('miniAlmTotal')) document.getElementById('miniAlmTotal').innerText = totalAlm;
         let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
@@ -815,7 +1017,6 @@
         if(document.getElementById('filtroSemaforoAlm')) document.getElementById('filtroSemaforoAlm').value = "TODOS";
         if(document.getElementById('ordenPrecioAlm')) document.getElementById('ordenPrecioAlm').value = "MAYOR_MENOR";
         if(document.getElementById('filtroSemaforoCrit')) document.getElementById('filtroSemaforoCrit').value = "TODOS";
-        if(document.getElementById('filtroAreaCrit')) document.getElementById('filtroAreaCrit').value = "TODOS";
         if(document.getElementById('ordenPrecioCrit')) document.getElementById('ordenPrecioCrit').value = "MAYOR_MENOR";
 
         aplicarFiltrosAlmacen();
@@ -862,7 +1063,7 @@
 
     function aplicarFiltrosCriticos() {
         const colorSeleccionado = document.getElementById('filtroSemaforoCrit')?.value || "TODOS";
-        const areaSeleccionada = document.getElementById('filtroAreaCrit')?.value || "TODOS";
+        const areasSeleccionadas = obtenerSeleccionMultiArea('crit');
         const ordenSeleccionado = document.getElementById('ordenPrecioCrit')?.value || "MAYOR_MENOR";
         const tbodyCriticos = document.getElementById('tbodyCriticos');
 
@@ -876,13 +1077,13 @@
             datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
         }
 
-        // 2. Filtrar por área (si es un área específica)
-        if (areaSeleccionada !== "TODOS" && areaSeleccionada !== "ORDEN_AZ") {
-            datosFiltrados = datosFiltrados.filter(p => p.area === areaSeleccionada);
+        // 2. Filtrar por área (multi-selección: conjunto vacío o "TODOS" = mostrar todas)
+        if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+            datosFiltrados = datosFiltrados.filter(p => areasSeleccionadas.has(p.area));
         }
 
         // 3. Aplicar ordenamiento final respetando la selección
-        if (areaSeleccionada === "ORDEN_AZ") {
+        if (filtrosAreaEstado.crit.ordenarAZ) {
             datosFiltrados.sort((a, b) => a.area.localeCompare(b.area));
         } else {
             if (ordenSeleccionado === "MAYOR_MENOR") {
@@ -935,6 +1136,8 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
     let areasOmisiones = new Set();
     let fechasOmisiones = new Set();
     let areasInasistencias = new Set();
+    let areasRefrigerio = new Set();
+    let areasTurno = new Set();
 
     const archivoId = nombreArchivo.replace(/[\.\#\$\[\]\/]/g, "_");
     let archivoYaProcesado = false;
@@ -1085,6 +1288,69 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
             datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
             if (areaFinal) areasInasistencias.add(areaFinal);
         }
+
+        // ========================================================
+        // 4. PROCESAR EXCESO DE REFRIGERIO (MARC SAL REF -> MARC REG REF)
+        // Break estándar de 60 min + tolerancia de 5 min. Exceso cuenta desde el minuto 6.
+        // ========================================================
+        let salRef = row["MARC SAL REF"] ? String(row["MARC SAL REF"]).trim() : "";
+        let regRef = row["MARC REG REF"] ? String(row["MARC REG REF"]).trim() : "";
+        if (salRef && salRef !== "00:00" && regRef && regRef !== "00:00") {
+            let minSalRef = convertirHoraAMinutos(salRef);
+            let minRegRef = convertirHoraAMinutos(regRef);
+            let duracionBreak = minRegRef - minSalRef;
+            if (duracionBreak < 0) duracionBreak += 24 * 60; // cruce de medianoche
+            let excesoBreak = duracionBreak - 60;
+
+            if (excesoBreak > 5) {
+                datosRefrigerioGlobal.push({
+                    dni, nombre, area: areaFinal, fecha,
+                    salida: salRef, regreso: regRef,
+                    excesoMin: excesoBreak,
+                    excesoStr: convertirMinutosAHora(excesoBreak),
+                    tipoEtiqueta
+                });
+                if (areaFinal) areasRefrigerio.add(areaFinal);
+            }
+        }
+
+        // ========================================================
+        // 5. PROCESAR EXCESO DE TURNO (HOR ENTRADA/HRSALIDA -> MARC INGR/MARC SALIDA)
+        // Duración total del turno programado = HRSALIDA - HOR ENTRADA (incluye refrigerio).
+        // Salida esperada = hora real de ingreso + esa duración de turno.
+        // Tolerancia de 5 min. Exceso cuenta desde el minuto 6.
+        // (No se usa HORAS PROGRAMADAS porque es neto sin refrigerio y genera falsos excesos)
+        // ========================================================
+        let marcIngr = row["MARC INGR"] ? String(row["MARC INGR"]).trim() : "";
+        let marcSalida = row["MARC SALIDA"] ? String(row["MARC SALIDA"]).trim() : "";
+        let horEntradaProg = row["HOR ENTRADA"] ? String(row["HOR ENTRADA"]).trim() : "";
+        let hrSalidaProg = row["HRSALIDA"] ? String(row["HRSALIDA"]).trim() : "";
+
+        if (marcIngr && marcIngr !== "00:00" && marcSalida && marcSalida !== "00:00" && horEntradaProg && hrSalidaProg) {
+            let minHorEntrada = convertirHoraAMinutos(horEntradaProg);
+            let minHrSalida = convertirHoraAMinutos(hrSalidaProg);
+            let duracionTurnoProgramado = minHrSalida - minHorEntrada;
+            if (duracionTurnoProgramado <= 0) duracionTurnoProgramado += 24 * 60; // cruce de medianoche
+
+            let minIngr = convertirHoraAMinutos(marcIngr);
+            let minSalidaEsperada = minIngr + duracionTurnoProgramado;
+
+            let minSalidaReal = convertirHoraAMinutos(marcSalida);
+            if (minSalidaReal < minIngr) minSalidaReal += 24 * 60; // cruce de medianoche
+
+            let excesoTurno = minSalidaReal - minSalidaEsperada;
+
+            if (excesoTurno > 5) {
+                datosTurnoGlobal.push({
+                    dni, nombre, area: areaFinal, fecha,
+                    ingreso: marcIngr, salida: marcSalida,
+                    excesoMin: excesoTurno,
+                    excesoStr: convertirMinutosAHora(excesoTurno),
+                    tipoEtiqueta
+                });
+                if (areaFinal) areasTurno.add(areaFinal);
+            }
+        }
     } // Fin bucle for
 
     // ========================================================
@@ -1094,32 +1360,40 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
     if(document.getElementById('kpiOmisiones')) document.getElementById('kpiOmisiones').innerText = datosOmisionesGlobal.length;
     if(document.getElementById('kpiInasistencias')) document.getElementById('kpiInasistencias').innerText = datosInasistenciasGlobal.length;
 
-    // Configurar Selectores
-    const selAreaTard = document.getElementById('filtroAreaTard');
-    if (selAreaTard) {
-        selAreaTard.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
-        Array.from(areasTardanzas).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaTard.innerHTML += `<option value="${a}">${a}</option>`);
-    }
+    if(document.getElementById('miniRefrigTotal')) document.getElementById('miniRefrigTotal').innerText = datosRefrigerioGlobal.length;
+    if(document.getElementById('miniTurnoTotal')) document.getElementById('miniTurnoTotal').innerText = datosTurnoGlobal.length;
 
-    const selAreaOmis = document.getElementById('filtroAreaOmis');
-    if (selAreaOmis) {
-        selAreaOmis.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
-        Array.from(areasOmisiones).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaOmis.innerHTML += `<option value="${a}">${a}</option>`);
-    }
+    document.getElementById('miniRefrigArea') && (document.getElementById('miniRefrigArea').innerText = calcularAreaMasFrecuente(datosRefrigerioGlobal));
+    document.getElementById('miniTurnoArea') && (document.getElementById('miniTurnoArea').innerText = calcularAreaMasFrecuente(datosTurnoGlobal));
 
-    const selAreaInas = document.getElementById('filtroAreaInas');
-    if (selAreaInas) {
-        selAreaInas.innerHTML = `<option value="TODOS">(Todas las Áreas)</option><option value="ORDEN_AZ">Ordenar: A a la Z (Todo)</option>`;
-        Array.from(areasInasistencias).sort((a, b) => a.localeCompare(b)).forEach(a => selAreaInas.innerHTML += `<option value="${a}">${a}</option>`);
-    }
+    // Configurar Selectores multi-área
+    construirMenuMultiArea('tard', areasTardanzas, filtrarYRenderizarTardanzas);
+    construirMenuMultiArea('omis', areasOmisiones, filtrarYRenderizarOmisiones);
+    construirMenuMultiArea('inas', areasInasistencias, filtrarYRenderizarInasistencias);
+    construirMenuMultiArea('refrig', areasRefrigerio, filtrarYRenderizarRefrigerio);
+    construirMenuMultiArea('turno', areasTurno, filtrarYRenderizarTurno);
 
     filtrarYRenderizarTardanzas();
     filtrarYRenderizarOmisiones();
     filtrarYRenderizarInasistencias();
+    filtrarYRenderizarRefrigerio();
+    filtrarYRenderizarTurno();
+}
+
+// Calcula el área con más casos dentro de un arreglo de incidencias (para las tarjetas "Foco de Atención")
+function calcularAreaMasFrecuente(lista) {
+    if (!lista.length) return "Ninguna";
+    let conteo = {};
+    lista.forEach(x => { if (x.area) conteo[x.area] = (conteo[x.area] || 0) + 1; });
+    let areaTop = "Ninguna", maxCasos = 0;
+    for (const [area, casos] of Object.entries(conteo)) {
+        if (casos > maxCasos) { maxCasos = casos; areaTop = area; }
+    }
+    return areaTop + " (" + maxCasos + " Casos)";
 }
 
    function filtrarYRenderizarTardanzas() {
-    const areaSel = document.getElementById('filtroAreaTard')?.value || "TODOS";
+    const areasSeleccionadas = obtenerSeleccionMultiArea('tard');
     const fechaCronologiaSel = document.getElementById('filtroFechaTardCronologia')?.value || "NINGUNO";
     const ordenTiempoSel = document.getElementById('ordenTiempoTard')?.value || "NINGUNO";
     const tbody = document.getElementById('tbodyTardanzas');
@@ -1127,13 +1401,13 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
 
     let filtrados = [...datosTardanzasGlobal];
 
-    // 1. FILTRAR POR ÁREA
-    if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
-        filtrados = filtrados.filter(x => x.area === areaSel);
+    // 1. FILTRAR POR ÁREA (multi-selección)
+    if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+        filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
     }
 
     // 2. ORDENAMIENTO EN CASCADA COMBINADO
-    if (areaSel === "ORDEN_AZ") {
+    if (filtrosAreaEstado.tard.ordenarAZ) {
         filtrados.sort((a, b) => a.area.localeCompare(b.area));
     } else {
         filtrados.sort((a, b) => {
@@ -1176,20 +1450,20 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
 }
 
    function filtrarYRenderizarOmisiones() {
-    const areaSel = document.getElementById('filtroAreaOmis')?.value || "TODOS";
+    const areasSeleccionadas = obtenerSeleccionMultiArea('omis');
     const fechaCronologiaSel = document.getElementById('filtroFechaOmisCronologia')?.value || "NINGUNO";
     const tbody = document.getElementById('tbodyOmisiones');
     if (!tbody) return;
 
     let filtrados = [...datosOmisionesGlobal];
 
-    // 1. FILTRAR POR ÁREA
-    if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
-        filtrados = filtrados.filter(x => x.area === areaSel);
+    // 1. FILTRAR POR ÁREA (multi-selección)
+    if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+        filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
     }
 
-    // 2. ORDENAMIENTO (Área o Fecha)
-    if (areaSel === "ORDEN_AZ") {
+    // 2. ORDENAMIENTO (Área A-Z o Fecha)
+    if (filtrosAreaEstado.omis.ordenarAZ) {
         filtrados.sort((a, b) => a.area.localeCompare(b.area));
     } else if (fechaCronologiaSel !== "NINGUNO") {
         filtrados.sort((a, b) => {
@@ -1216,20 +1490,20 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
 }
 
     function filtrarYRenderizarInasistencias() {
-        const areaSel = document.getElementById('filtroAreaInas')?.value || "TODOS";
+        const areasSeleccionadas = obtenerSeleccionMultiArea('inas');
         const ordenSel = document.getElementById('ordenFechaInas')?.value || "RECIENTE_ANTIGUO";
         const tbody = document.getElementById('tbodyInasistencias');
         if (!tbody) return;
 
         let filtrados = [...datosInasistenciasGlobal];
 
-        // 1. Filtrar por Área (si es un área específica)
-        if (areaSel !== "TODOS" && areaSel !== "ORDEN_AZ") {
-            filtrados = filtrados.filter(x => x.area === areaSel);
+        // 1. Filtrar por Área (multi-selección)
+        if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+            filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
         }
 
         // 2. Aplicar ordenamiento final
-        if (areaSel === "ORDEN_AZ") {
+        if (filtrosAreaEstado.inas.ordenarAZ) {
             filtrados.sort((a, b) => a.area.localeCompare(b.area));
         } else {
             if (ordenSel === "RECIENTE_ANTIGUO") {
@@ -1250,6 +1524,216 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
             </tr>
         `).join('');
         ejecutarBuscadorTextoPlano('tbodyInasistencias');
+    }
+
+    function filtrarYRenderizarRefrigerio() {
+        const areasSeleccionadas = obtenerSeleccionMultiArea('refrig');
+        const fechaCronologiaSel = document.getElementById('filtroFechaRefrigCronologia')?.value || "NINGUNO";
+        const ordenExcesoSel = document.getElementById('ordenExcesoRefrig')?.value || "NINGUNO";
+        const tbody = document.getElementById('tbodyRefrigerio');
+        if (!tbody) return;
+
+        let filtrados = [...datosRefrigerioGlobal];
+
+        // 1. Filtrar por área (multi-selección)
+        if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+            filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+        }
+
+        // 2. Ordenamiento en cascada: A-Z de área > Fecha > Exceso
+        if (filtrosAreaEstado.refrig.ordenarAZ) {
+            filtrados.sort((a, b) => a.area.localeCompare(b.area));
+        } else {
+            filtrados.sort((a, b) => {
+                const fechaA = mapearFechaObjeto(a.fecha);
+                const fechaB = mapearFechaObjeto(b.fecha);
+                if (fechaCronologiaSel !== "NINGUNO" && fechaA !== fechaB) {
+                    return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
+                }
+                if (ordenExcesoSel !== "NINGUNO" && a.excesoMin !== b.excesoMin) {
+                    return ordenExcesoSel === "MAYOR_MENOR" ? b.excesoMin - a.excesoMin : a.excesoMin - b.excesoMin;
+                }
+                return 0;
+            });
+        }
+
+        // 3. Renderizar
+        tbody.innerHTML = filtrados.map(x => `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+                <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.salida}</td>
+                <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.regreso}</td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">🍽️ ${x.excesoStr}</span>
+                </td>
+            </tr>
+        `).join('');
+
+        ejecutarBuscadorTextoPlano('tbodyRefrigerio');
+    }
+
+    function filtrarYRenderizarTurno() {
+        const areasSeleccionadas = obtenerSeleccionMultiArea('turno');
+        const fechaCronologiaSel = document.getElementById('filtroFechaTurnoCronologia')?.value || "NINGUNO";
+        const ordenExcesoSel = document.getElementById('ordenExcesoTurno')?.value || "NINGUNO";
+        const tbody = document.getElementById('tbodyTurno');
+        if (!tbody) return;
+
+        let filtrados = [...datosTurnoGlobal];
+
+        // 1. Filtrar por área (multi-selección)
+        if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+            filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+        }
+
+        // 2. Ordenamiento en cascada: A-Z de área > Fecha > Exceso
+        if (filtrosAreaEstado.turno.ordenarAZ) {
+            filtrados.sort((a, b) => a.area.localeCompare(b.area));
+        } else {
+            filtrados.sort((a, b) => {
+                const fechaA = mapearFechaObjeto(a.fecha);
+                const fechaB = mapearFechaObjeto(b.fecha);
+                if (fechaCronologiaSel !== "NINGUNO" && fechaA !== fechaB) {
+                    return fechaCronologiaSel === "FECHA_RECIENTE" ? fechaB - fechaA : fechaA - fechaB;
+                }
+                if (ordenExcesoSel !== "NINGUNO" && a.excesoMin !== b.excesoMin) {
+                    return ordenExcesoSel === "MAYOR_MENOR" ? b.excesoMin - a.excesoMin : a.excesoMin - b.excesoMin;
+                }
+                return 0;
+            });
+        }
+
+        // 3. Renderizar
+        tbody.innerHTML = filtrados.map(x => `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
+                <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.ingreso}</td>
+                <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.salida}</td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle" style="font-size: 0.75rem; padding: 2px 8px;">⏳ ${x.excesoStr}</span>
+                </td>
+            </tr>
+        `).join('');
+
+        ejecutarBuscadorTextoPlano('tbodyTurno');
+    }
+
+    // ============================================================
+    // NUEVO: Sistema de filtro multi-selección de Áreas (checkboxes)
+    // ============================================================
+    // Estado por cada filtro: qué áreas están marcadas y si el orden A-Z está activo
+    const filtrosAreaEstado = {
+        crit: { seleccion: new Set(), ordenarAZ: false },
+        tard: { seleccion: new Set(), ordenarAZ: false },
+        omis: { seleccion: new Set(), ordenarAZ: false },
+        inas: { seleccion: new Set(), ordenarAZ: false },
+        refrig: { seleccion: new Set(), ordenarAZ: false },
+        turno: { seleccion: new Set(), ordenarAZ: false }
+    };
+
+    // Construye (o reconstruye) el menú desplegable de checkboxes para un filtro de área dado
+    function construirMenuMultiArea(key, areasSet, callbackFiltrar) {
+        const menu = document.getElementById('filtroAreaMenu_' + key);
+        const btnTexto = document.getElementById('filtroAreaBtnTexto_' + key);
+        if (!menu) return;
+
+        // Conservamos la selección previa que siga siendo válida (por si se recarga otro archivo)
+        const areasOrdenadas = Array.from(areasSet).sort((a, b) => a.localeCompare(b));
+        const seleccionPrevia = filtrosAreaEstado[key].seleccion;
+        const seleccionValida = new Set(Array.from(seleccionPrevia).filter(a => areasSet.has(a)));
+        filtrosAreaEstado[key].seleccion = seleccionValida;
+
+        let html = `
+            <li class="px-2 py-1">
+                <div class="form-check">
+                    <input class="form-check-input chk-area-todos" type="checkbox" id="chkTodos_${key}" ${seleccionValida.size === 0 ? 'checked' : ''}>
+                    <label class="form-check-label fw-semibold" for="chkTodos_${key}">(Todas las Áreas)</label>
+                </div>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li class="px-2 py-1">
+                <div class="form-check">
+                    <input class="form-check-input chk-area-az" type="checkbox" id="chkAZ_${key}" ${filtrosAreaEstado[key].ordenarAZ ? 'checked' : ''}>
+                    <label class="form-check-label" for="chkAZ_${key}">🔤 Ordenar A a la Z</label>
+                </div>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+        `;
+
+        areasOrdenadas.forEach((area, idx) => {
+            const checked = seleccionValida.has(area) ? 'checked' : '';
+            const inputId = `chkArea_${key}_${idx}`;
+            html += `
+                <li class="px-2 py-1 multi-area-item">
+                    <div class="form-check">
+                        <input class="form-check-input chk-area-item" type="checkbox" id="${inputId}" data-area="${area}" ${checked}>
+                        <label class="form-check-label" for="${inputId}" title="${area}">${area}</label>
+                    </div>
+                </li>`;
+        });
+
+        menu.innerHTML = html;
+
+        // Checkbox "Todas las Áreas": al marcarla se limpia el resto
+        const chkTodos = menu.querySelector('.chk-area-todos');
+        chkTodos.addEventListener('change', () => {
+            if (chkTodos.checked) {
+                filtrosAreaEstado[key].seleccion.clear();
+                menu.querySelectorAll('.chk-area-item').forEach(c => c.checked = false);
+            }
+            actualizarTextoBotonMultiArea(key);
+            callbackFiltrar();
+        });
+
+        // Checkbox "Ordenar A-Z"
+        const chkAZ = menu.querySelector('.chk-area-az');
+        chkAZ.addEventListener('change', () => {
+            filtrosAreaEstado[key].ordenarAZ = chkAZ.checked;
+            callbackFiltrar();
+        });
+
+        // Checkboxes individuales de área
+        menu.querySelectorAll('.chk-area-item').forEach(chk => {
+            chk.addEventListener('change', () => {
+                const area = chk.getAttribute('data-area');
+                if (chk.checked) {
+                    filtrosAreaEstado[key].seleccion.add(area);
+                    chkTodos.checked = false;
+                } else {
+                    filtrosAreaEstado[key].seleccion.delete(area);
+                    if (filtrosAreaEstado[key].seleccion.size === 0) chkTodos.checked = true;
+                }
+                actualizarTextoBotonMultiArea(key);
+                callbackFiltrar();
+            });
+        });
+
+        actualizarTextoBotonMultiArea(key);
+    }
+
+    // Actualiza el texto del botón (ej. "3 áreas seleccionadas")
+    function actualizarTextoBotonMultiArea(key) {
+        const btnTexto = document.getElementById('filtroAreaBtnTexto_' + key);
+        if (!btnTexto) return;
+        const seleccion = filtrosAreaEstado[key].seleccion;
+        if (seleccion.size === 0) {
+            btnTexto.innerText = "(Todas las Áreas)";
+        } else if (seleccion.size === 1) {
+            btnTexto.innerText = Array.from(seleccion)[0];
+        } else {
+            btnTexto.innerText = seleccion.size + " áreas seleccionadas";
+        }
+    }
+
+    // Devuelve el Set de áreas seleccionadas para un filtro (vacío = todas)
+    function obtenerSeleccionMultiArea(key) {
+        return filtrosAreaEstado[key].seleccion;
     }
 
     // Acción del Botón de Reinicio Total
@@ -1303,4 +1787,8 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
     window.filtrarYRenderizarTardanzas = filtrarYRenderizarTardanzas;
     window.filtrarYRenderizarOmisiones = filtrarYRenderizarOmisiones;
     window.filtrarYRenderizarInasistencias = filtrarYRenderizarInasistencias;
+    window.filtrarYRenderizarRefrigerio = filtrarYRenderizarRefrigerio;
+    window.filtrarYRenderizarTurno = filtrarYRenderizarTurno;
 </script>
+</body>
+</html>
