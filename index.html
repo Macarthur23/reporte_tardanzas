@@ -493,6 +493,13 @@
                             <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
                             <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
                         </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">👤 Tipo:</div>
+                        <select id="filtroTipoTard" class="form-select form-select-sm" style="width: 130px;" onchange="filtrarYRenderizarTardanzas()">
+                            <option value="TODOS">Todos</option>
+                            <option value="FT">FT</option>
+                            <option value="PT">PT</option>
+                        </select>
                     </div>
 
                     <div class="custom-table-container">
@@ -533,6 +540,13 @@
                             <option value="FECHA_RECIENTE">Más Reciente</option>
                             <option value="FECHA_ANTIGUA">Más Antiguo</option>
                         </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">👤 Tipo:</div>
+                        <select id="filtroTipoOmis" class="form-select form-select-sm" style="width: 130px;" onchange="filtrarYRenderizarOmisiones()">
+                            <option value="TODOS">Todos</option>
+                            <option value="FT">FT</option>
+                            <option value="PT">PT</option>
+                        </select>
                     </div>
                     <div class="custom-table-container">
                         <table class="table table-hover align-middle">
@@ -542,7 +556,7 @@
                                 <th>Colaborador</th>
                                 <th>Área</th>
                                 <th>Fecha</th>
-                                <th class="text-center">Tiempo de Marca Omitida</th>
+                                <th class="text-center">Marca Omitida</th>
                             </tr>
                             </thead>
                             <tbody id="tbodyOmisiones"></tbody>
@@ -573,6 +587,13 @@
                         <select id="ordenFechaInas" class="form-select form-select-sm" style="width: 180px;" onchange="filtrarYRenderizarInasistencias()">
                             <option value="RECIENTE_ANTIGUO">Más Reciente ↓</option>
                             <option value="ANTIGUO_RECIENTE">Más Antiguo ↑</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">👤 Tipo:</div>
+                        <select id="filtroTipoInas" class="form-select form-select-sm" style="width: 130px;" onchange="filtrarYRenderizarInasistencias()">
+                            <option value="TODOS">Todos</option>
+                            <option value="FT">FT</option>
+                            <option value="PT">PT</option>
                         </select>
                     </div>
 
@@ -649,6 +670,13 @@
                             <option value="NINGUNO">-- Seleccionar Orden --</option>
                             <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
                             <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">👤 Tipo:</div>
+                        <select id="filtroTipoRefrig" class="form-select form-select-sm" style="width: 130px;" onchange="filtrarYRenderizarRefrigerio()">
+                            <option value="TODOS">Todos</option>
+                            <option value="FT">FT</option>
+                            <option value="PT">PT</option>
                         </select>
                     </div>
 
@@ -728,6 +756,13 @@
                             <option value="NINGUNO">-- Seleccionar Orden --</option>
                             <option value="MAYOR_MENOR">Mayor a Menor ↓</option>
                             <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
+                        </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">👤 Tipo:</div>
+                        <select id="filtroTipoTurno" class="form-select form-select-sm" style="width: 130px;" onchange="filtrarYRenderizarTurno()">
+                            <option value="TODOS">Todos</option>
+                            <option value="FT">FT</option>
+                            <option value="PT">PT</option>
                         </select>
                     </div>
 
@@ -1286,10 +1321,13 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
 
         let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
         let tipoEtiqueta = "";
+        let tipoCategoria = ""; // "FT", "PT" o "" (sin tipo)
         if (tipoRaw === "EMP") {
             tipoEtiqueta = `<span class="badge bg-info text-dark ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; background-color: #e0f2fe !important; border: 1px solid #bae6fd;">FT</span>`;
+            tipoCategoria = "FT";
         } else if (tipoRaw === "PRT" || tipoRaw === "PTM") {
             tipoEtiqueta = `<span class="badge text-purple ms-2 fw-bold" style="font-size: 0.68rem; padding: 1px 4px; color: #6b21a8 !important; background-color: #f3e8ff !important; border: 1px solid #e9d5ff;">PT</span>`;
+            tipoCategoria = "PT";
         }
 
         // ========================================================
@@ -1363,7 +1401,9 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                         area: areaFinal,
                         fecha,
                         valor: `Falta Marcaje (${tardanza})`,
+                        marcaFaltante: "Ingreso (tardanza > 4h)",
                         tipoEtiqueta,
+                        tipo: tipoCategoria,
                         totalOmisiones: 1
                     });
                     if (areaFinal) areasOmisiones.add(areaFinal);
@@ -1379,7 +1419,8 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                         area: areaFinal,
                         fecha,
                         valor: tardanza,
-                        tipoEtiqueta
+                        tipoEtiqueta,
+                        tipo: tipoCategoria
                     });
                     if (areaFinal) areasTardanzas.add(areaFinal);
                     if (fecha) fechasTardanzas.add(fecha);
@@ -1401,13 +1442,24 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                 console.error("Error leyendo contador:", e);
             }
 
+            // Describe cuál(es) de las 4 marcas del día están vacías o son fantasma,
+            // para que la tabla muestre exactamente qué se omitió (no solo un genérico "Omitido")
+            let marcasFaltantes = [];
+            if (!hayIngresoReal) marcasFaltantes.push("Ingreso");
+            if (!haySalidaRefValida) marcasFaltantes.push("Salida Refrigerio");
+            if (!hayRegresoRefValido) marcasFaltantes.push("Regreso Refrigerio");
+            if (!haySalidaValida) marcasFaltantes.push("Salida");
+            let marcaFaltanteStr = marcasFaltantes.length ? marcasFaltantes.join(" + ") : "Sin especificar";
+
             datosOmisionesGlobal.push({
                 dni,
                 nombre,
                 area: areaFinal,
                 fecha,
                 valor: omision,
+                marcaFaltante: marcaFaltanteStr,
                 tipoEtiqueta,
+                tipo: tipoCategoria,
                 totalOmisiones: totalAcumuladoHistorico
             });
             if (areaFinal) areasOmisiones.add(areaFinal);
@@ -1420,7 +1472,7 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
         let falta = row["Falta injus"] || row["FALTA INJUS"] || "";
         let faltaStr = String(falta).trim();
         if (faltaStr && faltaStr !== "00:00" && faltaStr !== "0") {
-            datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta });
+            datosInasistenciasGlobal.push({ dni, nombre, area: areaFinal, fecha, tipoEtiqueta, tipo: tipoCategoria });
             if (areaFinal) areasInasistencias.add(areaFinal);
         }
 
@@ -1445,7 +1497,8 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                     salida: salRef, regreso: regRef,
                     excesoMin: excesoBreak,
                     excesoStr: convertirMinutosAHora(excesoBreak),
-                    tipoEtiqueta
+                    tipoEtiqueta,
+                    tipo: tipoCategoria
                 });
                 if (areaFinal) areasRefrigerio.add(areaFinal);
             }
@@ -1487,7 +1540,8 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                     ingreso: marcIngr, salida: marcSalida,
                     excesoMin: excesoTurno,
                     excesoStr: convertirMinutosAHora(excesoTurno),
-                    tipoEtiqueta
+                    tipoEtiqueta,
+                    tipo: tipoCategoria
                 });
                 if (areaFinal) areasTurno.add(areaFinal);
             }
@@ -1537,6 +1591,7 @@ function calcularAreaMasFrecuente(lista) {
     const areasSeleccionadas = obtenerSeleccionMultiArea('tard');
     const fechaCronologiaSel = document.getElementById('filtroFechaTardCronologia')?.value || "NINGUNO";
     const ordenTiempoSel = document.getElementById('ordenTiempoTard')?.value || "NINGUNO";
+    const tipoSel = document.getElementById('filtroTipoTard')?.value || "TODOS";
     const tbody = document.getElementById('tbodyTardanzas');
     if (!tbody) return;
 
@@ -1545,6 +1600,11 @@ function calcularAreaMasFrecuente(lista) {
     // 1. FILTRAR POR ÁREA (multi-selección)
     if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
         filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+    }
+
+    // 1b. FILTRAR POR TIPO (FT/PT)
+    if (tipoSel !== "TODOS") {
+        filtrados = filtrados.filter(x => x.tipo === tipoSel);
     }
 
     // 2. ORDENAMIENTO EN CASCADA COMBINADO
@@ -1593,6 +1653,7 @@ function calcularAreaMasFrecuente(lista) {
    function filtrarYRenderizarOmisiones() {
     const areasSeleccionadas = obtenerSeleccionMultiArea('omis');
     const fechaCronologiaSel = document.getElementById('filtroFechaOmisCronologia')?.value || "NINGUNO";
+    const tipoSel = document.getElementById('filtroTipoOmis')?.value || "TODOS";
     const tbody = document.getElementById('tbodyOmisiones');
     if (!tbody) return;
 
@@ -1601,6 +1662,11 @@ function calcularAreaMasFrecuente(lista) {
     // 1. FILTRAR POR ÁREA (multi-selección)
     if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
         filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+    }
+
+    // 1b. FILTRAR POR TIPO (FT/PT)
+    if (tipoSel !== "TODOS") {
+        filtrados = filtrados.filter(x => x.tipo === tipoSel);
     }
 
     // 2. ORDENAMIENTO (Área A-Z o Fecha)
@@ -1622,7 +1688,7 @@ function calcularAreaMasFrecuente(lista) {
             <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
             <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
             <td class="text-center" style="padding: 4px 10px;">
-                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold border border-danger-subtle" style="font-size: 0.75rem; padding: 2px 8px;">❌ Omitido</span>
+                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold border border-danger-subtle" style="font-size: 0.75rem; padding: 2px 8px;">❌ ${x.marcaFaltante || 'Omitido'}</span>
             </td>
         </tr>
     `).join('');
@@ -1633,6 +1699,7 @@ function calcularAreaMasFrecuente(lista) {
     function filtrarYRenderizarInasistencias() {
         const areasSeleccionadas = obtenerSeleccionMultiArea('inas');
         const ordenSel = document.getElementById('ordenFechaInas')?.value || "RECIENTE_ANTIGUO";
+        const tipoSel = document.getElementById('filtroTipoInas')?.value || "TODOS";
         const tbody = document.getElementById('tbodyInasistencias');
         if (!tbody) return;
 
@@ -1641,6 +1708,11 @@ function calcularAreaMasFrecuente(lista) {
         // 1. Filtrar por Área (multi-selección)
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+        }
+
+        // 1b. Filtrar por Tipo (FT/PT)
+        if (tipoSel !== "TODOS") {
+            filtrados = filtrados.filter(x => x.tipo === tipoSel);
         }
 
         // 2. Aplicar ordenamiento final
@@ -1671,6 +1743,7 @@ function calcularAreaMasFrecuente(lista) {
         const areasSeleccionadas = obtenerSeleccionMultiArea('refrig');
         const fechaCronologiaSel = document.getElementById('filtroFechaRefrigCronologia')?.value || "NINGUNO";
         const ordenExcesoSel = document.getElementById('ordenExcesoRefrig')?.value || "NINGUNO";
+        const tipoSel = document.getElementById('filtroTipoRefrig')?.value || "TODOS";
         const tbody = document.getElementById('tbodyRefrigerio');
         if (!tbody) return;
 
@@ -1679,6 +1752,11 @@ function calcularAreaMasFrecuente(lista) {
         // 1. Filtrar por área (multi-selección)
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+        }
+
+        // 1b. Filtrar por Tipo (FT/PT)
+        if (tipoSel !== "TODOS") {
+            filtrados = filtrados.filter(x => x.tipo === tipoSel);
         }
 
         // 2. Ordenamiento en cascada: A-Z de área > Fecha > Exceso
@@ -1720,6 +1798,7 @@ function calcularAreaMasFrecuente(lista) {
         const areasSeleccionadas = obtenerSeleccionMultiArea('turno');
         const fechaCronologiaSel = document.getElementById('filtroFechaTurnoCronologia')?.value || "NINGUNO";
         const ordenExcesoSel = document.getElementById('ordenExcesoTurno')?.value || "NINGUNO";
+        const tipoSel = document.getElementById('filtroTipoTurno')?.value || "TODOS";
         const tbody = document.getElementById('tbodyTurno');
         if (!tbody) return;
 
@@ -1728,6 +1807,11 @@ function calcularAreaMasFrecuente(lista) {
         // 1. Filtrar por área (multi-selección)
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
+        }
+
+        // 1b. Filtrar por Tipo (FT/PT)
+        if (tipoSel !== "TODOS") {
+            filtrados = filtrados.filter(x => x.tipo === tipoSel);
         }
 
         // 2. Ordenamiento en cascada: A-Z de área > Fecha > Exceso
