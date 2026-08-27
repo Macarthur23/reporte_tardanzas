@@ -265,6 +265,8 @@
             <li><button class="tab-nav-btn" data-target="panel-inasistencias-det" id="btnMenuInas" disabled><i class="bi bi-exclamation-octagon"></i> Reporte de Inasistencias</button></li>
             <li><button class="tab-nav-btn" data-target="panel-refrigerio-det" id="btnMenuRefrig" disabled><i class="bi bi-cup-hot"></i> Reporte Exceso de Refrigerio</button></li>
             <li><button class="tab-nav-btn" data-target="panel-turno-det" id="btnMenuTurno" disabled><i class="bi bi-hourglass-split"></i> Reporte de Exceso de Turno</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-ranking-omisiones" id="btnMenuRankingOmis" disabled><i class="bi bi-trophy"></i> Ranking de Omisiones</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-resumen-tardanzas" id="btnMenuResumenTard" disabled><i class="bi bi-stopwatch"></i> Ranking de Tardanzas</button></li>
         </ul>
     </nav>
 
@@ -323,6 +325,32 @@
                 <div class="main-card">
                     <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart-fill text-danger me-2"></i>CUMPLIMIENTO POR ÁREAS</h5>
                     <div class="row g-4" id="gridGraficos"></div>
+                </div>
+
+                <div class="main-card" id="cardEvolucionAreas" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-graph-up-arrow text-success me-2"></i>EVOLUCIÓN POR ÁREA</h5>
+                        <small class="text-muted" id="evolucionPeriodoActualLabel"></small>
+                    </div>
+                    <p class="text-muted small mb-3">Compara el cumplimiento de cada área contra el período anterior guardado, y muestra la tendencia histórica.</p>
+
+                    <div class="custom-table-container mb-4">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Área</th>
+                                <th class="text-center">Período Actual</th>
+                                <th class="text-center">Período Anterior</th>
+                                <th class="text-center">Variación</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyEvolucionAreas"></tbody>
+                        </table>
+                    </div>
+
+                    <div style="position: relative; height: 320px;">
+                        <canvas id="chartEvolucionAreas"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -435,6 +463,15 @@
                         <option value="🟡">🟡 Solo Amarillos (95% - 98.5%)</option>
                         <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
                     </select>
+                    <div class="small fw-semibold text-muted ms-2 me-1">🏭 División:</div>
+                    <select id="filtroDivision_crit" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('crit', this.value)">
+                        <option value="TODAS">(Todas)</option>
+                        <option value="Div1">División 1</option>
+                        <option value="Div2">División 2</option>
+                        <option value="Div3">División 3</option>
+                        <option value="Div4">División 4</option>
+                        <option value="Otras">Otras / Sin División</option>
+                    </select>
                     <div class="small fw-semibold text-muted ms-2 me-1">🏢 Filtrar Área:</div>
                     <div class="dropdown">
                         <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_crit" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -472,6 +509,15 @@
                     </div>
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏭 División:</div>
+                        <select id="filtroDivision_tard" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('tard', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <div class="dropdown">
                             <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_tard" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -526,6 +572,15 @@
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyOmisiones" placeholder="Filtrar omisiones...">
                     </div>
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏭 División:</div>
+                        <select id="filtroDivision_omis" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('omis', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <div class="dropdown">
                             <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_omis" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -575,6 +630,15 @@
                     </div>
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏭 División:</div>
+                        <select id="filtroDivision_inas" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('inas', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <div class="dropdown">
                             <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_inas" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -650,6 +714,15 @@
                     </div>
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏭 División:</div>
+                        <select id="filtroDivision_refrig" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('refrig', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <div class="dropdown">
                             <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_refrig" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -736,6 +809,15 @@
                     </div>
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🏭 División:</div>
+                        <select id="filtroDivision_turno" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('turno', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
                         <div class="small fw-semibold text-muted me-1">🏢 Filtrar Área:</div>
                         <div class="dropdown">
                             <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_turno" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -780,6 +862,115 @@
                             </tr>
                             </thead>
                             <tbody id="tbodyTurno"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-ranking-omisiones">
+                <div class="main-card border-start border-warning border-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-warning-emphasis m-0"><i class="bi bi-trophy-fill me-2"></i>RANKING DE OMISIONES ACUMULADAS</h5>
+                        <input type="text" class="form-control w-25 buscador" data-target="tbodyRankingOmisiones" placeholder="Buscar colaborador...">
+                    </div>
+                    <p class="text-muted small mb-3">Total histórico de marcaciones omitidas por colaborador, acumulado desde que se empezó a usar el sistema (o desde el último "Reiniciar Historial").</p>
+
+                    <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🔢 Mínimo de omisiones:</div>
+                        <select id="filtroMinimoRanking" class="form-select form-select-sm" style="width: 160px;" onchange="dibujarTablaRankingOmisiones()">
+                            <option value="1">Todos (1+)</option>
+                            <option value="2" selected>Reincidentes (2+)</option>
+                            <option value="3">3 o más</option>
+                            <option value="5">5 o más</option>
+                        </select>
+                    </div>
+
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th class="text-center">Total Omisiones</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyRankingOmisiones"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-custom d-none" id="panel-resumen-tardanzas">
+                <div class="main-card">
+                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-stopwatch-fill text-danger me-2"></i>RANKING DE TARDANZAS</h5>
+                    <p class="text-muted small mb-3">Total histórico de tardanzas por colaborador, acumulado desde que se empezó a usar el sistema (o desde el último "Reiniciar Historial"), separado por tipo.</p>
+
+                    <div class="d-flex gap-2 mb-4 flex-wrap align-items-center bg-light p-2 rounded border">
+                        <div class="small fw-semibold text-muted me-1">🔢 Mínimo de tardanzas:</div>
+                        <select id="filtroMinimoRankingTard" class="form-select form-select-sm" style="width: 160px;" onchange="dibujarTablasRankingTardanzas()">
+                            <option value="1">Todos (1+)</option>
+                            <option value="2" selected>Reincidentes (2+)</option>
+                            <option value="3">3 o más</option>
+                            <option value="5">5 o más</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-secondary m-0"><i class="bi bi-box-arrow-in-right me-1"></i> Tardanza de Ingreso de Turno</h6>
+                        <input type="text" class="form-control form-control-sm w-25 buscador" data-target="tbodyResumenIngresoTurno" placeholder="Buscar colaborador...">
+                    </div>
+                    <div class="custom-table-container mb-4">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th class="text-center">Total Tardanzas</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyResumenIngresoTurno"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-secondary m-0"><i class="bi bi-cup-hot me-1"></i> Tardanza de Ingreso de Break (Regreso de Refrigerio)</h6>
+                        <input type="text" class="form-control form-control-sm w-25 buscador" data-target="tbodyResumenIngresoBreak" placeholder="Buscar colaborador...">
+                    </div>
+                    <div class="custom-table-container mb-4">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th class="text-center">Total Tardanzas</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyResumenIngresoBreak"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-secondary m-0"><i class="bi bi-box-arrow-right me-1"></i> Tardanza de Salida de Turno</h6>
+                        <input type="text" class="form-control form-control-sm w-25 buscador" data-target="tbodyResumenSalidaTurno" placeholder="Buscar colaborador...">
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>DNI</th>
+                                <th>Colaborador</th>
+                                <th>Área</th>
+                                <th class="text-center">Total Tardanzas</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbodyResumenSalidaTurno"></tbody>
                         </table>
                     </div>
                 </div>
@@ -866,6 +1057,8 @@
 
     // Variables globales para almacenar los datos limpios y permitir el filtrado reactivo
     let datosAlmacenGlobal = [];
+    let ultimasAreasProcesadasGlobal = [];
+    let mapaPersonasGlobal = {}; // dni -> {nombre, area} — se acumula con TODOS los DNI vistos en cualquier archivo de la sesión, para rellenar nombres/áreas en los rankings históricos
     let datosCriticosGlobal = [];
     let datosTardanzasGlobal = [];
     let datosOmisionesGlobal = [];
@@ -889,6 +1082,57 @@
         const h = Math.floor(mins / 60);
         const m = mins % 60;
         return String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
+    }
+
+    // ============================================================
+    // Contadores históricos genéricos (usados por Ranking de Omisiones y
+    // Ranking de Tardanzas): incrementan un total por DNI en una colección
+    // de Firestore, guardando también nombre/área para que el ranking sea
+    // legible sin depender del archivo actual.
+    // ============================================================
+    async function guardarContadorHistorico(coleccion, conteoPorDni, mapaPersonas) {
+        for (const [dni, incremento] of Object.entries(conteoPorDni)) {
+            if (!incremento) continue;
+            const info = mapaPersonas[dni] || {};
+            await setDoc(doc(db, coleccion, dni), {
+                total: increment(incremento),
+                nombre: info.nombre || "",
+                area: info.area || "",
+                ultimaActualizacion: new Date().toISOString()
+            }, { merge: true });
+        }
+    }
+
+    // Lee toda la colección, ordena de mayor a menor, y si algún registro no tiene
+    // nombre/área guardado (porque es de antes de este sistema) intenta rellenarlo
+    // con lo que sepamos del mapa de personas de la sesión actual — y si lo logra,
+    // corrige el dato en Firestore en segundo plano para que quede así permanentemente.
+    async function leerYBackfillRankingHistorico(coleccion, mapaPersonas, campoTotalLegado) {
+        const snap = await getDocs(collection(db, coleccion));
+        let lista = [];
+        let backfills = [];
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            let nombre = d.nombre || "";
+            let area = d.area || "";
+            const info = mapaPersonas[docSnap.id];
+            if ((!nombre || !area) && info) {
+                nombre = info.nombre || nombre;
+                area = info.area || area;
+                backfills.push({ id: docSnap.id, nombre, area });
+            }
+            let total = d.total !== undefined ? d.total : (campoTotalLegado ? (d[campoTotalLegado] || 0) : 0);
+            lista.push({ dni: docSnap.id, nombre: nombre || "(sin nombre registrado)", area: area || "—", total });
+        });
+        lista.sort((a, b) => b.total - a.total);
+
+        // Backfill en segundo plano: no bloquea el render de la tabla
+        backfills.forEach(b => {
+            setDoc(doc(db, coleccion, b.id), { nombre: b.nombre, area: b.area }, { merge: true })
+                .catch(e => console.error("Error rellenando nombre/área en", coleccion, e));
+        });
+
+        return lista;
     }
 
     // Función de apoyo para parsear fechas "DD/MM/AAAA" para ordenamiento preciso
@@ -978,12 +1222,17 @@
                 document.getElementById('btnMenuInas').disabled = false;
                 document.getElementById('btnMenuRefrig').disabled = false;
                 document.getElementById('btnMenuTurno').disabled = false;
+                document.getElementById('btnMenuRankingOmis').disabled = false;
+                document.getElementById('btnMenuResumenTard').disabled = false;
 
                 document.getElementById('kpiRow').style.display = 'flex';
 
                 renderizarAnillosDATA1(data1);
                 procesarTablasDATA2(data2);
                 await procesarIncidenciasDATA5(data5, file.name);
+                await procesarHistoricoAreas(ultimasAreasProcesadasGlobal, data5);
+                await renderizarRankingOmisiones();
+                await renderizarRankingTardanzas();
 
                 btnProcesar.disabled = false;
                 btnProcesar.innerText = "Generar Dashboard";
@@ -1023,6 +1272,7 @@
         });
 
         areasProcesadas.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
+        ultimasAreasProcesadasGlobal = areasProcesadas;
 
         let contenedorHtml = `<div class="col-12"><div class="row g-3">`;
 
@@ -1258,6 +1508,9 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
     let areasInasistencias = new Set();
     let areasRefrigerio = new Set();
     let areasTurno = new Set();
+    let conteoTardanzaIngreso = {}; // dni -> veces que llegó tarde al ingreso, en este archivo
+    let conteoTardanzaBreak = {};   // dni -> veces que se pasó del break, en este archivo
+    let conteoTardanzaSalida = {};  // dni -> veces que se pasó de su hora de salida, en este archivo
 
     const archivoId = nombreArchivo.replace(/[\.\#\$\[\]\/]/g, "_");
     let archivoYaProcesado = false;
@@ -1273,11 +1526,21 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
     }
 
     let omisionesExcelActual = [];
+    let infoPersonaPorDni = {}; // dni -> {nombre, area} — para que el ranking histórico sea legible sin depender del archivo actual
     data.forEach(row => {
         const dni = String(row["DNI"] || "").trim();
         let omision = row["AUSENCIA OMITIDA"] ? String(row["AUSENCIA OMITIDA"]).trim() : "";
         if (dni && omision && omision !== "00:00" && omision !== "0" && !dni.includes("FECHA:")) {
             omisionesExcelActual.push(row);
+            let areaRaw = row["AREA"] || row["AREAS"] || "";
+            let seccion2 = row["SECCION2"] || row["SECCION"] || "";
+            let areaParaRanking = areaRaw;
+            if (areaRaw.toUpperCase().includes("HOME CENTER") || areaRaw.toUpperCase().includes("PROMART") || areaRaw.length > 25) {
+                if (seccion2 && seccion2.trim() !== "" && !seccion2.toUpperCase().includes("Total general")) {
+                    areaParaRanking = seccion2;
+                }
+            }
+            infoPersonaPorDni[dni] = { nombre: row["NOMBRE"] || row["FULLNM"] || "", area: areaParaRanking };
         }
     });
 
@@ -1296,7 +1559,13 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
 
             for (const [dni, incremento] of Object.entries(conteoFrecuenciaExcel)) {
                 const docRef = doc(db, "omisiones_historicas", dni);
-                await setDoc(docRef, { totalOmisiones: increment(incremento) }, { merge: true });
+                const info = infoPersonaPorDni[dni] || {};
+                await setDoc(docRef, {
+                    totalOmisiones: increment(incremento),
+                    nombre: info.nombre || "",
+                    area: info.area || "",
+                    ultimaActualizacion: new Date().toISOString()
+                }, { merge: true });
             }
         } catch (error) {
             console.error("Error al escribir omisiones:", error);
@@ -1318,6 +1587,10 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                 areaFinal = seccion2;
             }
         }
+
+        // Registra a esta persona en el mapa global (para poder rellenar nombre/área
+        // en los rankings históricos, incluso de registros guardados antes de este dato)
+        if (nombre) mapaPersonasGlobal[dni] = { nombre, area: areaFinal };
 
         let tipoRaw = row["TIPO"] ? String(row["TIPO"]).toUpperCase().trim() : "";
         let tipoEtiqueta = "";
@@ -1424,6 +1697,7 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                     });
                     if (areaFinal) areasTardanzas.add(areaFinal);
                     if (fecha) fechasTardanzas.add(fecha);
+                    conteoTardanzaIngreso[dni] = (conteoTardanzaIngreso[dni] || 0) + 1;
                 }
             }
         }
@@ -1501,6 +1775,7 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                     tipo: tipoCategoria
                 });
                 if (areaFinal) areasRefrigerio.add(areaFinal);
+                conteoTardanzaBreak[dni] = (conteoTardanzaBreak[dni] || 0) + 1;
             }
         }
 
@@ -1544,9 +1819,22 @@ async function procesarIncidenciasDATA5(data, nombreArchivo) {
                     tipo: tipoCategoria
                 });
                 if (areaFinal) areasTurno.add(areaFinal);
+                conteoTardanzaSalida[dni] = (conteoTardanzaSalida[dni] || 0) + 1;
             }
         }
     } // Fin bucle for
+
+    // Guarda los 3 contadores de tardanza (ingreso, break, salida) en Firebase para el ranking histórico,
+    // reutilizando la misma protección contra archivos duplicados que ya se usa para omisiones.
+    if (!archivoYaProcesado) {
+        try {
+            await guardarContadorHistorico("historico_tardanza_ingreso", conteoTardanzaIngreso, mapaPersonasGlobal);
+            await guardarContadorHistorico("historico_tardanza_break", conteoTardanzaBreak, mapaPersonasGlobal);
+            await guardarContadorHistorico("historico_tardanza_salida", conteoTardanzaSalida, mapaPersonasGlobal);
+        } catch (error) {
+            console.error("Error al escribir ranking de tardanzas:", error);
+        }
+    }
 
     // ========================================================
     // 4. ACTUALIZAR CONTADORES Y RENDERIZAR
@@ -1586,6 +1874,289 @@ function calcularAreaMasFrecuente(lista) {
     }
     return areaTop + " (" + maxCasos + " Casos)";
 }
+
+// ============================================================
+// EVOLUCIÓN POR ÁREA: guarda el % de cada área en Firebase, etiquetado con el
+// rango de fechas real que trae el archivo (sea semanal, mensual o lo que sea),
+// y luego muestra la comparación contra el período anterior + la tendencia histórica.
+// ============================================================
+let graficoEvolucionAreas = null; // referencia al Chart.js activo, para poder destruirlo al redibujar
+
+async function procesarHistoricoAreas(areasProcesadas, data5) {
+    const card = document.getElementById('cardEvolucionAreas');
+    if (!areasProcesadas || !areasProcesadas.length || !data5 || !data5.length) {
+        if (card) card.style.display = 'none';
+        return;
+    }
+
+    // 1. Detectar el rango de fechas real que cubre este archivo (a partir de DATA 5)
+    let fechasOrdenables = [];
+    data5.forEach(row => {
+        let f = row["FECHA"];
+        if (f) {
+            let n = mapearFechaObjeto(String(f).trim());
+            if (n > 0) fechasOrdenables.push({ texto: String(f).trim(), num: n });
+        }
+    });
+    if (!fechasOrdenables.length) { if (card) card.style.display = 'none'; return; }
+
+    fechasOrdenables.sort((a, b) => a.num - b.num);
+    let fechaInicio = fechasOrdenables[0].texto;
+    let fechaFin = fechasOrdenables[fechasOrdenables.length - 1].texto;
+    let periodoId = fechasOrdenables[0].num + "_" + fechasOrdenables[fechasOrdenables.length - 1].num;
+    let periodoLabel = fechaInicio.slice(0, 5) + " - " + fechaFin.slice(0, 5); // DD/MM - DD/MM
+
+    // 2. Guardar el % de cada área del archivo actual en Firestore (merge, no pisa otros períodos)
+    for (const item of areasProcesadas) {
+        let areaId = item.area.replace(/[\.\#\$\[\]\/]/g, "_").trim();
+        if (!areaId) continue;
+        try {
+            await setDoc(doc(db, "historico_areas", areaId), {
+                nombre: item.area,
+                periodos: {
+                    [periodoId]: {
+                        porcentaje: item.valorPorcentaje,
+                        label: periodoLabel,
+                        guardadoEl: new Date().toISOString()
+                    }
+                }
+            }, { merge: true });
+        } catch (e) {
+            console.error("Error guardando histórico de área:", item.area, e);
+        }
+    }
+
+    // 3. Leer TODO el histórico guardado (incluye áreas de archivos anteriores que quizá no vengan en este)
+    let historico = {}; // { nombreArea: { periodoId: {porcentaje, label} } }
+    try {
+        const snap = await getDocs(collection(db, "historico_areas"));
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            historico[d.nombre] = d.periodos || {};
+        });
+    } catch (e) {
+        console.error("Error leyendo histórico de áreas:", e);
+        if (card) card.style.display = 'none';
+        return;
+    }
+
+    renderizarEvolucionAreas(historico, periodoId, periodoLabel);
+}
+
+function renderizarEvolucionAreas(historico, periodoActualId, periodoActualLabel) {
+    const card = document.getElementById('cardEvolucionAreas');
+    const tbody = document.getElementById('tbodyEvolucionAreas');
+    const labelActual = document.getElementById('evolucionPeriodoActualLabel');
+    if (!card || !tbody) return;
+
+    const nombresAreas = Object.keys(historico);
+    if (!nombresAreas.length) { card.style.display = 'none'; return; }
+
+    // Todos los periodoId distintos guardados hasta ahora, ordenados cronológicamente
+    let todosLosPeriodos = new Set();
+    nombresAreas.forEach(area => Object.keys(historico[area]).forEach(pid => todosLosPeriodos.add(pid)));
+    let periodosOrdenados = Array.from(todosLosPeriodos).sort((a, b) => {
+        // periodoId = "numInicio_numFin" -> ordenar por numInicio
+        return parseInt(a.split('_')[0]) - parseInt(b.split('_')[0]);
+    });
+
+    let idxActual = periodosOrdenados.indexOf(periodoActualId);
+    let periodoAnteriorId = idxActual > 0 ? periodosOrdenados[idxActual - 1] : null;
+
+    if (labelActual) labelActual.innerText = "Período actual: " + periodoActualLabel;
+
+    // --- Tabla de variación (área x período actual vs período anterior) ---
+    let filas = nombresAreas.map(area => {
+        let pActual = historico[area][periodoActualId];
+        let pAnterior = periodoAnteriorId ? historico[area][periodoAnteriorId] : null;
+        let valorActual = pActual ? pActual.porcentaje : null;
+        let valorAnterior = pAnterior ? pAnterior.porcentaje : null;
+        let variacion = (valorActual !== null && valorAnterior !== null) ? (valorActual - valorAnterior) : null;
+        return { area, valorActual, valorAnterior, variacion };
+    }).filter(f => f.valorActual !== null); // solo áreas presentes en el período actual
+
+    filas.sort((a, b) => {
+        if (a.variacion === null && b.variacion === null) return b.valorActual - a.valorActual;
+        if (a.variacion === null) return 1;
+        if (b.variacion === null) return -1;
+        return b.variacion - a.variacion;
+    });
+
+    tbody.innerHTML = filas.map(f => {
+        let celdaAnterior = f.valorAnterior !== null ? f.valorAnterior.toFixed(1) + "%" : "—";
+        let celdaVariacion;
+        if (f.variacion === null) {
+            celdaVariacion = `<span class="badge bg-light text-muted border">Nuevo</span>`;
+        } else if (f.variacion > 0) {
+            celdaVariacion = `<span class="badge bg-success-subtle text-success fw-bold">▲ +${f.variacion.toFixed(1)}%</span>`;
+        } else if (f.variacion < 0) {
+            celdaVariacion = `<span class="badge bg-danger-subtle text-danger fw-bold">▼ ${f.variacion.toFixed(1)}%</span>`;
+        } else {
+            celdaVariacion = `<span class="badge bg-light text-muted border">= 0.0%</span>`;
+        }
+        return `
+            <tr style="height: 34px;">
+                <td style="padding: 4px 10px; font-size: 0.85rem;" class="fw-semibold text-dark">${f.area}</td>
+                <td class="text-center" style="padding: 4px 10px; font-size: 0.85rem;">${f.valorActual.toFixed(1)}%</td>
+                <td class="text-center text-muted" style="padding: 4px 10px; font-size: 0.85rem;">${celdaAnterior}</td>
+                <td class="text-center" style="padding: 4px 10px;">${celdaVariacion}</td>
+            </tr>`;
+    }).join('');
+
+    // --- Gráfico de tendencia (todas las áreas a lo largo de los períodos guardados) ---
+    const ctx = document.getElementById('chartEvolucionAreas');
+    if (ctx && window.Chart) {
+        const labelsPeriodos = periodosOrdenados.map(pid => {
+            for (const area of nombresAreas) {
+                if (historico[area][pid]) return historico[area][pid].label;
+            }
+            return pid;
+        });
+
+        const paleta = ['#FF6B00','#2563eb','#16a34a','#dc2626','#9333ea','#0891b2','#ca8a04','#db2777','#4b5563','#059669','#7c3aed','#ea580c'];
+
+        const datasets = nombresAreas.map((area, i) => ({
+            label: area,
+            data: periodosOrdenados.map(pid => historico[area][pid] ? historico[area][pid].porcentaje : null),
+            borderColor: paleta[i % paleta.length],
+            backgroundColor: paleta[i % paleta.length],
+            spanGaps: true,
+            tension: 0.25,
+            borderWidth: 2,
+            pointRadius: 3
+        }));
+
+        if (graficoEvolucionAreas) graficoEvolucionAreas.destroy();
+        graficoEvolucionAreas = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labelsPeriodos, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                scales: { y: { ticks: { callback: (v) => v + '%' } } }
+            }
+        });
+    }
+
+    card.style.display = filas.length ? 'block' : 'none';
+}
+
+// ============================================================
+// RANKING DE OMISIONES: lee el contador histórico completo de Firebase
+// (independiente del archivo actual) y muestra a los colaboradores
+// ordenados de mayor a menor total de omisiones acumuladas.
+// ============================================================
+let rankingOmisionesCacheGlobal = [];
+
+async function renderizarRankingOmisiones() {
+    const tbody = document.getElementById('tbodyRankingOmisiones');
+    if (!tbody) return;
+
+    try {
+        rankingOmisionesCacheGlobal = await leerYBackfillRankingHistorico("omisiones_historicas", mapaPersonasGlobal, "totalOmisiones");
+    } catch (e) {
+        console.error("Error leyendo ranking de omisiones:", e);
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-3">No se pudo cargar el ranking. Revisa las reglas de Firestore.</td></tr>`;
+        return;
+    }
+
+    dibujarTablaRankingOmisiones();
+}
+
+function dibujarTablaRankingOmisiones() {
+    const tbody = document.getElementById('tbodyRankingOmisiones');
+    if (!tbody) return;
+    const minimo = parseInt(document.getElementById('filtroMinimoRanking')?.value || "1", 10);
+
+    let filtrados = rankingOmisionesCacheGlobal.filter(x => x.total >= minimo);
+
+    tbody.innerHTML = filtrados.map((x, i) => {
+        let colorBadge = "bg-light text-dark border";
+        if (x.total >= 5) colorBadge = "bg-danger-subtle text-danger fw-bold border border-danger-subtle";
+        else if (x.total >= 2) colorBadge = "bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle";
+
+        return `
+            <tr style="height: 34px;">
+                <td class="text-center text-muted" style="padding: 4px 10px; font-size: 0.8rem;">${i + 1}</td>
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge ${colorBadge}" style="font-size: 0.78rem; padding: 3px 10px;">${x.total}</span>
+                </td>
+            </tr>`;
+    }).join('');
+
+    if (!filtrados.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-3">Nadie cumple ese mínimo de omisiones.</td></tr>`;
+    }
+
+    ejecutarBuscadorTextoPlano('tbodyRankingOmisiones');
+}
+window.dibujarTablaRankingOmisiones = dibujarTablaRankingOmisiones; // usado por el select de mínimo (solo redibuja, no vuelve a leer Firebase)
+
+// ============================================================
+// RANKING DE TARDANZAS: igual que el de Omisiones, pero en 3 tablas separadas
+// (Ingreso de Turno, Ingreso de Break, Salida de Turno), cada una acumulada
+// históricamente en Firebase, independiente del archivo actualmente cargado.
+// ============================================================
+let rankingTardanzaCache = { ingreso: [], break: [], salida: [] };
+
+async function renderizarRankingTardanzas() {
+    try {
+        const [ingreso, brk, salida] = await Promise.all([
+            leerYBackfillRankingHistorico("historico_tardanza_ingreso", mapaPersonasGlobal),
+            leerYBackfillRankingHistorico("historico_tardanza_break", mapaPersonasGlobal),
+            leerYBackfillRankingHistorico("historico_tardanza_salida", mapaPersonasGlobal)
+        ]);
+        rankingTardanzaCache = { ingreso, break: brk, salida };
+    } catch (e) {
+        console.error("Error leyendo ranking de tardanzas:", e);
+        ['tbodyResumenIngresoTurno', 'tbodyResumenIngresoBreak', 'tbodyResumenSalidaTurno'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-3">No se pudo cargar el ranking. Revisa las reglas de Firestore.</td></tr>`;
+        });
+        return;
+    }
+    dibujarTablasRankingTardanzas();
+}
+
+function dibujarUnRankingTardanza(tbodyId, lista) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    const minimo = parseInt(document.getElementById('filtroMinimoRankingTard')?.value || "1", 10);
+    let filtrados = lista.filter(x => x.total >= minimo);
+
+    tbody.innerHTML = filtrados.map((x, i) => {
+        let colorBadge = "bg-light text-dark border";
+        if (x.total >= 5) colorBadge = "bg-danger-subtle text-danger fw-bold border border-danger-subtle";
+        else if (x.total >= 2) colorBadge = "bg-warning-subtle text-warning-emphasis fw-bold border border-warning-subtle";
+
+        return `
+            <tr style="height: 34px;">
+                <td class="text-center text-muted" style="padding: 4px 10px; font-size: 0.8rem;">${i + 1}</td>
+                <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}</td>
+                <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
+                <td class="text-center" style="padding: 4px 10px;">
+                    <span class="badge ${colorBadge}" style="font-size: 0.78rem; padding: 3px 10px;">${x.total}</span>
+                </td>
+            </tr>`;
+    }).join('');
+
+    if (!filtrados.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted p-3">Nadie cumple ese mínimo.</td></tr>`;
+    }
+    ejecutarBuscadorTextoPlano(tbodyId);
+}
+
+function dibujarTablasRankingTardanzas() {
+    dibujarUnRankingTardanza('tbodyResumenIngresoTurno', rankingTardanzaCache.ingreso);
+    dibujarUnRankingTardanza('tbodyResumenIngresoBreak', rankingTardanzaCache.break);
+    dibujarUnRankingTardanza('tbodyResumenSalidaTurno', rankingTardanzaCache.salida);
+}
+window.dibujarTablasRankingTardanzas = dibujarTablasRankingTardanzas; // usado por el select de mínimo (solo redibuja)
 
    function filtrarYRenderizarTardanzas() {
     const areasSeleccionadas = obtenerSeleccionMultiArea('tard');
@@ -1955,6 +2526,96 @@ function calcularAreaMasFrecuente(lista) {
             btnTexto.innerText = seleccion.size + " áreas seleccionadas";
         }
     }
+
+    // ============================================================
+    // FILTRO POR DIVISIÓN: agrupa las áreas de la tienda en 4 divisiones +
+    // "Otras" (áreas administrativas/operativas que no pertenecen a ninguna
+    // división comercial). Al elegir una división, se marcan automáticamente
+    // las áreas correspondientes en el multi-select de "Filtrar Área" ya
+    // existente — no es un filtro aparte, solo un atajo sobre el mismo sistema.
+    // ============================================================
+    function normalizarTextoArea(s) {
+        return (s || "").toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    const MAPA_DIVISIONES_RAW = {
+        // División 1
+        "MATERIALES DE CONSTRUCCION": "Div1",
+        "HERRAMIENTAS Y AUTOMOTRIZ": "Div1",
+        "FERRETERIA, PUERTAS Y VENTANAS": "Div1",
+        // División 2
+        "PINTURAS": "Div2",
+        "PISOS Y REVESTIMIENTOS": "Div2",
+        "BAÑOS": "Div2",
+        "COCINAS": "Div2",
+        "ELECTRO HOGAR": "Div2",
+        // División 3
+        "ILUMINACION": "Div3",
+        "ELECTRICIDAD": "Div3",
+        "GASFITERIA": "Div3",
+        // División 4
+        "ORGANIZACIÓN": "Div4",
+        "MUEBLES": "Div4",
+        "LIMPIEZA": "Div4",
+        "JARDIN, AIRE LIBRE Y TEMPORADA": "Div4",
+        // Otras / sin división comercial
+        "PREVENCION DE RIESGO": "Otras",
+        "PREVENCION DE RIESGOS": "Otras",
+        "ADMINISTRATIVA": "Otras",
+        "SERVICIOS": "Otras",
+        "ERIT": "Otras",
+        "CAJAS": "Otras",
+        "ALMACEN": "Otras",
+        "LOGISTICA": "Otras",
+        "VENTA CORPORATIVA": "Otras"
+    };
+    // Versión normalizada (sin tildes, mayúsculas) para que el mapeo no falle por acentos/variaciones
+    const MAPA_DIVISIONES_NORM = {};
+    Object.entries(MAPA_DIVISIONES_RAW).forEach(([area, div]) => {
+        MAPA_DIVISIONES_NORM[normalizarTextoArea(area)] = div;
+    });
+
+    // Cualquier área que no esté en la lista (ej. "GERENCIA", o áreas nuevas que aparezcan
+    // en otros locales) cae por defecto en "Otras", en vez de quedar sin clasificar.
+    function obtenerDivisionDeArea(area) {
+        return MAPA_DIVISIONES_NORM[normalizarTextoArea(area)] || "Otras";
+    }
+
+    // Qué función de renderizado corresponde a cada pestaña con filtro de área
+    const CALLBACK_FILTRO_POR_KEY = {
+        crit: () => aplicarFiltrosCriticos(),
+        tard: () => filtrarYRenderizarTardanzas(),
+        omis: () => filtrarYRenderizarOmisiones(),
+        inas: () => filtrarYRenderizarInasistencias(),
+        refrig: () => filtrarYRenderizarRefrigerio(),
+        turno: () => filtrarYRenderizarTurno()
+    };
+
+    function aplicarDivisionAMultiArea(key, divisionSel) {
+        const menu = document.getElementById('filtroAreaMenu_' + key);
+        if (!menu) return;
+        const chkTodos = menu.querySelector('.chk-area-todos');
+        const chkItems = menu.querySelectorAll('.chk-area-item');
+
+        filtrosAreaEstado[key].seleccion.clear();
+
+        if (divisionSel === "TODAS") {
+            chkItems.forEach(c => c.checked = false);
+            if (chkTodos) chkTodos.checked = true;
+        } else {
+            chkItems.forEach(c => {
+                const area = c.getAttribute('data-area');
+                const pertenece = obtenerDivisionDeArea(area) === divisionSel;
+                c.checked = pertenece;
+                if (pertenece) filtrosAreaEstado[key].seleccion.add(area);
+            });
+            if (chkTodos) chkTodos.checked = filtrosAreaEstado[key].seleccion.size === 0;
+        }
+
+        actualizarTextoBotonMultiArea(key);
+        if (CALLBACK_FILTRO_POR_KEY[key]) CALLBACK_FILTRO_POR_KEY[key]();
+    }
+    window.aplicarDivisionAMultiArea = aplicarDivisionAMultiArea;
 
     // Devuelve el Set de áreas seleccionadas para un filtro (vacío = todas)
     function obtenerSeleccionMultiArea(key) {
