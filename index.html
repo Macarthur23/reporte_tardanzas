@@ -168,8 +168,18 @@
             font-size: 0.8rem; font-weight: 600; margin-right: 10px;
         }
 
-        .custom-table-container { border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .table { margin-bottom: 0; }
+        .custom-table-container { 
+            border-radius: 12px; 
+            overflow-x: auto; /* Permite la movilidad horizontal con el dedo */
+            -webkit-overflow-scrolling: touch; /* Desplazamiento fluido en móviles */
+            border: 1px solid #e2e8f0; 
+            max-width: 100%;
+        }
+        .table { 
+            margin-bottom: 0; 
+            width: 100%; 
+            white-space: nowrap; /* Mantiene la estructura de datos sin romper celdas */
+        }
         .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 14px; }
         .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
 
