@@ -218,12 +218,10 @@
 
         #mobileTopbar, #sidebarBackdrop { display: none; }
 
-        /* Cabeceras de panel y filtros: siempre pueden envolver */
         .main-card > .d-flex.justify-content-between { flex-wrap: wrap; gap: .5rem; }
         .custom-table-container > .table { min-width: 560px; }
         .multi-area-menu { max-width: calc(100vw - 32px); }
 
-        /* Tablet y móvil: menú lateral como cajón */
         @media (max-width: 991.98px) {
             #sidebar {
                 position: fixed; top: 0; left: 0; bottom: 0;
@@ -257,12 +255,11 @@
 
             #content {
                 padding: 30px 20px calc(30px + env(safe-area-inset-bottom, 0px)) 20px;
-                overflow-x: clip;   /* clip no crea scroll interno: mantiene el topbar sticky */
+                overflow-x: clip;
             }
             #sidebar ul li button { padding: 14px 15px; }
         }
 
-        /* Móvil */
         @media (max-width: 767.98px) {
             #content { padding: 0 12px calc(24px + env(safe-area-inset-bottom, 0px)) 12px; }
             #mobileTopbar { margin: 0 -12px 16px -12px; }
@@ -281,14 +278,13 @@
             #panel-carga .d-flex.justify-content-center { flex-direction: column; }
 
             .buscador.w-25 { width: 100% !important; }
-            .form-control, .form-select { font-size: 16px; }   /* evita zoom automático al enfocar */
+            .form-control, .form-select { font-size: 16px; }
 
             .table th { padding: 10px; font-size: 0.7rem; }
             .table td { padding: 10px; font-size: 0.82rem; }
 
             .image-card-right-value { font-size: 1.4rem; }
 
-            /* Barras de filtros: etiqueta y control a ancho completo */
             .bg-light.p-2.rounded.border > .small.fw-semibold,
             .bg-light.p-2.rounded.border .small.fw-semibold.text-muted {
                 flex: 0 0 100%; margin: .35rem 0 0 0 !important;
@@ -306,14 +302,12 @@
             canvas { max-width: 100%; }
         }
 
-        /* Tablet en vertical: filtros más compactos, sin romper el diseño */
         @media (min-width: 768px) and (max-width: 991.98px) {
             #content { padding: 0 24px 30px 24px; }
             #mobileTopbar { margin: 0 -24px 20px -24px; }
             .buscador.w-25 { width: 40% !important; }
         }
 
-        /* Pantallas muy angostas */
         @media (max-width: 359.98px) {
             .kpi-icon { display: none; }
         }
@@ -336,6 +330,13 @@
                 <label class="form-label small fw-semibold text-muted">Contraseña</label>
                 <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
             </div>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold text-muted">Seleccionar Tienda / Sucursal</label>
+                <select id="loginTiendaSelect" class="form-select" required>
+                    <option value="TTP-404">Tarapoto (TTP - 404)</option>
+                    <option value="HCO-402">Huánuco (HCO - 402)</option>
+                </select>
+            </div>
             <div id="loginError" class="text-danger small mb-3" style="display: none;"></div>
             <button type="submit" id="btnLogin" class="btn btn-dark w-100" style="border-radius: 10px; padding: 10px;">Iniciar Sesión</button>
         </form>
@@ -347,13 +348,16 @@
     <nav id="sidebar">
         <div class="sidebar-header">
             <h5 class="m-0 fw-bold text-white d-flex align-items-center">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RwJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3TbX0grIHJrDeCbBgrfcW5PIzgQEiwII1QI3NVWUC650AC9Z6b0EuPxPoRWCDHmPB2qANy9ViAhuRAAvWRmxVrhMT2KAEWLA2aMNytZjARiTAgtWrVfkYE2ACa5IAC9aabBYuFBNgAr0IsGD1osLHmAATWJMEWLDWZLNwoVaOAOe0ngiwYK2n1uKyMoEBJ8CCNeAdgKvPBNYTARas9dRaXFYmMOAElihYA06Pq88EmMCKEmDBWlHcnBkTYAJLIcCCtRR6fC0TYAIrSoAFa0Vxr+vMuPBMYNUJsGCtehNwAZgAEzhTAixYZ0qK0zEBJrDqBFiwVr0JuABMYO0RWKslYsFaqy3D5WICTOAUAixYpyDhA0yACaxVAixYa7VluFxMgAmcQoAF6xQkSz/AHpgAE1geAixYy8OVvTIBJrAMBFiwlgEqu2QCTGB5CLBgLQ9X9jooBLieK0qABWrFcXNmTIAJLIUAC9ZS6PG1TIAJrCgBFqwVxc2ZMQEmsBQCqytYSyk5X8sEmMDAEWDBGrgm5wozgfVLgAVr/bYdl5wJDBwBFqyBa/LVqjDnywSWToAFa+kM2QMTYAIrRIAFa4VAczZMgAksnQAL1tIZsgcmwASeSWDZ9lgi1o2VAAAAAElFTkSuQmCC" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RqJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3DxK0ggrIQAYrWIXaNAGKkAMU6IChBw2AsnICU48Ea0Vw12cCEz8CAwRbaAVgE98N2NAsE4CAjVAcC1oM2JbVvICAgAVr3WACawwI8F+u49g0A5qICAsWLCgjC6xH00uAw7E/3L15e1qLAKvLBCbAgjV3iA21l8jABNiIV0WAFiv1M4QAC1YK17JAsGEgAA==" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
             </h5>
             <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
         </div>
 
         <div class="px-3 py-2 d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.1);">
-            <small class="text-white text-truncate" style="font-size: 0.72rem; max-width: 170px;" id="userEmailLabel"></small>
+            <div class="text-truncate">
+                <small class="text-white text-truncate d-block" style="font-size: 0.72rem; max-width: 140px;" id="userEmailLabel"></small>
+                <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.65rem;" id="badgeTiendaActiva">TTP-404</span>
+            </div>
             <button id="btnLogout" class="btn btn-sm btn-light py-0 px-2" style="font-size: 0.7rem; border-radius: 6px;" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></button>
         </div>
 
@@ -377,7 +381,7 @@
         <div id="mobileTopbar" class="d-lg-none">
             <button id="btnToggleSidebar" type="button" aria-label="Abrir menú"><i class="bi bi-list"></i></button>
             <span class="fw-bold">PROMART</span>
-            <small class="text-uppercase">Control de Operaciones</small>
+            <small class="text-uppercase" id="mobileTiendaLabel">TTP-404</small>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1134,7 +1138,10 @@
     const btnLogin = document.getElementById('btnLogin');
     const btnLogout = document.getElementById('btnLogout');
     const userEmailLabel = document.getElementById('userEmailLabel');
+    const badgeTiendaActiva = document.getElementById('badgeTiendaActiva');
+    const mobileTiendaLabel = document.getElementById('mobileTiendaLabel');
 
+    let tiendaSeleccionadaActual = "TTP-404";
     let chartComparativo = null;
     let periodosGuardadosMap = {};
 
@@ -1143,6 +1150,8 @@
             loginOverlay.style.display = 'none';
             appWrapper.style.display = 'flex';
             if (userEmailLabel) userEmailLabel.innerText = user.email || '';
+            if (badgeTiendaActiva) badgeTiendaActiva.innerText = tiendaSeleccionadaActual;
+            if (mobileTiendaLabel) mobileTiendaLabel.innerText = tiendaSeleccionadaActual;
             cargarSelectorPeriodos();
         } else {
             appWrapper.style.display = 'none';
@@ -1159,6 +1168,7 @@
 
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            tiendaSeleccionadaActual = document.getElementById('loginTiendaSelect').value;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
@@ -1194,6 +1204,10 @@
     let datosBreakTardeGlobal = [];
     let datosTurnoGlobal = [];
 
+    function obtenerTiendaSeleccionada() {
+        return tiendaSeleccionadaActual;
+    }
+
     function convertirHoraAMinutos(tiempoStr) {
         if (!tiempoStr) return 0;
         const partes = tiempoStr.split(':');
@@ -1215,6 +1229,7 @@
     }
 
     async function guardarContadorHistorico(coleccion, conteoPorDni, mapaPersonas) {
+        const tiendaId = obtenerTiendaSeleccionada();
         const entradas = Object.entries(conteoPorDni).filter(([_, inc]) => inc > 0);
         if (!entradas.length) return;
 
@@ -1225,8 +1240,10 @@
 
             subConjunto.forEach(([dni, incremento]) => {
                 const info = mapaPersonas[dni] || {};
-                const ref = doc(db, coleccion, sanitizarIdDoc(dni));
+                const idDocTienda = sanitizarIdDoc(`${tiendaId}_${dni}`);
+                const ref = doc(db, coleccion, idDocTienda);
                 batch.set(ref, {
+                    tienda: tiendaId,
                     total: increment(incremento),
                     nombre: info.nombre || "",
                     area: info.area || "",
@@ -1312,7 +1329,6 @@
 
             reader.onload = async (e) => {
                 try {
-                    // LECTURA ROBUSTA CON Uint8Array PARA ARCHIVOS GRANDES O FORMATOS SHEET1/SHEET2
                     const dataBuffer = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(dataBuffer, { type: 'array' });
 
@@ -1322,7 +1338,6 @@
                         hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
                     });
 
-                    // MAPEO FLEXIBLE DE PESTAÑAS (DATA 1 / SHEET 1 / HOJA 1)
                     let data1 = hojas["DATA 1"] || hojas["DATA1"] || hojas["SHEET1"] || hojas["HOJA1"] || [];
                     let data2 = hojas["DATA 2"] || hojas["DATA2"] || hojas["SHEET2"] || hojas["HOJA2"] || [];
                     let data5 = hojas["DATA 5"] || hojas["DATA5"] || hojas["SHEET5"] || hojas["HOJA5"] || [];
@@ -1339,7 +1354,6 @@
                     document.getElementById('btnMenuAlm').disabled = false;
                     document.getElementById('btnMenuCrit').disabled = false;
 
-                    // Solo activar botones de marcación si existe DATA 5
                     const tieneData5 = data5.length > 0;
                     document.getElementById('btnMenuTard').disabled = !tieneData5;
                     document.getElementById('btnMenuOmis').disabled = !tieneData5;
@@ -1360,7 +1374,7 @@
                         alert("ℹ️ Se procesó el resumen por Áreas y Colaboradores (Sheet1 / Sheet2).\n\nNota: Para visualizar los reportes detallados de marcaciones (Tardanzas, Omisiones, Refrigerio, etc.), el Excel debe incluir la pestaña DATA 5.");
                     }
 
-                    // Registrar en Firebase en historico_periodos
+                    const tiendaId = obtenerTiendaSeleccionada();
                     let labelPeriodo = file.name.replace(/\.[^/.]+$/, "");
                     if (tieneData5) {
                         let fechas = [];
@@ -1380,10 +1394,11 @@
                         }
                     });
 
-                    const idDocPeriodo = sanitizarIdDoc(labelPeriodo);
+                    const idDocPeriodo = sanitizarIdDoc(`${tiendaId}_${labelPeriodo}`);
                     const docRef = doc(db, "historico_periodos", idDocPeriodo);
                     await setDoc(docRef, {
-                        nombrePeriodo: labelPeriodo,
+                        tienda: tiendaId,
+                        nombrePeriodo: `[${tiendaId}] ${labelPeriodo}`,
                         fechaRegistro: new Date().toISOString(),
                         areas: mapaAreas,
                         totalRegistros: data5.length || data2.length
@@ -1670,14 +1685,15 @@
         let conteoTardanzaBreak = {};
         let conteoTardanzaSalida = {};
 
-        const archivoId = sanitizarIdDoc(nombreArchivo);
+        const tiendaId = obtenerTiendaSeleccionada();
+        const archivoId = sanitizarIdDoc(`${tiendaId}_${nombreArchivo}`);
         let archivoYaProcesado = false;
 
         try {
             const archivoSnap = await getDoc(doc(db, "archivos_procesados", archivoId));
             if (archivoSnap.exists()) {
                 archivoYaProcesado = true;
-                alert(`⚠️ El archivo "${nombreArchivo}" ya fue registrado anteriormente.\n\nSe generará el reporte visual, pero NO se duplicarán las omisiones en la base de datos.`);
+                alert(`⚠️ El archivo "${nombreArchivo}" ya fue registrado anteriormente para la tienda ${tiendaId}.\n\nSe generará el reporte visual, pero NO se duplicarán las omisiones en la base de datos.`);
             }
         } catch (e) {
             console.error("Error validando duplicados:", e);
@@ -1711,6 +1727,7 @@
         if (!archivoYaProcesado && Object.keys(conteoFrecuenciaExcel).length > 0) {
             try {
                 await setDoc(doc(db, "archivos_procesados", archivoId), {
+                    tienda: tiendaId,
                     procesadoEl: new Date().toISOString(),
                     nombreOriginal: nombreArchivo
                 });
@@ -1722,9 +1739,11 @@
                     const subConjunto = entradasOmisiones.slice(i, i + tamañoLote);
 
                     subConjunto.forEach(([dni, incremento]) => {
-                        const ref = doc(db, "omisiones_historicas", sanitizarIdDoc(dni));
+                        const idDocOmision = sanitizarIdDoc(`${tiendaId}_${dni}`);
+                        const ref = doc(db, "omisiones_historicas", idDocOmision);
                         const info = infoPersonaPorDni[dni] || {};
                         batch.set(ref, {
+                            tienda: tiendaId,
                             totalOmisiones: increment(incremento),
                             nombre: info.nombre || "",
                             area: info.area || "",
@@ -1859,10 +1878,9 @@
                 }
             }
 
-            // --- FILTRO EXCLUSIVO PARA BREAK PASADO LAS 5 PM (SOLO FULL TIME) ---
             if (haySalidaRefValida && tipoCategoria === "FT") {
                 let minSalRef = convertirHoraAMinutos(salRef);
-                if (minSalRef >= 1020) { // 17:00 PM
+                if (minSalRef >= 1020) {
                     datosBreakTardeGlobal.push({
                         dni, nombre, area: areaFinal, fecha,
                         salida: salRef,
@@ -1961,6 +1979,7 @@
             return;
         }
 
+        const tiendaId = obtenerTiendaSeleccionada();
         let fechasOrdenables = [];
         data5.forEach(row => {
             let f = row["FECHA"];
@@ -1979,10 +1998,11 @@
 
         const batch = writeBatch(db);
         for (const item of areasProcesadas) {
-            let areaId = sanitizarIdDoc(item.area);
+            let areaId = sanitizarIdDoc(`${tiendaId}_${item.area}`);
             if (!areaId) continue;
             const ref = doc(db, "historico_areas", areaId);
             batch.set(ref, {
+                tienda: tiendaId,
                 nombre: item.area,
                 periodos: {
                     [periodoId]: {
@@ -2000,7 +2020,9 @@
             const snap = await getDocs(collection(db, "historico_areas"));
             snap.forEach(docSnap => {
                 const d = docSnap.data();
-                historico[d.nombre] = d.periodos || {};
+                if (d.tienda === tiendaId) {
+                    historico[d.nombre] = d.periodos || {};
+                }
             });
         } catch (e) {
             console.error("Error leyendo histórico de áreas:", e);
@@ -2193,23 +2215,27 @@
         selectA.innerHTML = ""; selectB.innerHTML = "";
 
         try {
+            const tiendaId = obtenerTiendaSeleccionada();
             const q = query(collection(db, "historico_periodos"), orderBy("fechaRegistro", "desc"));
             const snap = await getDocs(q);
 
             periodosGuardadosMap = {};
             snap.forEach(docSnap => {
                 let data = docSnap.data();
-                periodosGuardadosMap[docSnap.id] = data;
+                // FILTRO ESTRICTO: Solo carga períodos de la tienda actual seleccionada
+                if (data.tienda === tiendaId) {
+                    periodosGuardadosMap[docSnap.id] = data;
 
-                let optA = document.createElement('option');
-                optA.value = docSnap.id;
-                optA.innerText = data.nombrePeriodo;
-                selectA.appendChild(optA);
+                    let optA = document.createElement('option');
+                    optA.value = docSnap.id;
+                    optA.innerText = data.nombrePeriodo;
+                    selectA.appendChild(optA);
 
-                let optB = document.createElement('option');
-                optB.value = docSnap.id;
-                optB.innerText = data.nombrePeriodo;
-                selectB.appendChild(optB);
+                    let optB = document.createElement('option');
+                    optB.value = docSnap.id;
+                    optB.innerText = data.nombrePeriodo;
+                    selectB.appendChild(optB);
+                }
             });
 
             if(selectB.options.length > 1) selectB.selectedIndex = 1;
@@ -2481,7 +2507,7 @@
         const tbody = document.getElementById('tbodyBreakTarde');
         if (!tbody) return;
 
-        let filtrados = [...datosBreakTardeGlobal]; // Solo FT
+        let filtrados = [...datosBreakTardeGlobal];
 
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
@@ -2750,7 +2776,8 @@
     const btnReiniciar = document.getElementById('btnReiniciarFirebase');
     if (btnReiniciar) {
         btnReiniciar.onclick = async () => {
-            const seguro = confirm("⚠️ ¿ESTÁS COMPLETAMENTE SEGURA?\n\nEsta acción eliminará de forma PERMANENTE todo el historial acumulativo de omisiones y los nombres de archivos registrados en la nube. No se puede deshacer.");
+            const tiendaId = obtenerTiendaSeleccionada();
+            const seguro = confirm(`⚠️ ¿ESTÁS COMPLETAMENTE SEGURA?\n\nEsta acción eliminará de forma PERMANENTE todo el historial y registros de la tienda seleccionada (${tiendaId}). No se puede deshacer.`);
             if (!seguro) return;
 
             btnReiniciar.disabled = true;
@@ -2763,7 +2790,11 @@
                     const tamañoLote = 400;
                     for (let i = 0; i < docs.length; i += tamañoLote) {
                         const batch = writeBatch(db);
-                        docs.slice(i, i + tamañoLote).forEach(d => batch.delete(d.ref));
+                        docs.slice(i, i + tamañoLote).forEach(d => {
+                            if (d.id.startsWith(tiendaId + "_")) {
+                                batch.delete(d.ref);
+                            }
+                        });
                         await batch.commit();
                     }
                 };
@@ -2776,12 +2807,12 @@
                 await eliminarColeccionEnLotes("historico_areas");
                 await eliminarColeccionEnLotes("historico_periodos");
 
-                alert("✅ Base de datos reseteada con éxito. Firebase está completamente limpio.");
+                alert(`✅ Historial de la tienda ${tiendaId} reseteado con éxito.`);
                 location.reload();
             } catch (error) {
                 console.error("Error al reiniciar la base de datos:", error);
                 const codigo = error.code ? ` (${error.code})` : "";
-                alert("❌ Ocurrió un error al intentar vaciar los datos:\n\n" + error.message + codigo + "\n\nRevisa las reglas de seguridad de Firestore si el error menciona permisos.");
+                alert("❌ Ocurrió un error al intentar vaciar los datos:\n\n" + error.message + codigo);
                 btnReiniciar.disabled = false;
                 btnReiniciar.innerText = "🗑️ Reiniciar Historial";
             }
