@@ -168,17 +168,20 @@
             font-size: 0.8rem; font-weight: 600; margin-right: 10px;
         }
 
-        .custom-table-container { 
-            border-radius: 12px; 
-            overflow-x: auto; /* Permite la movilidad horizontal con el dedo */
-            -webkit-overflow-scrolling: touch; /* Desplazamiento fluido en móviles */
-            border: 1px solid #e2e8f0; 
+        /* MEJORA DEFINITIVA PARA MOVILIDAD Y SCROLL HORIZONTAL EN TABLAS */
+        .custom-table-container {
+            border-radius: 12px;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            border: 1px solid #e2e8f0;
             max-width: 100%;
+            display: block;
         }
-        .table { 
-            margin-bottom: 0; 
-            width: 100%; 
-            white-space: nowrap; /* Mantiene la estructura de datos sin romper celdas */
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+            min-width: 650px; /* Fuerza el ancho mínimo para permitir deslizar cómodamente */
+            white-space: nowrap;
         }
         .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 14px; }
         .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
@@ -244,7 +247,7 @@
     <nav id="sidebar">
         <div class="sidebar-header">
             <h5 class="m-0 fw-bold text-white d-flex align-items-center">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RwJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3TbX0grIHJrDeCbBgrfcW5PIzgQEiwII1QI3NVWUC650AC9Z6b0EuPxPoRWCDHmPB2qANy9ViAhuRAAvWRmxVrhMT2KAEWLA2aMNytZjARiTAgtWrVfkYE2ACa5IAC9aabBYuFBNgAr0IsGD1osLHmAATWJMEWLDWZLNwoVaOAOe0ngiwYK2n1uKyMoEBJ8CCNeAdgKvPBNYTARas9dRaXFYmMOAElihYA06Pq88EmMCKEmDBWlHcnBkTYAJLIcCCtRR6fC0TYAIrSoAFa0Vxr+vMuPBMYNUJsGCtehNwAZgAEzhTAixYZ0qK0zEBJrDqBFiwVr0JuABMYO0RWKslYsFaqy3D5WICTOAUAixYpyDhA0yACaxVAixYa7VluFxMgAmcQoAF6xQkSz/AHpgAE1geAixYy8OVvTIBJrAMBFiwlgEqu2QCTGB5CLBgLQ9X9jooBLieK0qABWrFcXNmTIAJLIUAC9ZS6PG1TIAJrCgBFqwVxc2ZMQEmsBQCqytYSyk5X8sEmMDAEWDBGrgm5wozgfVLgAVr/bYdl5wJDBwBFqyBa/LVqjDnywSWToAFa+kM2QMTYAIrRIAFa4VAczZMgAksnQAL1tIZsgcmwASeSWDZ9lgi1o2VAAAAAElFTkSuQmCC" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RwJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3DxKGYsqMAUa6cEIAW7HwEKEKkZc4O1V2I4gAAK3aEQaEa6wE2I2CGAh1jMQAosB7Bgi6tN23JqgC0kK0m7cEIAm1LgAasC6k4hDkK0gQo1v3iABpAYk09M6gK8EAsm1F2Dq3bEIA1hEAWG9N0J98Q19dAIseANp2L1k4C1BvW5EAA0bU23C9Xv2gA1m53Aawj9wLw3Qn30iZ0hWk1kZf68GjQo9qW7W9wA69o3Hq3kEIAv5v2pW43Gq7AQAQe0hA7d5V2AAb7wK8EAu7WbB2A5gAX1cAYNlGBAh2I2CGAp7q1v08HAYD7j49qC97mEKAi2LwEAZ5jOQAsv3iOAW5w3wN25M2N3g9Q1j8E4v62KzC0D9wJ4sCGAEAUv2jIQcAYO1qW47d7wAA8k7n+t1264b3cAw33u10EAEAs3w40C29N4cT7jYAEB/bB1gAAAABJRU5ErkJggg==" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
             </h5>
             <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
         </div>
@@ -332,11 +335,11 @@
 
                     <div class="row g-3 bg-light p-3 rounded border mb-4">
                         <div class="col-md-5">
-                            <label class="form-label small fw-bold text-muted">Período Anterior:</label>
+                            <label class="form-label small fw-bold text-muted">Período A (Base anterior):</label>
                             <select id="selectPeriodoA" class="form-select form-select-sm"></select>
                         </div>
                         <div class="col-md-5">
-                            <label class="form-label small fw-bold text-muted">Período Actual:</label>
+                            <label class="form-label small fw-bold text-muted">Período B (Comparado reciente):</label>
                             <select id="selectPeriodoB" class="form-select form-select-sm"></select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
@@ -349,8 +352,8 @@
                             <thead class="table-light">
                             <tr>
                                 <th>Área Operativa</th>
-                                <th class="text-center">Período Anterior</th>
-                                <th class="text-center">Período Actual</th>
+                                <th class="text-center">Período Base (A)</th>
+                                <th class="text-center">Período Comparado (B)</th>
                                 <th class="text-center">Diferencia Neto</th>
                                 <th class="text-center">Estado de Mejora</th>
                             </tr>
@@ -1190,7 +1193,6 @@
 
             reader.onload = async (e) => {
                 try {
-                    // USO DE ArrayBuffer PARA OPTIMIZAR ARCHIVOS GRANDES (EJ. MES COMPLETO)
                     const dataBuffer = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(dataBuffer, { type: 'array' });
 
@@ -1200,43 +1202,50 @@
                         hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
                     });
 
-                    let data1 = hojas["DATA 1"] || hojas["DATA1"] || [];
-                    let data2 = hojas["DATA 2"] || hojas["DATA2"] || [];
-                    let data5 = hojas["DATA 5"] || hojas["DATA5"] || [];
+                    let data1 = hojas["DATA 1"] || hojas["DATA1"] || hojas["SHEET1"] || hojas["HOJA1"] || [];
+                    let data2 = hojas["DATA 2"] || hojas["DATA2"] || hojas["SHEET2"] || hojas["HOJA2"] || [];
+                    let data5 = hojas["DATA 5"] || hojas["DATA5"] || hojas["SHEET5"] || hojas["HOJA5"] || [];
 
                     if (!data1.length && !data2.length && !data5.length) {
-                        alert("⚠️ No se identificaron las pestañas requeridas (DATA 1, DATA 2, DATA 5) en el archivo subido.");
+                        alert("⚠️ No se identificaron las pestañas requeridas en el archivo subido.");
                         return;
                     }
 
                     btnProcesar.disabled = true;
-                    btnProcesar.innerText = "Procesando " + data5.length + " registros...";
+                    btnProcesar.innerText = "Procesando " + (data5.length || data2.length) + " registros...";
 
                     document.getElementById('btnMenuDash').disabled = false;
                     document.getElementById('btnMenuAlm').disabled = false;
                     document.getElementById('btnMenuCrit').disabled = false;
-                    document.getElementById('btnMenuTard').disabled = false;
-                    document.getElementById('btnMenuOmis').disabled = false;
-                    document.getElementById('btnMenuInas').disabled = false;
-                    document.getElementById('btnMenuRefrig').disabled = false;
-                    document.getElementById('btnMenuBreakTarde').disabled = false;
-                    document.getElementById('btnMenuTurno').disabled = false;
+
+                    const tieneData5 = data5.length > 0;
+                    document.getElementById('btnMenuTard').disabled = !tieneData5;
+                    document.getElementById('btnMenuOmis').disabled = !tieneData5;
+                    document.getElementById('btnMenuInas').disabled = !tieneData5;
+                    document.getElementById('btnMenuRefrig').disabled = !tieneData5;
+                    document.getElementById('btnMenuBreakTarde').disabled = !tieneData5;
+                    document.getElementById('btnMenuTurno').disabled = !tieneData5;
 
                     document.getElementById('kpiRow').style.display = 'flex';
 
                     renderizarAnillosDATA1(data1);
                     procesarTablasDATA2(data2);
-                    await procesarIncidenciasDATA5(data5, file.name);
-                    await procesarHistoricoAreas(ultimasAreasProcesadasGlobal, data5);
 
-                    // Registrar en Firebase en historico_periodos
-                    let fechas = [];
-                    data5.forEach(r => { if(r["FECHA"]) fechas.push(String(r["FECHA"]).trim()); });
-                    fechas.sort((a, b) => mapearFechaObjeto(a) - mapearFechaObjeto(b));
+                    if (tieneData5) {
+                        await procesarIncidenciasDATA5(data5, file.name);
+                        await procesarHistoricoAreas(ultimasAreasProcesadasGlobal, data5);
+                    } else {
+                        alert("ℹ️ Se procesó el resumen por Áreas y Colaboradores (Sheet1 / Sheet2).\n\nNota: Para visualizar los reportes detallados de marcaciones (Tardanzas, Omisiones, Refrigerio, etc.), el Excel debe incluir la pestaña DATA 5.");
+                    }
 
                     let labelPeriodo = file.name.replace(/\.[^/.]+$/, "");
-                    if(fechas.length > 0) {
-                        labelPeriodo = `${fechas[0]} al ${fechas[fechas.length - 1]}`;
+                    if (tieneData5) {
+                        let fechas = [];
+                        data5.forEach(r => { if(r["FECHA"]) fechas.push(String(r["FECHA"]).trim()); });
+                        fechas.sort((a, b) => mapearFechaObjeto(a) - mapearFechaObjeto(b));
+                        if(fechas.length > 0) {
+                            labelPeriodo = `${fechas[0]} al ${fechas[fechas.length - 1]}`;
+                        }
                     }
 
                     let mapaAreas = {};
@@ -1254,7 +1263,7 @@
                         nombrePeriodo: labelPeriodo,
                         fechaRegistro: new Date().toISOString(),
                         areas: mapaAreas,
-                        totalRegistros: data5.length
+                        totalRegistros: data5.length || data2.length
                     }, { merge: true });
 
                     await cargarSelectorPeriodos();
@@ -1264,7 +1273,7 @@
                     document.getElementById('btnMenuDash').click();
                 } catch (err) {
                     console.error("Error al procesar el archivo Excel:", err);
-                    alert("❌ Ocurrió un error al leer el archivo Excel. Consulta la consola (F12) para más detalles: " + err.message);
+                    alert("❌ Ocurrió un error al leer el archivo Excel. Revisa la consola (F12) para más detalles: " + err.message);
                     btnProcesar.disabled = false;
                     btnProcesar.innerText = "Generar Dashboard y Guardar Histórico";
                 }
@@ -1727,10 +1736,9 @@
                 }
             }
 
-            // --- FILTRO EXCLUSIVO PARA BREAK PASADO LAS 5 PM (SOLO FULL TIME) ---
             if (haySalidaRefValida && tipoCategoria === "FT") {
                 let minSalRef = convertirHoraAMinutos(salRef);
-                if (minSalRef >= 1020) { // 17:00 PM
+                if (minSalRef >= 1020) {
                     datosBreakTardeGlobal.push({
                         dni, nombre, area: areaFinal, fecha,
                         salida: salRef,
@@ -2349,7 +2357,7 @@
         const tbody = document.getElementById('tbodyBreakTarde');
         if (!tbody) return;
 
-        let filtrados = [...datosBreakTardeGlobal]; // Solo FT
+        let filtrados = [...datosBreakTardeGlobal];
 
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
