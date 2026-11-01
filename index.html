@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#E05E00">
     <title>Promart - Dashboard de Operaciones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -31,8 +32,12 @@
             width: 280px;
             background: var(--orange-sidebar);
             color: #fff;
-            transition: all 0.3s;
+            transition: transform 0.3s ease;
             flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         #sidebar .sidebar-header {
@@ -168,21 +173,8 @@
             font-size: 0.8rem; font-weight: 600; margin-right: 10px;
         }
 
-        /* MEJORA DEFINITIVA PARA MOVILIDAD Y SCROLL HORIZONTAL EN TABLAS */
-        .custom-table-container {
-            border-radius: 12px;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            border: 1px solid #e2e8f0;
-            max-width: 100%;
-            display: block;
-        }
-        .table {
-            margin-bottom: 0;
-            width: 100%;
-            min-width: 650px; /* Fuerza el ancho mínimo para permitir deslizar cómodamente */
-            white-space: nowrap;
-        }
+        .custom-table-container { border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; }
+        .table { margin-bottom: 0; }
         .table th { background-color: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 14px; }
         .table td { padding: 14px; vertical-align: middle; font-size: 0.9rem; }
 
@@ -218,6 +210,113 @@
 
         .badge-improvement-up { background-color: #d1fae5; color: #065f46; font-weight: 700; border: 1px solid #a7f3d0; }
         .badge-improvement-down { background-color: #fee2e2; color: #991b1b; font-weight: 700; border: 1px solid #fca5a5; }
+
+        /* ===== RESPONSIVE (móvil / tablet / APK) ===== */
+        html { -webkit-text-size-adjust: 100%; }
+        body { -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .wrapper { min-height: 100vh; min-height: 100dvh; }
+
+        #mobileTopbar, #sidebarBackdrop { display: none; }
+
+        /* Cabeceras de panel y filtros: siempre pueden envolver */
+        .main-card > .d-flex.justify-content-between { flex-wrap: wrap; gap: .5rem; }
+        .custom-table-container > .table { min-width: 560px; }
+        .multi-area-menu { max-width: calc(100vw - 32px); }
+
+        /* Tablet y móvil: menú lateral como cajón */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0;
+                width: 280px; max-width: 85vw; height: 100%;
+                z-index: 1050;
+                transform: translateX(-100%);
+                padding-top: env(safe-area-inset-top, 0px);
+                box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+            }
+            #sidebar.open { transform: translateX(0); }
+            #sidebarBackdrop {
+                display: block; position: fixed; inset: 0; z-index: 1040;
+                background: rgba(0,0,0,0.45); opacity: 0; pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+            #sidebarBackdrop.show { opacity: 1; pointer-events: auto; }
+
+            #mobileTopbar {
+                display: flex; align-items: center; gap: 12px;
+                position: sticky; top: 0; z-index: 1030;
+                margin: -30px -30px 20px -30px;
+                padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px 16px;
+                background: var(--orange-header); color: #fff;
+            }
+            #mobileTopbar button {
+                background: rgba(255,255,255,0.18); border: none; color: #fff;
+                width: 42px; height: 42px; border-radius: 10px; font-size: 1.6rem;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
+            #mobileTopbar small { font-size: 0.65rem; opacity: .85; margin-left: auto; }
+
+            #content {
+                padding: 30px 20px calc(30px + env(safe-area-inset-bottom, 0px)) 20px;
+                overflow-x: clip;   /* clip no crea scroll interno: mantiene el topbar sticky */
+            }
+            #sidebar ul li button { padding: 14px 15px; }
+        }
+
+        /* Móvil */
+        @media (max-width: 767.98px) {
+            #content { padding: 0 12px calc(24px + env(safe-area-inset-bottom, 0px)) 12px; }
+            #mobileTopbar { margin: 0 -12px 16px -12px; }
+            .main-card { padding: 16px; border-radius: 14px; margin-bottom: 16px; }
+            h4#dinamicTitle { font-size: 1.15rem; }
+            h5 { font-size: 1rem; }
+
+            .kpi-card { padding: 14px; }
+            .kpi-card h3 { font-size: 1.4rem; }
+            .kpi-card .text-uppercase { font-size: 0.65rem !important; }
+            .kpi-icon { width: 38px; height: 38px; font-size: 1.2rem; }
+
+            .drop-zone { padding: 28px 12px; }
+            .drop-zone i { font-size: 2.6rem !important; }
+            #panel-carga .btn-lg { width: 100%; padding: 12px 16px !important; font-size: 1rem; }
+            #panel-carga .d-flex.justify-content-center { flex-direction: column; }
+
+            .buscador.w-25 { width: 100% !important; }
+            .form-control, .form-select { font-size: 16px; }   /* evita zoom automático al enfocar */
+
+            .table th { padding: 10px; font-size: 0.7rem; }
+            .table td { padding: 10px; font-size: 0.82rem; }
+
+            .image-card-right-value { font-size: 1.4rem; }
+
+            /* Barras de filtros: etiqueta y control a ancho completo */
+            .bg-light.p-2.rounded.border > .small.fw-semibold,
+            .bg-light.p-2.rounded.border .small.fw-semibold.text-muted {
+                flex: 0 0 100%; margin: .35rem 0 0 0 !important;
+            }
+            .bg-light.p-2.rounded.border .form-select,
+            .bg-light.p-2.rounded.border .dropdown,
+            .bg-light.p-2.rounded.border .multi-area-btn,
+            .bg-light.p-2.rounded.border .d-flex.align-items-center { width: 100% !important; flex: 0 0 100%; }
+            .multi-area-menu { width: 100%; }
+            #selectorAreaGrafico { width: 100% !important; }
+
+            #loginOverlay { align-items: flex-start !important; overflow-y: auto; padding: 24px 16px; }
+            #loginOverlay > div { padding: 28px 22px !important; margin: auto; }
+
+            canvas { max-width: 100%; }
+        }
+
+        /* Tablet en vertical: filtros más compactos, sin romper el diseño */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            #content { padding: 0 24px 30px 24px; }
+            #mobileTopbar { margin: 0 -24px 20px -24px; }
+            .buscador.w-25 { width: 40% !important; }
+        }
+
+        /* Pantallas muy angostas */
+        @media (max-width: 359.98px) {
+            .kpi-icon { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -244,10 +343,11 @@
 </div>
 
 <div class="wrapper" id="appWrapper" style="display: none;">
+    <div id="sidebarBackdrop"></div>
     <nav id="sidebar">
         <div class="sidebar-header">
             <h5 class="m-0 fw-bold text-white d-flex align-items-center">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RwJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3DxKGYsqMAUa6cEIAW7HwEKEKkZc4O1V2I4gAAK3aEQaEa6wE2I2CGAh1jMQAosB7Bgi6tN23JqgC0kK0m7cEIAm1LgAasC6k4hDkK0gQo1v3iABpAYk09M6gK8EAsm1F2Dq3bEIA1hEAWG9N0J98Q19dAIseANp2L1k4C1BvW5EAA0bU23C9Xv2gA1m53Aawj9wLw3Qn30iZ0hWk1kZf68GjQo9qW7W9wA69o3Hq3kEIAv5v2pW43Gq7AQAQe0hA7d5V2AAb7wK8EAu7WbB2A5gAX1cAYNlGBAh2I2CGAp7q1v08HAYD7j49qC97mEKAi2LwEAZ5jOQAsv3iOAW5w3wN25M2N3g9Q1j8E4v62KzC0D9wJ4sCGAEAUv2jIQcAYO1qW47d7wAA8k7n+t1264b3cAw33u10EAEAs3w40C29N4cT7jYAEB/bB1gAAAABJRU5ErkJggg==" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAQAElEQVR4Aey9B4BlR3nn+31VddJNnaYnB2mUhQSSkAQoEYQJQiTb2IC9ONvLe2/tdXrvbfCu3ybb63XAXmNs7xobR8AIDCKDQRGTRBCSGKXRzEgz0zOdbjypwvvO7R4x0tweTU/fjvc7+u65J9T5qupXdf73qzo9RwJ4YQJMgAmsEwIsWOukobiYTIAJALBgcS9gAkxg3RBgwVo3TbX0grIHJrDeCbBgrfcW5PIzgQEiwII1QI3NVWUC650AC9Z6b0EuPxPoRWCDHmPB2qANy9ViAhuRAAvWRmxVrhMT2KAEWLA2aMNytZjARiTAgtWrVfkYE2ACa5IAC9aabBYuFBNgAr0IsGD1osLHmAATWJMEWLDWZLNwoVaOAOe0ngiwYK2n1uKyMoEBJ8CCNeAdgKvPBNYTARas9dRaXFYmMOAElihYA06Pq88EmMCKEmDBWlHcnBkTYAJLIcCCtRR6fC0TYAIrSoAFa0Vxr+vMuPBMYNUJsGCtehNwAZgAEzhTAixYZ0qK0zEBJrDqBFiwVr0JuABMYO0RWKslYsFaqy3D5WICTOAUAixYpyDhA0yACaxVAixYa7VluFxMgAmcQoAF6xQkSz/AHpgAE1geAixYy8OVvTIBJrAMBFiwlgEqu2QCTGB5CLBgLQ9X9jooBLieK0qABWrFcXNmTIAJLIUAC9ZS6PG1TIAJrCgBFqwVxc2ZMQEmsBQCqytYSyk5X8sEmMDAEWDBGrgm5wozgfVLgAVr/bYdl5wJDBwBFqyBa/LVqjDnywSWToAFa+kM2QMTYAIrRIAFa4VAczZMgAksnQAL1tIZsgcmwASeSWDZ9lgi1o2VAAAAAElFTkSuQmCC" alt="Promart" style="width: 30px; height: 30px; border-radius: 7px; margin-right: 10px; flex-shrink: 0;"> PROMART
             </h5>
             <small class="text-white text-uppercase fw-bold" style="font-size: 0.7rem;">Control de Operaciones</small>
         </div>
@@ -274,6 +374,12 @@
 
     <div id="content">
 
+        <div id="mobileTopbar" class="d-lg-none">
+            <button id="btnToggleSidebar" type="button" aria-label="Abrir menú"><i class="bi bi-list"></i></button>
+            <span class="fw-bold">PROMART</span>
+            <small class="text-uppercase">Control de Operaciones</small>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="fw-bold m-0" id="dinamicTitle">Módulo de Carga Integral</h4>
@@ -283,10 +389,10 @@
         </div>
 
         <div id="kpiRow" class="row g-3 mb-4" style="display: none;">
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Colaboradores menor al 95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
-            <div class="col-md-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Omision de Marcajes</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
-            <div class="col-md-3">
+            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Colaboradores menor al 95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
+            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
+            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Omision de Marcajes</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
+            <div class="col-6 col-lg-3">
                 <div class="kpi-card">
                     <div>
                         <span class="text-muted small text-uppercase fw-semibold">Total Inasistencias</span>
@@ -1141,6 +1247,17 @@
         return 0;
     }
 
+    const sidebarEl = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    function abrirSidebarMovil() { sidebarEl.classList.add('open'); sidebarBackdrop.classList.add('show'); }
+    function cerrarSidebarMovil() { sidebarEl.classList.remove('open'); sidebarBackdrop.classList.remove('show'); }
+    document.getElementById('btnToggleSidebar').addEventListener('click', () => {
+        sidebarEl.classList.contains('open') ? cerrarSidebarMovil() : abrirSidebarMovil();
+    });
+    sidebarBackdrop.addEventListener('click', cerrarSidebarMovil);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarSidebarMovil(); });
+    window.addEventListener('resize', () => { if (window.innerWidth >= 992) cerrarSidebarMovil(); });
+
     const navButtons = document.querySelectorAll('.tab-nav-btn');
     const panels = document.querySelectorAll('.panel-custom');
     const dinamicTitle = document.getElementById('dinamicTitle');
@@ -1157,6 +1274,8 @@
             }
 
             dinamicTitle.innerText = btn.innerText.trim();
+            cerrarSidebarMovil();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     });
 
@@ -1193,6 +1312,7 @@
 
             reader.onload = async (e) => {
                 try {
+                    // LECTURA ROBUSTA CON Uint8Array PARA ARCHIVOS GRANDES O FORMATOS SHEET1/SHEET2
                     const dataBuffer = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(dataBuffer, { type: 'array' });
 
@@ -1202,6 +1322,7 @@
                         hojas[upper] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
                     });
 
+                    // MAPEO FLEXIBLE DE PESTAÑAS (DATA 1 / SHEET 1 / HOJA 1)
                     let data1 = hojas["DATA 1"] || hojas["DATA1"] || hojas["SHEET1"] || hojas["HOJA1"] || [];
                     let data2 = hojas["DATA 2"] || hojas["DATA2"] || hojas["SHEET2"] || hojas["HOJA2"] || [];
                     let data5 = hojas["DATA 5"] || hojas["DATA5"] || hojas["SHEET5"] || hojas["HOJA5"] || [];
@@ -1218,6 +1339,7 @@
                     document.getElementById('btnMenuAlm').disabled = false;
                     document.getElementById('btnMenuCrit').disabled = false;
 
+                    // Solo activar botones de marcación si existe DATA 5
                     const tieneData5 = data5.length > 0;
                     document.getElementById('btnMenuTard').disabled = !tieneData5;
                     document.getElementById('btnMenuOmis').disabled = !tieneData5;
@@ -1238,6 +1360,7 @@
                         alert("ℹ️ Se procesó el resumen por Áreas y Colaboradores (Sheet1 / Sheet2).\n\nNota: Para visualizar los reportes detallados de marcaciones (Tardanzas, Omisiones, Refrigerio, etc.), el Excel debe incluir la pestaña DATA 5.");
                     }
 
+                    // Registrar en Firebase en historico_periodos
                     let labelPeriodo = file.name.replace(/\.[^/.]+$/, "");
                     if (tieneData5) {
                         let fechas = [];
@@ -1736,9 +1859,10 @@
                 }
             }
 
+            // --- FILTRO EXCLUSIVO PARA BREAK PASADO LAS 5 PM (SOLO FULL TIME) ---
             if (haySalidaRefValida && tipoCategoria === "FT") {
                 let minSalRef = convertirHoraAMinutos(salRef);
-                if (minSalRef >= 1020) {
+                if (minSalRef >= 1020) { // 17:00 PM
                     datosBreakTardeGlobal.push({
                         dni, nombre, area: areaFinal, fecha,
                         salida: salRef,
@@ -2357,7 +2481,7 @@
         const tbody = document.getElementById('tbodyBreakTarde');
         if (!tbody) return;
 
-        let filtrados = [...datosBreakTardeGlobal];
+        let filtrados = [...datosBreakTardeGlobal]; // Solo FT
 
         if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
