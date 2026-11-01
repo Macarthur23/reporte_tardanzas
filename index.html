@@ -1116,7 +1116,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, writeBatch, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, writeBatch, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -1145,19 +1145,21 @@
     let tiendaSeleccionadaActual = "TTP-404";
     let chartComparativo = null;
     let periodosGuardadosMap = {};
+    let unsubscribeRealtimeData = null;
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             loginOverlay.style.display = 'none';
             appWrapper.style.display = 'flex';
             if (userEmailLabel) userEmailLabel.innerText = user.email || '';
             if (badgeTiendaActiva) badgeTiendaActiva.innerText = tiendaSeleccionadaActual;
             if (mobileTiendaLabel) mobileTiendaLabel.innerText = tiendaSeleccionadaActual;
-            cargarSelectorPeriodos();
+            await cargarSelectorPeriodos();
 
-            // TIEMPO REAL: Al iniciar sesión, verifica si hay datos guardados previamente en este navegador
-            restaurarDatosSesionActual();
+            // ESCUCHA EN TIEMPO REAL MULTI-USUARIO DESDE LA NUBE DE FIREBASE
+            suscribirCargaEnTiempoReal(tiendaSeleccionadaActual);
         } else {
+            if (unsubscribeRealtimeData) unsubscribeRealtimeData();
             appWrapper.style.display = 'none';
             loginOverlay.style.display = 'flex';
         }
@@ -1210,6 +1212,29 @@
 
     function obtenerTiendaSeleccionada() {
         return tiendaSeleccionadaActual;
+    }
+
+    function suscribirCargaEnTiempoReal(tiendaId) {
+        if (unsubscribeRealtimeData) unsubscribeRealtimeData();
+
+        const refDoc = doc(db, "datos_en_vivo", tiendaId);
+        unsubscribeRealtimeData = onSnapshot(refDoc, (snapshot) => {
+            if (snapshot.exists()) {
+                const dataCloud = snapshot.data();
+                if (dataCloud && dataCloud.data1) {
+                    fileNameDisplay.innerText = "Sincronizado en Vivo: " + (dataCloud.nombreArchivo || "Archivo Compartido");
+                    document.getElementById('fileStatusBadge').className = "badge bg-success p-2 rounded-3";
+                    document.getElementById('fileStatusBadge').innerText = "🟢 Conectado en Tiempo Real";
+
+                    procesarDatosCompletos(dataCloud.data1 || [], dataCloud.data2 || [], dataCloud.data5 || [], dataCloud.nombreArchivo || "Nube", false);
+                }
+            } else {
+                restaurarDatosSesionActual();
+            }
+        }, (err) => {
+            console.error("Error en escucha en tiempo real:", err);
+            restaurarDatosSesionActual();
+        });
     }
 
     function convertirHoraAMinutos(tiempoStr) {
@@ -1352,9 +1377,8 @@
                     }
 
                     btnProcesar.disabled = true;
-                    btnProcesar.innerText = "Procesando en tiempo real...";
+                    btnProcesar.innerText = "Guardando en Tiempo Real...";
 
-                    // TIEMPO REAL: Guardar datos sin procesar en localStorage para persistencia instantánea
                     const tiendaId = obtenerTiendaSeleccionada();
                     const rawDataCache = {
                         data1, data2, data5,
@@ -1363,7 +1387,20 @@
                     };
                     localStorage.setItem(`promart_cache_${tiendaId}`, JSON.stringify(rawDataCache));
 
-                    procesarDatosCompletos(data1, data2, data5, file.name, true);
+                    // PROPAGACIÓN MULTI-DISPOSITIVO: Guarda el objeto en Firestore para que otros equipos lo vean en vivo
+                    try {
+                        const refDocEnVivo = doc(db, "datos_en_vivo", tiendaId);
+                        await setDoc(refDocEnVivo, {
+                            tienda: tiendaId,
+                            nombreArchivo: file.name,
+                            actualizadoEl: new Date().toISOString(),
+                            data1, data2, data5
+                        });
+                    } catch (errNube) {
+                        console.error("Error al publicar datos en vivo en Firestore:", errNube);
+                    }
+
+                    await procesarDatosCompletos(data1, data2, data5, file.name, true);
 
                 } catch (err) {
                     console.error("Error al procesar el archivo Excel:", err);
@@ -1448,12 +1485,12 @@
                 if (parsed.tienda === tiendaId) {
                     fileNameDisplay.innerText = "Archivo activo: " + parsed.nombreArchivo;
                     document.getElementById('fileStatusBadge').className = "badge bg-success p-2 rounded-3";
-                    document.getElementById('fileStatusBadge').innerText = "Sincronizado en tiempo real";
+                    document.getElementById('fileStatusBadge').innerText = "Sincronizado Localmente";
 
                     procesarDatosCompletos(parsed.data1 || [], parsed.data2 || [], parsed.data5 || [], parsed.nombreArchivo, false);
                 }
             } catch (e) {
-                console.error("Error al restaurar caché en tiempo real:", e);
+                console.error("Error al restaurar caché local:", e);
             }
         }
     }
@@ -2826,7 +2863,7 @@
                     for (let i = 0; i < docs.length; i += tamañoLote) {
                         const batch = writeBatch(db);
                         docs.slice(i, i + tamañoLote).forEach(d => {
-                            if (d.id.startsWith(tiendaId + "_")) {
+                            if (d.id.startsWith(tiendaId + "_") || d.id === tiendaId) {
                                 batch.delete(d.ref);
                             }
                         });
@@ -2841,8 +2878,8 @@
                 await eliminarColeccionEnLotes("historico_tardanza_salida");
                 await eliminarColeccionEnLotes("historico_areas");
                 await eliminarColeccionEnLotes("historico_periodos");
+                await eliminarColeccionEnLotes("datos_en_vivo");
 
-                // Limpiar caché local
                 localStorage.removeItem(`promart_cache_${tiendaId}`);
 
                 alert(`✅ Historial de la tienda ${tiendaId} reseteado con éxito.`);
