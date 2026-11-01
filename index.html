@@ -312,6 +312,12 @@
         @media (max-width: 359.98px) {
             .kpi-icon { display: none; }
         }
+
+        /* ===== ZOOM (acercar / alejar) ===== */
+        #content > :not(#mobileTopbar) { zoom: var(--ui-zoom, 1); }
+        html.zoom-js, html.zoom-js body { touch-action: pan-x pan-y; }
+        #mobileTopbar .zoom-btns { display: flex; gap: 6px; }
+        #mobileTopbar .zoom-btns button { width: 36px; height: 36px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -383,6 +389,10 @@
             <button id="btnToggleSidebar" type="button" aria-label="Abrir menú"><i class="bi bi-list"></i></button>
             <span class="fw-bold">PROMART</span>
             <small class="text-uppercase" id="mobileTiendaLabel">TTP-404</small>
+            <div class="zoom-btns">
+                <button id="btnZoomOut" type="button" aria-label="Alejar"><i class="bi bi-zoom-out"></i></button>
+                <button id="btnZoomIn" type="button" aria-label="Acercar"><i class="bi bi-zoom-in"></i></button>
+            </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1114,6 +1124,54 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    (function () {
+        var MIN = 0.6, MAX = 2.0, STEP = 0.1, KEY = 'promart_zoom';
+        var root = document.documentElement;
+        var nivel = 1;
+        try { nivel = parseFloat(localStorage.getItem(KEY)) || 1; } catch (e) {}
+
+        function aplicar(z, guardar) {
+            nivel = Math.min(MAX, Math.max(MIN, z));
+            root.style.setProperty('--ui-zoom', nivel.toFixed(2));
+            if (guardar) { try { localStorage.setItem(KEY, nivel.toFixed(2)); } catch (e) {} }
+        }
+        aplicar(nivel, false);
+
+        var bIn = document.getElementById('btnZoomIn');
+        var bOut = document.getElementById('btnZoomOut');
+        if (bIn)  bIn.addEventListener('click',  function () { aplicar(nivel + STEP, true); });
+        if (bOut) bOut.addEventListener('click', function () { aplicar(nivel - STEP, true); });
+
+        // Pellizco con dos dedos: solo dentro de un WebView/APK, donde el zoom nativo suele venir desactivado.
+        // En el navegador normal (Chrome, Safari) el zoom nativo ya funciona y no se toca.
+        var esWebView = /; wv\)/.test(navigator.userAgent) || !!window.Capacitor || !!window.cordova;
+        if (!esWebView) return;
+        root.classList.add('zoom-js');
+
+        var d0 = 0, z0 = 1, zPend = 1, raf = 0;
+        function dist(t) {
+            var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        document.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 2) { d0 = dist(e.touches); z0 = nivel; }
+        }, { passive: true });
+        document.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2 && d0 > 0) {
+                e.preventDefault();
+                zPend = z0 * (dist(e.touches) / d0);
+                if (!raf) raf = requestAnimationFrame(function () { raf = 0; aplicar(zPend, false); });
+            }
+        }, { passive: false });
+        function terminar(e) {
+            if (e.touches.length < 2 && d0 > 0) { d0 = 0; aplicar(nivel, true); }
+        }
+        document.addEventListener('touchend', terminar, { passive: true });
+        document.addEventListener('touchcancel', terminar, { passive: true });
+    })();
+</script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, writeBatch, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1142,7 +1200,16 @@
     const badgeTiendaActiva = document.getElementById('badgeTiendaActiva');
     const mobileTiendaLabel = document.getElementById('mobileTiendaLabel');
 
+    const CLAVE_TIENDA = "promart_tienda_activa";
+    const selectTiendaLogin = document.getElementById('loginTiendaSelect');
     let tiendaSeleccionadaActual = "TTP-404";
+    try {
+        // Si la sesión ya estaba abierta, no se muestra el login: se recupera la última tienda elegida
+        const guardada = localStorage.getItem(CLAVE_TIENDA);
+        const validas = selectTiendaLogin ? Array.from(selectTiendaLogin.options).map(o => o.value) : [];
+        if (guardada && validas.includes(guardada)) tiendaSeleccionadaActual = guardada;
+    } catch (e) {}
+    if (selectTiendaLogin) selectTiendaLogin.value = tiendaSeleccionadaActual;
     let chartComparativo = null;
     let periodosGuardadosMap = {};
     let unsubscribeRealtimeData = null;
@@ -1175,6 +1242,7 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             tiendaSeleccionadaActual = document.getElementById('loginTiendaSelect').value;
+            try { localStorage.setItem(CLAVE_TIENDA, tiendaSeleccionadaActual); } catch (e) {}
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
@@ -1214,26 +1282,169 @@
         return tiendaSeleccionadaActual;
     }
 
+    // ═════════ TIEMPO REAL MULTI-DISPOSITIVO ═════════
+    // Firestore limita cada documento a 1 MiB, y un reporte completo lo supera con facilidad.
+    // Por eso los datos se guardan en varias "partes" (texto JSON) y un documento índice
+    // (datos_en_vivo/{tienda}) que se escribe AL FINAL. Los demás equipos escuchan solo ese índice.
+    const MAX_BYTES_PARTE = 700000;
+    let ultimaVersionEnVivo = null;
+    let procesandoEnVivo = false;
+    let metaPendienteEnVivo = null;
+    let avisoErrorEscuchaMostrado = false;
+
+    function setEstadoEnVivo(tipo, texto) {
+        const badge = document.getElementById('fileStatusBadge');
+        if (!badge) return;
+        const clase = { ok: 'bg-success', error: 'bg-danger', info: 'bg-secondary' }[tipo] || 'bg-secondary';
+        badge.className = `badge ${clase} p-2 rounded-3`;
+        badge.innerText = texto;
+    }
+
+    function describirErrorNube(err) {
+        const codigo = (err && (err.code || err.message)) || 'desconocido';
+        if (err && err.code === 'permission-denied') {
+            return "Firestore no permite leer/escribir la colección «datos_en_vivo».\n\n" +
+                   "Solución: en Firebase Console → Firestore Database → Reglas, agrega permiso para usuarios autenticados sobre datos_en_vivo.\n\n(Código: permission-denied)";
+        }
+        if (err && err.code === 'resource-exhausted') {
+            return "Se alcanzó la cuota de Firestore (plan gratuito) o el archivo es demasiado grande.\n\n(Código: resource-exhausted)";
+        }
+        if (err && (err.code === 'unavailable' || err.code === 'deadline-exceeded')) {
+            return "No hay conexión estable con Firebase. Revisa el internet e inténtalo otra vez.\n\n(Código: " + err.code + ")";
+        }
+        return "Detalle técnico: " + codigo;
+    }
+
+    function dividirEnPartes(filas) {
+        const enc = new TextEncoder();
+        const partes = [];
+        let actual = [], bytes = 2;
+        for (const fila of filas) {
+            const s = JSON.stringify(fila);
+            const b = enc.encode(s).length + 1;
+            if (actual.length && bytes + b > MAX_BYTES_PARTE) {
+                partes.push('[' + actual.join(',') + ']');
+                actual = []; bytes = 2;
+            }
+            actual.push(s); bytes += b;
+        }
+        if (actual.length) partes.push('[' + actual.join(',') + ']');
+        return partes;
+    }
+
+    function idParteEnVivo(tiendaId, tabla, i) {
+        return `${tiendaId}_${tabla}_${String(i).padStart(3, '0')}`;
+    }
+
+    async function publicarDatosEnVivo(tiendaId, nombreArchivo, data1, data2, data5) {
+        const version = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        const refMeta = doc(db, "datos_en_vivo", tiendaId);
+
+        let partesAnteriores = {};
+        try {
+            const snapPrev = await getDoc(refMeta);
+            if (snapPrev.exists() && snapPrev.data().partes) partesAnteriores = snapPrev.data().partes;
+        } catch (e) { /* si no se puede leer, solo no se limpia lo sobrante */ }
+
+        const conteos = {};
+        const tablas = { data1, data2, data5 };
+        for (const [nombre, filas] of Object.entries(tablas)) {
+            const partes = dividirEnPartes(filas);
+            conteos[nombre] = partes.length;
+            for (let i = 0; i < partes.length; i++) {
+                await setDoc(doc(db, "datos_en_vivo", idParteEnVivo(tiendaId, nombre, i)), {
+                    tienda: tiendaId, tabla: nombre, indice: i, version, json: partes[i]
+                });
+            }
+        }
+
+        // Esta versión ya la tengo yo: no hace falta reprocesarla cuando llegue mi propio cambio
+        ultimaVersionEnVivo = version;
+        await setDoc(refMeta, {
+            tienda: tiendaId, nombreArchivo, version, formato: 2,
+            actualizadoEl: new Date().toISOString(), partes: conteos
+        });
+
+        // Borra partes sobrantes de una carga anterior más grande
+        try {
+            const batch = writeBatch(db);
+            let hayBorrados = false;
+            for (const nombre of Object.keys(tablas)) {
+                for (let i = conteos[nombre]; i < (partesAnteriores[nombre] || 0); i++) {
+                    batch.delete(doc(db, "datos_en_vivo", idParteEnVivo(tiendaId, nombre, i)));
+                    hayBorrados = true;
+                }
+            }
+            if (hayBorrados) await batch.commit();
+        } catch (e) { console.warn("No se pudieron limpiar partes antiguas:", e); }
+    }
+
+    async function leerPartesEnVivo(tiendaId, meta) {
+        const resultado = { data1: [], data2: [], data5: [] };
+        for (const nombre of Object.keys(resultado)) {
+            const n = (meta.partes && meta.partes[nombre]) || 0;
+            const snaps = await Promise.all(
+                Array.from({ length: n }, (_, i) => getDoc(doc(db, "datos_en_vivo", idParteEnVivo(tiendaId, nombre, i))))
+            );
+            for (const s of snaps) {
+                // Si falta una parte o es de otra versión, hay una carga nueva en curso: llegará otro aviso
+                if (!s.exists() || s.data().version !== meta.version) return null;
+                resultado[nombre] = resultado[nombre].concat(JSON.parse(s.data().json));
+            }
+        }
+        return resultado;
+    }
+
+    async function procesarCambioEnVivo(tiendaId, meta) {
+        if (procesandoEnVivo) { metaPendienteEnVivo = meta; return; }
+        procesandoEnVivo = true;
+        try {
+            let actual = meta;
+            while (actual) {
+                metaPendienteEnVivo = null;
+                if (actual.version && actual.version === ultimaVersionEnVivo) break;
+
+                let datos = null;
+                if (actual.formato === 2) {
+                    datos = await leerPartesEnVivo(tiendaId, actual);
+                } else if (actual.data1) {   // compatibilidad con el formato anterior (documento único)
+                    datos = { data1: actual.data1 || [], data2: actual.data2 || [], data5: actual.data5 || [] };
+                }
+                if (!datos) break;
+
+                ultimaVersionEnVivo = actual.version || null;
+                fileNameDisplay.innerText = "Sincronizado en Vivo: " + (actual.nombreArchivo || "Archivo Compartido");
+                setEstadoEnVivo('ok', "🟢 Conectado en Tiempo Real");
+                await procesarDatosCompletos(datos.data1, datos.data2, datos.data5, actual.nombreArchivo || "Nube", false);
+                actual = metaPendienteEnVivo;
+            }
+        } catch (err) {
+            console.error("Error al sincronizar datos en vivo:", err);
+            setEstadoEnVivo('error', "🔴 Error al sincronizar");
+        } finally {
+            procesandoEnVivo = false;
+        }
+    }
+
     function suscribirCargaEnTiempoReal(tiendaId) {
         if (unsubscribeRealtimeData) unsubscribeRealtimeData();
+        ultimaVersionEnVivo = null;
 
         const refDoc = doc(db, "datos_en_vivo", tiendaId);
         unsubscribeRealtimeData = onSnapshot(refDoc, (snapshot) => {
-            if (snapshot.exists()) {
-                const dataCloud = snapshot.data();
-                if (dataCloud && dataCloud.data1) {
-                    fileNameDisplay.innerText = "Sincronizado en Vivo: " + (dataCloud.nombreArchivo || "Archivo Compartido");
-                    document.getElementById('fileStatusBadge').className = "badge bg-success p-2 rounded-3";
-                    document.getElementById('fileStatusBadge').innerText = "🟢 Conectado en Tiempo Real";
-
-                    procesarDatosCompletos(dataCloud.data1 || [], dataCloud.data2 || [], dataCloud.data5 || [], dataCloud.nombreArchivo || "Nube", false);
-                }
-            } else {
+            if (!snapshot.exists()) {
                 restaurarDatosSesionActual();
+                return;
             }
+            procesarCambioEnVivo(tiendaId, snapshot.data());
         }, (err) => {
             console.error("Error en escucha en tiempo real:", err);
             restaurarDatosSesionActual();
+            setEstadoEnVivo('error', "🔴 Sin tiempo real");
+            if (!avisoErrorEscuchaMostrado) {
+                avisoErrorEscuchaMostrado = true;
+                alert("⚠️ No se pudo activar la sincronización en tiempo real.\n\n" + describirErrorNube(err));
+            }
         });
     }
 
@@ -1385,22 +1596,29 @@
                         nombreArchivo: file.name,
                         tienda: tiendaId
                     };
-                    localStorage.setItem(`promart_cache_${tiendaId}`, JSON.stringify(rawDataCache));
-
-                    // PROPAGACIÓN MULTI-DISPOSITIVO: Guarda el objeto en Firestore para que otros equipos lo vean en vivo
                     try {
-                        const refDocEnVivo = doc(db, "datos_en_vivo", tiendaId);
-                        await setDoc(refDocEnVivo, {
-                            tienda: tiendaId,
-                            nombreArchivo: file.name,
-                            actualizadoEl: new Date().toISOString(),
-                            data1, data2, data5
-                        });
+                        localStorage.setItem(`promart_cache_${tiendaId}`, JSON.stringify(rawDataCache));
+                    } catch (errCache) {
+                        console.warn("No se pudo guardar la caché local (archivo grande):", errCache);
+                    }
+
+                    // PROPAGACIÓN MULTI-DISPOSITIVO: publica los datos en Firestore para que otros equipos los vean en vivo
+                    let errorPublicacion = null;
+                    try {
+                        await publicarDatosEnVivo(tiendaId, file.name, data1, data2, data5);
                     } catch (errNube) {
                         console.error("Error al publicar datos en vivo en Firestore:", errNube);
+                        errorPublicacion = errNube;
                     }
 
                     await procesarDatosCompletos(data1, data2, data5, file.name, true);
+
+                    if (errorPublicacion) {
+                        setEstadoEnVivo('error', "🔴 No se publicó en la nube");
+                        alert("⚠️ El archivo se procesó en este equipo, pero NO se pudo publicar para los demás dispositivos.\n\n" + describirErrorNube(errorPublicacion));
+                    } else {
+                        setEstadoEnVivo('ok', "🟢 Publicado en Tiempo Real");
+                    }
 
                 } catch (err) {
                     console.error("Error al procesar el archivo Excel:", err);
