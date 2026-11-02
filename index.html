@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- FORZADO: Habilita el zoom táctil y alejar con los dedos en cualquier APK, WebView o navegador móvil -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#E05E00">
     <title>Promart - Dashboard de Operaciones</title>
@@ -340,13 +339,49 @@
             <div class="mb-3">
                 <label class="form-label small fw-semibold text-muted">Seleccionar Tienda / Sucursal</label>
                 <select id="loginTiendaSelect" class="form-select" required>
-                    <option value="TTP-404">Tarapoto (TTP - 404)</option>
-                    <option value="HCO-402">Huánuco (HCO - 402)</option>
+                    <option value="" disabled selected>Selecciona tu tienda...</option>
+                    <option value="401">401 - Pucallpa HPO</option>
+                    <option value="HCO-402">402 - Huánuco HPO</option>
+                    <option value="403">403 - Jaen</option>
+                    <option value="TTP-404">404 - Tarapoto</option>
+                    <option value="405">405 - Tarapoto II</option>
+                    <option value="501">501 - La Campiña</option>
+                    <option value="502">502 - Pro</option>
+                    <option value="503">503 - Santa Clara</option>
+                    <option value="505">505 - Juliaca</option>
+                    <option value="506">506 - Chiclayo</option>
+                    <option value="507">507 - Piura</option>
+                    <option value="509">509 - Sullana</option>
+                    <option value="510">510 - Huancayo</option>
+                    <option value="511">511 - Cajamarca</option>
+                    <option value="512">512 - Brasil</option>
+                    <option value="514">514 - Cusco</option>
+                    <option value="515">515 - Nuevo Chimbote</option>
+                    <option value="516">516 - Salaverry</option>
+                    <option value="517">517 - Ate</option>
+                    <option value="518">518 - San Jeronimo</option>
+                    <option value="519">519 - Pisco</option>
+                    <option value="520">520 - Talara</option>
+                    <option value="521">521 - Moquegua</option>
+                    <option value="522">522 - Ica</option>
+                    <option value="523">523 - La Curva</option>
+                    <option value="524">524 - Lurín</option>
+                    <option value="525">525 - Puente Piedra</option>
+                    <option value="526">526 - Arequipa</option>
+                    <option value="527">527 - Tumbes</option>
+                    <option value="528">528 - La Molina</option>
+                    <option value="531">531 - San Miguel</option>
+                    <option value="536">536 - Chiclayo II</option>
+                    <option value="538">538 - Trujillo 2</option>
+                    <option value="540">540 - SMP</option>
+                    <option value="543">543 - San Juan de Lurigancho</option>
+                    <option value="544">544 - Huaral</option>
                 </select>
             </div>
             <div id="loginError" class="text-danger small mb-3" style="display: none;"></div>
             <button type="submit" id="btnLogin" class="btn btn-dark w-100" style="border-radius: 10px; padding: 10px;">Iniciar Sesión</button>
         </form>
+        <div class="text-center mt-3"><small class="text-muted" style="font-size: 0.65rem;">Versión 2026.11.01-j</small></div>
     </div>
 </div>
 
@@ -363,7 +398,7 @@
         <div class="px-3 py-2 d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.1);">
             <div class="text-truncate">
                 <small class="text-white text-truncate d-block" style="font-size: 0.72rem; max-width: 140px;" id="userEmailLabel"></small>
-                <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.65rem;" id="badgeTiendaActiva">TTP-404</span>
+                <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.65rem; white-space: normal; text-align: left;" id="badgeTiendaActiva">404 - Tarapoto</span>
             </div>
             <button id="btnLogout" class="btn btn-sm btn-light py-0 px-2" style="font-size: 0.7rem; border-radius: 6px;" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></button>
         </div>
@@ -372,15 +407,16 @@
             <li><button class="tab-nav-btn active" data-target="panel-carga"><i class="bi bi-cloud-upload"></i> Cargar Datos</button></li>
             <li><button class="tab-nav-btn" data-target="panel-dashboard" id="btnMenuDash" disabled><i class="bi bi-pie-chart"></i> Cumplimiento por Áreas</button></li>
             <li><button class="tab-nav-btn" data-target="panel-historico-comparativo" id="btnMenuHistComparativo"><i class="bi bi-graph-up-arrow"></i> Comparativa Histórica</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-box-seam"></i> Cumplimiento Almacén</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Cumplimiento menor al 95%</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-shop"></i> Cumplimiento Tienda</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Colaboradores en Riesgo de Rotacion</button></li>
             <li><button class="tab-nav-btn" data-target="panel-tardanzas-det" id="btnMenuTard" disabled><i class="bi bi-clock"></i> Reporte de Tardanzas</button></li>
             <li><button class="tab-nav-btn" data-target="panel-omisiones-det" id="btnMenuOmis" disabled><i class="bi bi-eraser"></i> Reporte Omision de Marcajes</button></li>
             <li><button class="tab-nav-btn" data-target="panel-inasistencias-det" id="btnMenuInas" disabled><i class="bi bi-exclamation-octagon"></i> Reporte de Inasistencias</button></li>
             <li><button class="tab-nav-btn" data-target="panel-refrigerio-det" id="btnMenuRefrig" disabled><i class="bi bi-cup-hot"></i> Reporte Exceso de Refrigerio</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-break-tarde-det" id="btnMenuBreakTarde" disabled><i class="bi bi-clock-history"></i> Break Pasado las 5 PM</button></li>
+            <li><button class="tab-nav-btn" data-target="panel-break-tarde-det" id="btnMenuBreakTarde" disabled><i class="bi bi-clock-history"></i> Break Igual o Pasado las 6 PM</button></li>
             <li><button class="tab-nav-btn" data-target="panel-turno-det" id="btnMenuTurno" disabled><i class="bi bi-hourglass-split"></i> Reporte de Exceso de Turno</button></li>
         </ul>
+        <div class="px-3 py-3 text-white-50" style="font-size: 0.65rem;">Versión 2026.11.01-j</div>
     </nav>
 
     <div id="content">
@@ -404,10 +440,10 @@
         </div>
 
         <div id="kpiRow" class="row g-3 mb-4" style="display: none;">
-            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Colaboradores menor al 95%</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
-            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
-            <div class="col-6 col-lg-3"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Omision de Marcajes</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
-            <div class="col-6 col-lg-3">
+            <div class="col-6 col-lg"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Colaboradores con Riesgo de Rotacion</span><h3 class="fw-bold m-0 mt-1 text-danger" id="kpiCriticos">0</h3></div><div class="kpi-icon bg-danger-subtle text-danger"><i class="bi bi-person-x"></i></div></div></div>
+            <div class="col-6 col-lg"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Tardanzas Totales</span><h3 class="fw-bold m-0 mt-1 text-warning" id="kpiTardanzas">0</h3></div><div class="kpi-icon bg-warning-subtle text-warning"><i class="bi bi-clock"></i></div></div></div>
+            <div class="col-6 col-lg"><div class="kpi-card"><div><span class="text-muted small text-uppercase fw-semibold">Total Omision de Marcajes</span><h3 class="fw-bold m-0 mt-1 text-dark" id="kpiOmisiones">0</h3></div><div class="kpi-icon bg-light text-dark border"><i class="bi bi-bookmark-x"></i></div></div></div>
+            <div class="col-6 col-lg">
                 <div class="kpi-card">
                     <div>
                         <span class="text-muted small text-uppercase fw-semibold">Total Inasistencias</span>
@@ -415,6 +451,18 @@
                     </div>
                     <div class="kpi-icon bg-danger-subtle text-danger">
                         <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg">
+                <div class="kpi-card" id="kpiNuevosRiesgoCard" style="cursor: pointer;" title="Ver la lista de nuevos con Alto Riesgo">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Total Nuevos menor al 85%</span>
+                        <h3 class="fw-bold m-0 mt-1 text-danger" id="kpiNuevosRiesgo">0</h3>
+                        <div class="text-muted" style="font-size: 0.7rem;" id="kpiNuevosRiesgoSub">Carga el archivo de Ingresos</div>
+                    </div>
+                    <div class="kpi-icon bg-danger-subtle text-danger">
+                        <i class="bi bi-person-exclamation"></i>
                     </div>
                 </div>
             </div>
@@ -441,6 +489,23 @@
                         <button id="btnReiniciarFirebase" class="btn btn-outline-danger btn-lg px-4 shadow-sm" style="border-radius:10px;">
                             🗑️ Reiniciar Historial
                         </button>
+                    </div>
+                </div>
+
+                <div class="main-card" id="cardIngresos">
+                    <h5 class="fw-bold mb-2 text-secondary"><i class="bi bi-person-plus-fill me-2"></i>Archivo de Ingresos (opcional)</h5>
+                    <p class="text-muted small mb-3">
+                        Sube el Excel con las columnas <b>DNI</b> y <b>F. Ingreso</b>. Se cruza por DNI con el reporte de asistencia y marca como nuevos a quienes ingresaron hace 90 días o menos:
+                        <span class="badge fw-bold" style="font-size: 0.68rem; color: #b91c1c; background-color: #fee2e2; border: 1px solid #fecaca;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Nuevo Fb. Relación</span> de 1 a 15 días,
+                        <span class="badge fw-bold" style="font-size: 0.68rem; color: #b91c1c; background-color: #fee2e2; border: 1px solid #fecaca;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Nuevo Fb. Adaptación</span> de 16 a 45 días y
+                        <span class="badge fw-bold" style="font-size: 0.68rem; color: #b91c1c; background-color: #fee2e2; border: 1px solid #fecaca;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Nuevo Fb. Desarrollo</span> de 46 a 90 días.
+                    </p>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <button id="btnCargarIngresos" class="btn btn-outline-dark" type="button" style="border-radius: 10px;">
+                            <i class="bi bi-upload me-1"></i> Seleccionar Excel de Ingresos
+                        </button>
+                        <input type="file" id="inputIngresos" accept=".xlsx, .xls" style="display: none;">
+                        <div id="estadoIngresos" class="small text-muted">Aún no se ha cargado ningún archivo de ingresos.</div>
                     </div>
                 </div>
             </div>
@@ -535,7 +600,7 @@
                 </div>
             </div>
 
-            <!-- PANEL CUMPLIMIENTO ALMACÉN -->
+            <!-- PANEL CUMPLIMIENTO TIENDA (todos los colaboradores, de cualquier área) -->
             <div class="panel-custom d-none" id="panel-almacen-det">
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
@@ -544,7 +609,7 @@
                                 <div class="image-card-icon-container bg-primary-subtle text-danger"><i class="bi bi-people-fill"></i></div>
                                 <div class="image-card-info-block">
                                     <p class="image-card-title">Personal Total</p>
-                                    <p class="image-card-subtitle">Colaboradores Almacén</p>
+                                    <p class="image-card-subtitle">Colaboradores Tienda</p>
                                     <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-danger" style="width: 100%;"></div></div>
                                 </div>
                             </div>
@@ -556,7 +621,7 @@
                             <div class="image-card-left">
                                 <div class="image-card-icon-container bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
                                 <div class="image-card-info-block">
-                                    <p class="image-card-title">Rendimiento Operación</p>
+                                    <p class="image-card-title">Rendimiento Tienda</p>
                                     <p class="image-card-subtitle">Promedio Cumplimiento</p>
                                     <div class="image-card-progress-bg"><div class="image-card-progress-bar bg-success" id="barAlmPromedio" style="width: 0%;"></div></div>
                                 </div>
@@ -568,18 +633,35 @@
 
                 <div class="main-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold m-0">REPORTE DE CUMPLIMIENTO ALMACÉN</h5>
+                        <h5 class="fw-bold m-0">REPORTE DE CUMPLIMIENTO TIENDA</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyAlmacen" placeholder="Buscar por colaborador...">
                     </div>
 
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🎨 Filtrar por Semáforo:</div>
-                        <select id="filtroSemaforoAlm" class="form-select form-select-sm" style="width: 160px;" onchange="aplicarFiltrosAlmacen()">
+                        <select id="filtroSemaforoAlm" class="form-select form-select-sm" style="width: 220px;" onchange="aplicarFiltrosAlmacen()">
                             <option value="TODOS">(Mostrar Todos)</option>
-                            <option value="🔴">🔴 Solo Rojos (&lt; 95%)</option>
-                            <option value="🟡">🟡 Solo Amarillos (95% - 98.5%)</option>
-                            <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
+                            <option value="🔴">🔴 Alto Riesgo (&lt; 85%)</option>
+                            <option value="🟡">🟡 Riesgo Menor (85% - 95%)</option>
+                            <option value="🟢">🟢 Sin Riesgo (95% a más)</option>
                         </select>
+
+                        <div class="small fw-semibold text-muted ms-2 me-1">🏭 División:</div>
+                        <select id="filtroDivision_tienda" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('tienda', this.value)">
+                            <option value="TODAS">(Todas)</option>
+                            <option value="Div1">División 1</option>
+                            <option value="Div2">División 2</option>
+                            <option value="Div3">División 3</option>
+                            <option value="Div4">División 4</option>
+                            <option value="Otras">Otras / Sin División</option>
+                        </select>
+                        <div class="small fw-semibold text-muted ms-2 me-1">🏢 Filtrar Área:</div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm multi-area-btn dropdown-toggle" type="button" id="filtroAreaDrop_tienda" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span id="filtroAreaBtnTexto_tienda">(Todas las Áreas)</span>
+                            </button>
+                            <ul class="dropdown-menu multi-area-menu" id="filtroAreaMenu_tienda" aria-labelledby="filtroAreaDrop_tienda"></ul>
+                        </div>
 
                         <div class="small fw-semibold text-muted ms-2 me-1">📈 Ordenar por %:</div>
                         <select id="ordenPrecioAlm" class="form-select form-select-sm" style="width: 190px;" onchange="aplicarFiltrosAlmacen()">
@@ -637,16 +719,15 @@
 
                 <div class="main-card border-start border-danger border-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-danger m-0">COLABORADORES CON CUMPLIMIENTO MENOR AL 95%</h5>
+                        <h5 class="fw-bold text-danger m-0">COLABORADORES EN RIESGO DE ROTACION</h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyCriticos" placeholder="Filtrar críticos...">
                     </div>
                     <div class="d-flex gap-2 mb-3 flex-wrap align-items-center bg-light p-2 rounded border">
                         <div class="small fw-semibold text-muted me-1">🎨 Filtrar por Semáforo:</div>
-                        <select id="filtroSemaforoCrit" class="form-select form-select-sm" style="width: 160px;" onchange="aplicarFiltrosCriticos()">
+                        <select id="filtroSemaforoCrit" class="form-select form-select-sm" style="width: 220px;" onchange="aplicarFiltrosCriticos()">
                             <option value="TODOS">(Mostrar Todos)</option>
-                            <option value="🔴">🔴 Solo Rojos (&lt; 95%)</option>
-                            <option value="🟡">🟡 Solo Amarillos (95% - 98.5%)</option>
-                            <option value="🟢">🟢 Solo Verdes (&gt; 98.5%)</option>
+                            <option value="🔴">🔴 Alto Riesgo (&lt; 85%)</option>
+                            <option value="🟡">🟡 Riesgo Menor (85% - 95%)</option>
                         </select>
                         <div class="small fw-semibold text-muted ms-2 me-1">🏭 División:</div>
                         <select id="filtroDivision_crit" class="form-select form-select-sm" style="width: 150px;" onchange="aplicarDivisionAMultiArea('crit', this.value)">
@@ -670,14 +751,18 @@
                             <option value="MENOR_MAYOR">Menor a Mayor ↑</option>
                         </select>
                     </div>
+                    <div class="small text-muted mb-2"><i class="bi bi-info-circle me-1"></i>Las columnas Tardanzas, Omisiones e Inasistencias cuentan solo lo registrado en el archivo cargado actualmente.</div>
                     <div class="custom-table-container">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle" style="min-width: 780px;">
                             <thead class="table-danger">
                             <tr>
                                 <th>Área Perteneciente</th>
                                 <th>DNI</th>
                                 <th>Nombre y Apellidos</th>
                                 <th class="text-center">Cumplimiento Bajo</th>
+                                <th class="text-center" title="Tardanzas en el archivo cargado actualmente">Tardanzas</th>
+                                <th class="text-center" title="Omisiones de marcaje en el archivo cargado actualmente">Omisiones</th>
+                                <th class="text-center" title="Inasistencias en el archivo cargado actualmente">Inasistencias</th>
                             </tr>
                             </thead>
                             <tbody id="tbodyCriticos"></tbody>
@@ -961,12 +1046,12 @@
                 </div>
             </div>
 
-            <!-- PANEL: REPORTE BREAK DESPUÉS DE LAS 5 PM (SOLO FT) -->
+            <!-- PANEL: REPORTE BREAK IGUAL O DESPUÉS DE LAS 6 PM (SOLO FT) -->
             <div class="panel-custom d-none" id="panel-break-tarde-det">
                 <div class="main-card border-start border-warning border-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold text-warning-emphasis m-0">
-                            <i class="bi bi-clock-history me-2"></i>REPORTE SALIDA A BREAK DESPUÉS DE LAS 5:00 PM (EXCLUSIVO FULL TIME)
+                            <i class="bi bi-clock-history me-2"></i>REPORTE SALIDA A BREAK IGUAL O DESPUÉS DE LAS 6:00 PM (EXCLUSIVO FULL TIME)
                         </h5>
                         <input type="text" class="form-control w-25 buscador" data-target="tbodyBreakTarde" placeholder="Filtrar colaboradores...">
                     </div>
@@ -998,9 +1083,9 @@
 
                         <div class="small fw-semibold text-muted ms-2 me-1">⏰ Hora Salida Break:</div>
                         <select id="filtroRangoHoraBreakTarde" class="form-select form-select-sm" style="width: 220px;" onchange="filtrarYRenderizarBreakTarde()">
-                            <option value="TODOS">Todos (Pasado 5:00 PM)</option>
-                            <option value="5PM_6PM">Pasado las 5:00 PM (17:00 a 17:59)</option>
-                            <option value="6PM_MAS">Pasado las 6:00 PM (18:00 a más)</option>
+                            <option value="TODOS">Todos (6:00 PM a más)</option>
+                            <option value="6PM_7PM">Desde las 6:00 PM (18:00 a 18:59)</option>
+                            <option value="7PM_MAS">Desde las 7:00 PM (19:00 a más)</option>
                         </select>
                     </div>
 
@@ -1174,7 +1259,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, writeBatch, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs, writeBatch, query, orderBy, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -1203,13 +1288,25 @@
     const CLAVE_TIENDA = "promart_tienda_activa";
     const selectTiendaLogin = document.getElementById('loginTiendaSelect');
     let tiendaSeleccionadaActual = "TTP-404";
+    let hayTiendaGuardada = false;
     try {
         // Si la sesión ya estaba abierta, no se muestra el login: se recupera la última tienda elegida
         const guardada = localStorage.getItem(CLAVE_TIENDA);
-        const validas = selectTiendaLogin ? Array.from(selectTiendaLogin.options).map(o => o.value) : [];
-        if (guardada && validas.includes(guardada)) tiendaSeleccionadaActual = guardada;
+        const validas = selectTiendaLogin ? Array.from(selectTiendaLogin.options).map(o => o.value).filter(v => v) : [];
+        if (guardada && validas.includes(guardada)) { tiendaSeleccionadaActual = guardada; hayTiendaGuardada = true; }
     } catch (e) {}
-    if (selectTiendaLogin) selectTiendaLogin.value = tiendaSeleccionadaActual;
+    // Con tantas tiendas, en un equipo nuevo no se preselecciona ninguna: hay que elegirla (evita entrar a la tienda equivocada)
+    if (selectTiendaLogin && hayTiendaGuardada) selectTiendaLogin.value = tiendaSeleccionadaActual;
+
+    // "404 - Tarapoto" (texto completo) y "404" (código corto para la barra móvil)
+    function nombreTiendaCompleto(id) {
+        const op = selectTiendaLogin ? Array.from(selectTiendaLogin.options).find(o => o.value === id) : null;
+        return op ? op.text : id;
+    }
+    function codigoTiendaCorto(id) {
+        const m = nombreTiendaCompleto(id).match(/^(\d{3})/);
+        return m ? m[1] : id;
+    }
     let chartComparativo = null;
     let periodosGuardadosMap = {};
     let unsubscribeRealtimeData = null;
@@ -1219,14 +1316,19 @@
             loginOverlay.style.display = 'none';
             appWrapper.style.display = 'flex';
             if (userEmailLabel) userEmailLabel.innerText = user.email || '';
-            if (badgeTiendaActiva) badgeTiendaActiva.innerText = tiendaSeleccionadaActual;
-            if (mobileTiendaLabel) mobileTiendaLabel.innerText = tiendaSeleccionadaActual;
+            if (badgeTiendaActiva) badgeTiendaActiva.innerText = nombreTiendaCompleto(tiendaSeleccionadaActual);
+            if (mobileTiendaLabel) mobileTiendaLabel.innerText = codigoTiendaCorto(tiendaSeleccionadaActual);
             await cargarSelectorPeriodos();
 
             // ESCUCHA EN TIEMPO REAL MULTI-USUARIO DESDE LA NUBE DE FIREBASE
             suscribirCargaEnTiempoReal(tiendaSeleccionadaActual);
+
+            // INGRESOS NUEVOS: caché local primero (aparece al instante) y luego escucha en vivo
+            cargarIngresosDesdeCache(tiendaSeleccionadaActual);
+            suscribirIngresosEnTiempoReal(tiendaSeleccionadaActual);
         } else {
             if (unsubscribeRealtimeData) unsubscribeRealtimeData();
+            if (unsubscribeIngresos) unsubscribeIngresos();
             appWrapper.style.display = 'none';
             loginOverlay.style.display = 'flex';
         }
@@ -1268,15 +1370,31 @@
     }
 
     let datosAlmacenGlobal = [];
+    let datosPersonasGlobal = [];   // todas las personas de DATA 2 (para cruzar con ingresos nuevos)
     let ultimasAreasProcesadasGlobal = [];
     let mapaPersonasGlobal = {};
+    // ═════════ SEMÁFORO DE CUMPLIMIENTO ═════════
+    //  🔴 Alto Riesgo   : menor a 85%
+    //  🟡 Riesgo Menor  : de 85% hasta menos de 95%
+    //  🟢 Sin Riesgo    : 95% a más
+    const UMBRAL_ALTO_RIESGO = 85.0;
+    const UMBRAL_SIN_RIESGO = 95.0;
+    function clasificarSemaforo(valor) {
+        if (valor < UMBRAL_ALTO_RIESGO) return { barra: "bg-danger",  texto: "text-danger",           emoji: "🔴" };
+        if (valor < UMBRAL_SIN_RIESGO)  return { barra: "bg-warning", texto: "text-warning-emphasis", emoji: "🟡" };
+        return                                 { barra: "bg-success", texto: "text-success",          emoji: "🟢" };
+    }
+
     let datosCriticosGlobal = [];
     let datosTardanzasGlobal = [];
     let datosOmisionesGlobal = [];
     let datosInasistenciasGlobal = [];
     let datosRefrigerioGlobal = [];
+    // Break tarde: sale a refrigerio a las 6:00 PM o después (igual o pasado)
+    const MIN_BREAK_TARDE = 18 * 60;   // 18:00 = 1080 minutos
     let datosBreakTardeGlobal = [];
     let datosTurnoGlobal = [];
+    let incidenciasCriticosListas = false;   // true cuando ya se procesaron las incidencias (DATA 5) del archivo actual
 
     function obtenerTiendaSeleccionada() {
         return tiendaSeleccionadaActual;
@@ -1447,6 +1565,273 @@
             }
         });
     }
+
+    // ═════════ INGRESOS NUEVOS (hasta 90 días desde "F. Ingreso") ═════════
+    //  1 a 15 días  -> "Nuevo Fb. Relación"
+    //  16 a 45 días -> "Nuevo Fb. Adaptación"
+    //  46 a 90 días -> "Nuevo Fb. Desarrollo"
+    //  más de 90    -> colaborador normal (sin etiqueta)
+    // Los días se cuentan desde la columna "F. Ingreso" del Excel hasta HOY (el día de ingreso cuenta como 0, dentro de Relación).
+    const DIAS_RELACION = 15;
+    const DIAS_ADAPTACION = 45;
+    const DIAS_INGRESO_NUEVO = 90;
+    let mapaIngresos = {};            // { DNI normalizado: Date (medianoche local) }
+    let ingresosMeta = null;          // { nombreArchivo, actualizadoEl }
+    let ultimaVersionIngresos = null;
+    let unsubscribeIngresos = null;
+
+    function normalizarDniClave(v) {
+        return String(v == null ? '' : v).trim().toUpperCase().replace(/^0+/, '');
+    }
+
+    function fechaAIso(d) {
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function isoAFecha(iso) {
+        const [y, m, d] = String(iso).split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+    function fechaADdMmAaaa(d) {
+        return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+    }
+
+    function parsearFechaIngreso(v) {
+        if (v == null || v === '') return null;
+        if (v instanceof Date) {
+            if (isNaN(v)) return null;
+            const d = new Date(v.getTime() + 12 * 3600 * 1000);   // evita desfases de zona horaria de SheetJS
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+        if (typeof v === 'number') {                               // número de serie de Excel
+            const u = new Date(Math.round((v - 25569) * 86400000));
+            return new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate());
+        }
+        const t = String(v).trim();
+        let m = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+        if (m) {
+            let y = parseInt(m[3], 10); if (y < 100) y += 2000;
+            const f = new Date(y, parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+            return (f.getMonth() === parseInt(m[2], 10) - 1) ? f : null;
+        }
+        m = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        return null;
+    }
+
+    // Busca la fila de títulos (puede haber filas de cabecera del sistema antes) y lee DNI + F. Ingreso
+    function leerExcelIngresos(buffer) {
+        const wb = XLSX.read(new Uint8Array(buffer), { type: 'array', cellDates: true });
+        const norm = (x) => String(x == null ? '' : x).toUpperCase().replace(/[^A-Z0-9]/g, '');
+        for (const nombreHoja of wb.SheetNames) {
+            const filas = XLSX.utils.sheet_to_json(wb.Sheets[nombreHoja], { header: 1, defval: '', raw: true });
+            for (let i = 0; i < Math.min(filas.length, 30); i++) {
+                const cab = filas[i].map(norm);
+                const iDni = cab.indexOf('DNI');
+                const iFecha = cab.findIndex(c => c === 'FINGRESO' || c === 'FECHAINGRESO' || c === 'FECHADEINGRESO');
+                if (iDni < 0 || iFecha < 0) continue;
+                const datos = {};
+                let leidas = 0, sinFecha = 0;
+                for (let r = i + 1; r < filas.length; r++) {
+                    const clave = normalizarDniClave(filas[r][iDni]);
+                    if (!clave) continue;
+                    leidas++;
+                    const f = parsearFechaIngreso(filas[r][iFecha]);
+                    if (!f) { sinFecha++; continue; }
+                    datos[clave] = fechaAIso(f);
+                }
+                return { datos, leidas, sinFecha };
+            }
+        }
+        return null;
+    }
+
+    function clasificarIngreso(dni, hoyRef) {
+        const f = mapaIngresos[normalizarDniClave(dni)];
+        if (!f) return null;
+        const hoy = hoyRef ? new Date(hoyRef) : new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const dias = Math.round((hoy - f) / 86400000);
+        if (dias < 0 || dias > DIAS_INGRESO_NUEVO) return null;
+        const etapa = dias <= DIAS_RELACION ? 'RELACION' : (dias <= DIAS_ADAPTACION ? 'ADAPTACION' : 'DESARROLLO');
+        return { dias, fecha: f, etapa };
+    }
+
+    const ESTILOS_ETAPA_INGRESO = {
+        RELACION:   { texto: 'Nuevo Fb. Relación',   color: '#b91c1c', fondo: '#fee2e2', borde: '#fecaca' },
+        ADAPTACION: { texto: 'Nuevo Fb. Adaptación', color: '#b91c1c', fondo: '#fee2e2', borde: '#fecaca' },
+        DESARROLLO: { texto: 'Nuevo Fb. Desarrollo', color: '#b91c1c', fondo: '#fee2e2', borde: '#fecaca' }
+    };
+
+    function etiquetaIngresoNuevo(dni) {
+        const c = clasificarIngreso(dni);
+        if (!c) return '';
+        const e = ESTILOS_ETAPA_INGRESO[c.etapa];
+        const titulo = `Ingresó el ${fechaADdMmAaaa(c.fecha)} · ${c.dias} día${c.dias === 1 ? '' : 's'}`;
+        return `<span class="badge ms-2 fw-bold" title="${titulo}" style="font-size: 0.68rem; padding: 1px 4px; color: ${e.color} !important; background-color: ${e.fondo} !important; border: 1px solid ${e.borde};"><i class="bi bi-exclamation-triangle-fill me-1"></i>${e.texto}</span>`;
+    }
+
+    function resumenIngresos() {
+        const clavesReporte = new Set(Object.keys(mapaPersonasGlobal).map(normalizarDniClave));
+        const conteo = { RELACION: 0, ADAPTACION: 0, DESARROLLO: 0 };
+        let enReporte = 0;
+        for (const clave of Object.keys(mapaIngresos)) {
+            const c = clasificarIngreso(clave);
+            if (!c) continue;
+            conteo[c.etapa]++;
+            if (clavesReporte.has(clave)) enReporte++;
+        }
+        return { ...conteo, enReporte, conReporte: clavesReporte.size > 0, total: Object.keys(mapaIngresos).length };
+    }
+
+    function pintarEstadoIngresos() {
+        const el = document.getElementById('estadoIngresos');
+        if (!el || !ingresosMeta) return;
+        const r = resumenIngresos();
+        const nuevos = r.RELACION + r.ADAPTACION + r.DESARROLLO;
+        let txt = `✅ ${ingresosMeta.nombreArchivo}: ${r.total} colaboradores · ${nuevos} ingresos nuevos (${r.RELACION} Fb. Relación · ${r.ADAPTACION} Fb. Adaptación · ${r.DESARROLLO} Fb. Desarrollo)`;
+        if (r.conReporte) txt += ` · ${r.enReporte} aparecen en el reporte de asistencia cargado`;
+        el.className = 'small text-success fw-semibold';
+        el.innerText = txt;
+    }
+
+    // Tarjeta del resumen: nuevos (hasta 90 días) con cumplimiento menor al 85% (Alto Riesgo).
+    // Misma regla que el panel "menor al 95%": solo cuentan personas con cumplimiento mayor a 0.
+    function actualizarKpiNuevosRiesgo() {
+        const num = document.getElementById('kpiNuevosRiesgo');
+        const sub = document.getElementById('kpiNuevosRiesgoSub');
+        if (!num || !sub) return;
+        if (!Object.keys(mapaIngresos).length) {
+            num.innerText = '0';
+            sub.innerText = 'Carga el archivo de Ingresos';
+            return;
+        }
+        let evaluados = 0, enRiesgo = 0;
+        datosPersonasGlobal.forEach(p => {
+            if (!clasificarIngreso(p.dni) || !(p.valorPorcentaje > 0)) return;
+            evaluados++;
+            if (p.valorPorcentaje < UMBRAL_ALTO_RIESGO) enRiesgo++;
+        });
+        num.innerText = enRiesgo;
+        sub.innerText = `de ${evaluados} nuevos evaluados`;
+    }
+
+    function refrescarVistasConIngresos() {
+        [aplicarFiltrosAlmacen, aplicarFiltrosCriticos, filtrarYRenderizarTardanzas, filtrarYRenderizarOmisiones,
+         filtrarYRenderizarInasistencias, filtrarYRenderizarRefrigerio, filtrarYRenderizarBreakTarde, filtrarYRenderizarTurno
+        ].forEach(fn => { try { fn(); } catch (e) { console.warn("No se pudo refrescar una vista:", e); } });
+        actualizarKpiNuevosRiesgo();
+    }
+
+    function claveCacheIngresos(tiendaId) { return `promart_ingresos_${tiendaId}`; }
+
+    function aplicarIngresos(paquete) {
+        const nuevo = {};
+        for (const [clave, iso] of Object.entries(paquete.datos || {})) nuevo[clave] = isoAFecha(iso);
+        mapaIngresos = nuevo;
+        ingresosMeta = { nombreArchivo: paquete.nombreArchivo || 'Ingresos', actualizadoEl: paquete.actualizadoEl };
+        ultimaVersionIngresos = paquete.version || null;
+        pintarEstadoIngresos();
+        refrescarVistasConIngresos();
+    }
+
+    function cargarIngresosDesdeCache(tiendaId) {
+        try {
+            const raw = localStorage.getItem(claveCacheIngresos(tiendaId));
+            if (raw) aplicarIngresos(JSON.parse(raw));
+        } catch (e) { console.warn("No se pudo leer la caché de ingresos:", e); }
+    }
+
+    // Se guarda en la misma colección que ya tiene permisos (datos_en_vivo). El id empieza con "ingresos_",
+    // así el botón "Reiniciar Historial" no lo borra: es información base, no historial.
+    async function publicarIngresos(tiendaId, paquete) {
+        await setDoc(doc(db, "datos_en_vivo", `ingresos_${tiendaId}`), {
+            tienda: tiendaId, nombreArchivo: paquete.nombreArchivo, version: paquete.version,
+            actualizadoEl: paquete.actualizadoEl, total: Object.keys(paquete.datos).length,
+            json: JSON.stringify(paquete.datos)
+        });
+    }
+
+    function suscribirIngresosEnTiempoReal(tiendaId) {
+        if (unsubscribeIngresos) unsubscribeIngresos();
+        unsubscribeIngresos = onSnapshot(doc(db, "datos_en_vivo", `ingresos_${tiendaId}`), (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            if (d.version && d.version === ultimaVersionIngresos) return;   // ya lo tengo (o lo subí yo)
+            try {
+                const paquete = { nombreArchivo: d.nombreArchivo, actualizadoEl: d.actualizadoEl, version: d.version, datos: JSON.parse(d.json) };
+                try { localStorage.setItem(claveCacheIngresos(tiendaId), JSON.stringify(paquete)); } catch (e) {}
+                aplicarIngresos(paquete);
+            } catch (e) { console.error("Error al aplicar ingresos en vivo:", e); }
+        }, (err) => console.error("Error al escuchar ingresos en vivo:", err));
+    }
+
+    async function procesarArchivoIngresos(file) {
+        if (!file) return;
+        const estado = document.getElementById('estadoIngresos');
+        estado.className = 'small text-muted';
+        estado.innerText = 'Leyendo ' + file.name + '...';
+        try {
+            const lectura = leerExcelIngresos(await file.arrayBuffer());
+            if (!lectura) {
+                estado.className = 'small text-danger fw-semibold';
+                estado.innerText = '⚠️ No se encontraron las columnas «DNI» y «F. Ingreso» en el archivo.';
+                return;
+            }
+            if (!Object.keys(lectura.datos).length) {
+                estado.className = 'small text-danger fw-semibold';
+                estado.innerText = '⚠️ Se encontraron las columnas, pero ninguna fila con DNI y fecha válidos.';
+                return;
+            }
+            const tiendaId = obtenerTiendaSeleccionada();
+            const paquete = {
+                nombreArchivo: file.name,
+                actualizadoEl: new Date().toISOString(),
+                version: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+                datos: lectura.datos
+            };
+            try { localStorage.setItem(claveCacheIngresos(tiendaId), JSON.stringify(paquete)); } catch (e) {}
+            aplicarIngresos(paquete);   // fija también ultimaVersionIngresos: mi propio cambio no se reprocesa
+
+            try {
+                await publicarIngresos(tiendaId, paquete);
+            } catch (errNube) {
+                console.error("Error al publicar ingresos en Firestore:", errNube);
+                alert("⚠️ Los ingresos se aplicaron en este equipo, pero NO se pudieron publicar para los demás dispositivos.\n\n" + describirErrorNube(errNube));
+            }
+            if (lectura.sinFecha > 0) {
+                estado.innerText += ` · ${lectura.sinFecha} fila(s) sin fecha válida omitidas`;
+            }
+        } catch (err) {
+            console.error("Error al leer el archivo de ingresos:", err);
+            estado.className = 'small text-danger fw-semibold';
+            estado.innerText = '❌ No se pudo leer el archivo: ' + (err.message || err);
+        }
+    }
+
+    (function conectarTarjetaNuevosRiesgo() {
+        const tarjeta = document.getElementById('kpiNuevosRiesgoCard');
+        if (!tarjeta) return;
+        tarjeta.addEventListener('click', () => {
+            const sel = document.getElementById('filtroSemaforoCrit');
+            if (sel) sel.value = '🔴';
+            const buscador = document.querySelector('.buscador[data-target="tbodyCriticos"]');
+            if (buscador) buscador.value = 'Nuevo Fb.';
+            const btn = document.getElementById('btnMenuCrit');
+            if (btn && !btn.disabled) btn.click();
+            aplicarFiltrosCriticos();
+        });
+    })();
+
+    (function conectarCargaIngresos() {
+        const btn = document.getElementById('btnCargarIngresos');
+        const input = document.getElementById('inputIngresos');
+        if (!btn || !input) return;
+        btn.addEventListener('click', () => input.click());
+        input.addEventListener('change', async (e) => {
+            await procesarArchivoIngresos(e.target.files[0]);
+            input.value = '';   // permite volver a elegir el mismo archivo
+        });
+    })();
 
     function convertirHoraAMinutos(tiempoStr) {
         if (!tiempoStr) return 0;
@@ -1638,6 +2023,12 @@
         document.getElementById('btnMenuCrit').disabled = false;
 
         const tieneData5 = data5.length > 0;
+
+        // Los conteos de la tabla de riesgo salen solo del archivo que se está cargando ahora
+        incidenciasCriticosListas = false;
+        datosTardanzasGlobal = [];
+        datosOmisionesGlobal = [];
+        datosInasistenciasGlobal = [];
         document.getElementById('btnMenuTard').disabled = !tieneData5;
         document.getElementById('btnMenuOmis').disabled = !tieneData5;
         document.getElementById('btnMenuInas').disabled = !tieneData5;
@@ -1686,6 +2077,7 @@
         }, { merge: true });
 
         await cargarSelectorPeriodos();
+        pintarEstadoIngresos();
 
         if (esNuevoUpload) {
             btnProcesar.disabled = false;
@@ -1750,20 +2142,10 @@
             let porcentaje = item.porcentajeStr;
             let valorPorcentaje = item.valorPorcentaje;
 
-            let colorBarra = "bg-success";
-            let textClass = "text-success";
-            let puntoEmoji = "🟢";
-
-            if (valorPorcentaje < 95.0) {
-                colorBarra = "bg-danger";
-                textClass = "text-danger";
-                puntoEmoji = "🔴";
-            }
-            else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
-                colorBarra = "bg-warning";
-                textClass = "text-warning-emphasis";
-                puntoEmoji = "🟡";
-            }
+            const sem = clasificarSemaforo(valorPorcentaje);
+            const colorBarra = sem.barra;
+            const textClass = sem.texto;
+            const puntoEmoji = sem.emoji;
 
             contenedorHtml += `
                 <div class="col-md-6 col-lg-4">
@@ -1788,10 +2170,12 @@
     function procesarTablasDATA2(data2) {
         datosAlmacenGlobal = [];
         datosCriticosGlobal = [];
+        datosPersonasGlobal = [];
 
         let totalAlm = 0, sumaAlm = 0, totalCriticos = 0;
         let conteoAreasCriticas = {};
         let areasUnicasCrit = new Set();
+        let areasUnicasTienda = new Set();
 
         data2.forEach(row => {
             let dni = row["DNI"] || "";
@@ -1807,25 +2191,19 @@
             let valorPorcentaje = parseFloat(porcentaje);
             let iniciales = nombre.split(',')[0].substring(0,2).toUpperCase();
 
-            let textColor = "text-success";
-            let semaforoEmoji = "🟢";
-
-            if (valorPorcentaje < 95.0) {
-                textColor = "text-danger";
-                semaforoEmoji = "🔴";
-            }
-            else if (valorPorcentaje >= 95.0 && valorPorcentaje <= 98.5) {
-                textColor = "text-warning-emphasis";
-                semaforoEmoji = "🟡";
-            }
+            const semPersona = clasificarSemaforo(valorPorcentaje);
+            const textColor = semPersona.texto;
+            const semaforoEmoji = semPersona.emoji;
 
             let objetoPersona = { dni, nombre, area, porcentaje, valorPorcentaje, iniciales, textColor, semaforoEmoji };
+            datosPersonasGlobal.push(objetoPersona);
 
-            if (area.toUpperCase().includes("ALM") || area.toUpperCase().includes("ALMACEN")) {
-                totalAlm++;
-                sumaAlm += valorPorcentaje;
-                datosAlmacenGlobal.push(objetoPersona);
-            }
+            // Cumplimiento Tienda: incluye a todos los colaboradores, de cualquier área
+            // (la lista y el promedio siguen usando las variables "Alm" por compatibilidad interna)
+            totalAlm++;
+            sumaAlm += valorPorcentaje;
+            datosAlmacenGlobal.push(objetoPersona);
+            if (area) areasUnicasTienda.add(area);
 
             if (valorPorcentaje < 95.0 && valorPorcentaje > 0) {
                 totalCriticos++;
@@ -1836,6 +2214,7 @@
         });
 
         construirMenuMultiArea('crit', areasUnicasCrit, aplicarFiltrosCriticos);
+        construirMenuMultiArea('tienda', areasUnicasTienda, aplicarFiltrosAlmacen);
 
         if(document.getElementById('miniAlmTotal')) document.getElementById('miniAlmTotal').innerText = totalAlm;
         let promFinal = totalAlm > 0 ? (sumaAlm / totalAlm).toFixed(1) : 0;
@@ -1843,6 +2222,7 @@
 
         if(document.getElementById('kpiCriticos')) document.getElementById('kpiCriticos').innerText = totalCriticos;
         if(document.getElementById('miniCritTotal')) document.getElementById('miniCritTotal').innerText = totalCriticos;
+        actualizarKpiNuevosRiesgo();
 
         let areaMasCritica = "Ninguna";
         let maxAlertas = 0;
@@ -1863,6 +2243,7 @@
     function aplicarFiltrosAlmacen() {
         const colorSeleccionado = document.getElementById('filtroSemaforoAlm')?.value || "TODOS";
         const ordenSeleccionado = document.getElementById('ordenPrecioAlm')?.value || "MAYOR_MENOR";
+        const areasSeleccionadas = obtenerSeleccionMultiArea('tienda');
         const tbodyAlmacen = document.getElementById('tbodyAlmacen');
 
         if (!tbodyAlmacen) return;
@@ -1873,7 +2254,13 @@
             datosFiltrados = datosFiltrados.filter(p => p.semaforoEmoji === colorSeleccionado);
         }
 
-        if (ordenSeleccionado === "MAYOR_MENOR") {
+        if (areasSeleccionadas.size > 0 && !areasSeleccionadas.has("TODOS")) {
+            datosFiltrados = datosFiltrados.filter(p => areasSeleccionadas.has(p.area));
+        }
+
+        if (filtrosAreaEstado.tienda.ordenarAZ) {
+            datosFiltrados.sort((a, b) => a.area.localeCompare(b.area));
+        } else if (ordenSeleccionado === "MAYOR_MENOR") {
             datosFiltrados.sort((a, b) => b.valorPorcentaje - a.valorPorcentaje);
         } else {
             datosFiltrados.sort((a, b) => a.valorPorcentaje - b.valorPorcentaje);
@@ -1885,7 +2272,7 @@
                     <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                     <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
                     <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
-                        <div class="avatar-circle" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
+                        <div class="avatar-circle" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}${etiquetaIngresoNuevo(x.dni)}
                     </td>
                     <td class="text-center" style="padding: 4px 10px;">
                         <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
@@ -1896,6 +2283,28 @@
                 </tr>`;
         });
         ejecutarBuscadorTextoPlano('tbodyAlmacen');
+    }
+
+    // Cuenta, por DNI, las tardanzas, omisiones e inasistencias del archivo cargado actualmente.
+    // Usa las mismas listas de los reportes y de las tarjetas del resumen, así los números coinciden.
+    function mapaIncidenciasPorDni() {
+        const m = {};
+        const sumar = (lista, campo) => lista.forEach(x => {
+            const k = normalizarDniClave(x.dni);
+            if (!k) return;
+            if (!m[k]) m[k] = { t: 0, o: 0, i: 0 };
+            m[k][campo]++;
+        });
+        sumar(datosTardanzasGlobal, 't');
+        sumar(datosOmisionesGlobal, 'o');
+        sumar(datosInasistenciasGlobal, 'i');
+        return m;
+    }
+
+    function celdaConteoIncidencia(n, claseColor) {
+        if (!incidenciasCriticosListas) return '<span class="text-muted">–</span>';
+        if (!n) return '<span class="text-muted">0</span>';
+        return `<span class="badge ${claseColor} rounded-pill" style="font-size: 0.78rem; min-width: 26px;">${n}</span>`;
     }
 
     function aplicarFiltrosCriticos() {
@@ -1927,13 +2336,16 @@
             }
         }
 
+        const incidenciasPorDni = mapaIncidenciasPorDni();
+
         datosFiltrados.forEach(x => {
+            const inc = incidenciasPorDni[normalizarDniClave(x.dni)] || { t: 0, o: 0, i: 0 };
             tbodyCriticos.innerHTML += `
                 <tr style="height: 34px;">
                     <td style="padding: 4px 10px;"><span class="badge bg-light text-secondary" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                     <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
                     <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">
-                        <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}
+                        <div class="avatar-circle bg-danger-subtle text-danger" style="width: 22px; height: 22px; font-size: 0.68rem; margin-right: 6px; display: inline-flex;">${x.iniciales}</div>${x.nombre}${etiquetaIngresoNuevo(x.dni)}
                     </td>
                     <td class="text-center" style="padding: 4px 10px;">
                         <div class="d-flex align-items-center justify-content-center fw-bold ${x.textColor}" style="font-size: 0.82rem; gap: 4px;">
@@ -1941,6 +2353,9 @@
                             <span>${x.porcentaje}%</span>
                         </div>
                     </td>
+                    <td class="text-center" style="padding: 4px 10px;">${celdaConteoIncidencia(inc.t, 'bg-warning text-dark')}</td>
+                    <td class="text-center" style="padding: 4px 10px;">${celdaConteoIncidencia(inc.o, 'bg-dark')}</td>
+                    <td class="text-center" style="padding: 4px 10px;">${celdaConteoIncidencia(inc.i, 'bg-danger')}</td>
                 </tr>`;
         });
         ejecutarBuscadorTextoPlano('tbodyCriticos');
@@ -2171,7 +2586,7 @@
 
             if (haySalidaRefValida && tipoCategoria === "FT") {
                 let minSalRef = convertirHoraAMinutos(salRef);
-                if (minSalRef >= 1020) {
+                if (minSalRef >= MIN_BREAK_TARDE) {
                     datosBreakTardeGlobal.push({
                         dni, nombre, area: areaFinal, fecha,
                         salida: salRef,
@@ -2248,6 +2663,9 @@
         filtrarYRenderizarRefrigerio();
         filtrarYRenderizarBreakTarde();
         filtrarYRenderizarTurno();
+
+        incidenciasCriticosListas = true;
+        aplicarFiltrosCriticos();   // actualiza los conteos de la tabla de Riesgo de Rotación
     }
 
     function calcularAreaMasFrecuente(lista) {
@@ -2308,7 +2726,7 @@
 
         let historico = {};
         try {
-            const snap = await getDocs(collection(db, "historico_areas"));
+            const snap = await getDocs(query(collection(db, "historico_areas"), where("tienda", "==", tiendaId)));
             snap.forEach(docSnap => {
                 const d = docSnap.data();
                 if (d.tienda === tiendaId) {
@@ -2463,7 +2881,7 @@
                         datasets: [{
                             label: 'Cumplimiento - ' + areaSeleccionada,
                             data: dataHistorica,
-                            backgroundColor: dataHistorica.map(v => v >= 98.5 ? '#10B981' : (v >= 95 ? '#F59E0B' : '#EF4444')),
+                            backgroundColor: dataHistorica.map(v => v >= UMBRAL_SIN_RIESGO ? '#10B981' : (v >= UMBRAL_ALTO_RIESGO ? '#F59E0B' : '#EF4444')),
                             borderRadius: 8,
                             barThickness: 35
                         }]
@@ -2507,11 +2925,13 @@
 
         try {
             const tiendaId = obtenerTiendaSeleccionada();
-            const q = query(collection(db, "historico_periodos"), orderBy("fechaRegistro", "desc"));
-            const snap = await getDocs(q);
+            // Solo los períodos de esta tienda; el orden (más reciente primero) se aplica aquí para no requerir un índice compuesto
+            const snap = await getDocs(query(collection(db, "historico_periodos"), where("tienda", "==", tiendaId)));
+            const docsPeriodos = snap.docs.slice().sort((a, b) =>
+                String(b.data().fechaRegistro || "").localeCompare(String(a.data().fechaRegistro || "")));
 
             periodosGuardadosMap = {};
-            snap.forEach(docSnap => {
+            docsPeriodos.forEach(docSnap => {
                 let data = docSnap.data();
                 if (data.tienda === tiendaId) {
                     periodosGuardadosMap[docSnap.id] = data;
@@ -2645,7 +3065,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px;">
@@ -2687,7 +3107,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta || ''}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta || ''}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px;">
@@ -2729,7 +3149,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td class="text-center" style="padding: 4px 10px;">
                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2" style="font-size: 0.75rem; padding: 2px 6px;">⚠️ ${x.fecha}</span>
@@ -2776,7 +3196,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.salida}</td>
@@ -2803,10 +3223,10 @@
             filtrados = filtrados.filter(x => areasSeleccionadas.has(x.area));
         }
 
-        if (rangoHoraSel === "5PM_6PM") {
-            filtrados = filtrados.filter(x => x.minSalida >= 1020 && x.minSalida < 1080);
-        } else if (rangoHoraSel === "6PM_MAS") {
-            filtrados = filtrados.filter(x => x.minSalida >= 1080);
+        if (rangoHoraSel === "6PM_7PM") {
+            filtrados = filtrados.filter(x => x.minSalida >= MIN_BREAK_TARDE && x.minSalida < MIN_BREAK_TARDE + 60);
+        } else if (rangoHoraSel === "7PM_MAS") {
+            filtrados = filtrados.filter(x => x.minSalida >= MIN_BREAK_TARDE + 60);
         }
 
         if (filtrosAreaEstado.breaktarde.ordenarAZ) {
@@ -2822,7 +3242,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px;">
@@ -2872,7 +3292,7 @@
         tbody.innerHTML = filtrados.map(x => `
             <tr style="height: 34px;">
                 <td style="padding: 4px 10px;"><small class="text-muted" style="font-size: 0.8rem; font-family: monospace;">${x.dni}</small></td>
-                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}</td>
+                <td class="fw-semibold text-dark" style="padding: 4px 10px; font-size: 0.82rem;">${x.nombre}${x.tipoEtiqueta}${etiquetaIngresoNuevo(x.dni)}</td>
                 <td style="padding: 4px 10px;"><span class="badge bg-light text-dark border" style="font-size: 0.72rem; padding: 2px 6px;">${x.area}</span></td>
                 <td style="padding: 4px 10px; font-size: 0.82rem;" class="text-muted">${x.fecha}</td>
                 <td class="text-center" style="padding: 4px 10px; font-size: 0.82rem;">${x.ingreso}</td>
@@ -2887,6 +3307,7 @@
     }
 
     const filtrosAreaEstado = {
+        tienda: { seleccion: new Set(), ordenarAZ: false },
         crit: { seleccion: new Set(), ordenarAZ: false },
         tard: { seleccion: new Set(), ordenarAZ: false },
         omis: { seleccion: new Set(), ordenarAZ: false },
@@ -3024,6 +3445,7 @@
     }
 
     const CALLBACK_FILTRO_POR_KEY = {
+        tienda: () => aplicarFiltrosAlmacen(),
         crit: () => aplicarFiltrosCriticos(),
         tard: () => filtrarYRenderizarTardanzas(),
         omis: () => filtrarYRenderizarOmisiones(),
