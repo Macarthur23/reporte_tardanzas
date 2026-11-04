@@ -381,7 +381,7 @@
             <div id="loginError" class="text-danger small mb-3" style="display: none;"></div>
             <button type="submit" id="btnLogin" class="btn btn-dark w-100" style="border-radius: 10px; padding: 10px;">Iniciar Sesión</button>
         </form>
-        <div class="text-center mt-3"><small class="text-muted" style="font-size: 0.65rem;">Versión 2026.11.01-k</small></div>
+        <div class="text-center mt-3"><small class="text-muted" style="font-size: 0.65rem;">Versión 2026.11.04-b</small></div>
     </div>
 </div>
 
@@ -406,7 +406,6 @@
         <ul class="components">
             <li><button class="tab-nav-btn active" data-target="panel-carga"><i class="bi bi-cloud-upload"></i> Cargar Datos</button></li>
             <li><button class="tab-nav-btn" data-target="panel-dashboard" id="btnMenuDash" disabled><i class="bi bi-pie-chart"></i> Cumplimiento por Áreas</button></li>
-            <li><button class="tab-nav-btn" data-target="panel-historico-comparativo" id="btnMenuHistComparativo"><i class="bi bi-graph-up-arrow"></i> Comparativa Histórica</button></li>
             <li><button class="tab-nav-btn" data-target="panel-almacen-det" id="btnMenuAlm" disabled><i class="bi bi-shop"></i> Cumplimiento Tienda</button></li>
             <li><button class="tab-nav-btn" data-target="panel-criticos-det" id="btnMenuCrit" disabled><i class="bi bi-person-exclamation"></i> Colaboradores en Riesgo de Rotacion</button></li>
             <li><button class="tab-nav-btn" data-target="panel-tardanzas-det" id="btnMenuTard" disabled><i class="bi bi-clock"></i> Reporte de Tardanzas</button></li>
@@ -416,7 +415,7 @@
             <li><button class="tab-nav-btn" data-target="panel-break-tarde-det" id="btnMenuBreakTarde" disabled><i class="bi bi-clock-history"></i> Break Igual o Pasado las 6 PM</button></li>
             <li><button class="tab-nav-btn" data-target="panel-turno-det" id="btnMenuTurno" disabled><i class="bi bi-hourglass-split"></i> Reporte de Exceso de Turno</button></li>
         </ul>
-        <div class="px-3 py-3 text-white-50" style="font-size: 0.65rem;">Versión 2026.11.01-k</div>
+        <div class="px-3 py-3 text-white-50" style="font-size: 0.65rem;">Versión 2026.11.04-b</div>
     </nav>
 
     <div id="content">
@@ -506,52 +505,6 @@
                         </button>
                         <input type="file" id="inputIngresos" accept=".xlsx, .xls" style="display: none;">
                         <div id="estadoIngresos" class="small text-muted">Aún no se ha cargado ningún archivo de ingresos.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL: COMPARATIVA HISTÓRICA MULTI-PERÍODO -->
-            <div class="panel-custom d-none" id="panel-historico-comparativo">
-                <div class="main-card border-start border-primary border-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-primary m-0"><i class="bi bi-bar-chart-steps me-2"></i>COMPARADOR HISTÓRICO MULTI-PERÍODO (Semanas, Meses o Trimestres)</h5>
-                        <button id="btnRefrescarHistorico" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise"></i> Actualizar Períodos Cargados</button>
-                    </div>
-                    <p class="text-muted small">Selecciona dos períodos cargados previamente en la nube para auditar la evolución real de la tienda.</p>
-
-                    <div class="row g-3 bg-light p-3 rounded border mb-4">
-                        <div class="col-md-5">
-                            <label class="form-label small fw-bold text-muted">Período A (Base anterior):</label>
-                            <select id="selectPeriodoA" class="form-select form-select-sm"></select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label small fw-bold text-muted">Período B (Comparado reciente):</label>
-                            <select id="selectPeriodoB" class="form-select form-select-sm"></select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button id="btnEjecutarComparacion" class="btn btn-primary btn-sm w-100 fw-bold"><i class="bi bi-funnel-fill"></i> Comparar</button>
-                        </div>
-                    </div>
-
-                    <div class="custom-table-container mb-4">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Área Operativa</th>
-                                <th class="text-center">Período Base (A)</th>
-                                <th class="text-center">Período Comparado (B)</th>
-                                <th class="text-center">Diferencia Neto</th>
-                                <th class="text-center">Estado de Mejora</th>
-                            </tr>
-                            </thead>
-                            <tbody id="tbodyTablaComparativa">
-                            <tr><td colspan="5" class="text-center text-muted py-4">Carga archivos en el sistema para iniciar comparaciones históricas.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="position: relative; height: 350px; background: #fafafa; border-radius: 12px; padding: 15px; border: 1px solid #f1f5f9;">
-                        <canvas id="chartComparativoGlobal"></canvas>
                     </div>
                 </div>
             </div>
@@ -1311,10 +1264,43 @@
     let periodosGuardadosMap = {};
     let unsubscribeRealtimeData = null;
 
+    // ═════════ VISIBILIDAD DE LA PESTAÑA "CARGAR DATOS" ═════════
+    //  En computadora de escritorio, laptop y tablet se ve normal.
+    //  En celular (app o navegador del teléfono) se oculta. Pon false para verla también en el celular.
+    const OCULTAR_CARGA_EN_CELULAR = true;
+    const mqCelular = window.matchMedia('(max-width: 767.98px)');
+
+    function esCelular() {
+        return /Android.*Mobile|iPhone|iPod|Mobile/i.test(navigator.userAgent) || mqCelular.matches;
+    }
+
+    function aplicarVisibilidadCarga() {
+        const ocultar = OCULTAR_CARGA_EN_CELULAR && esCelular();
+        const btnCarga = document.querySelector('.tab-nav-btn[data-target="panel-carga"]');
+        const liCarga = btnCarga ? btnCarga.closest('li') : null;
+        if (liCarga) liCarga.style.display = ocultar ? 'none' : '';
+        if (!ocultar) return;
+
+        // Si estaba abierta la pestaña de carga, se pasa a "Cumplimiento por Áreas"
+        const panelCarga = document.getElementById('panel-carga');
+        if (panelCarga && !panelCarga.classList.contains('d-none')) {
+            document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel-custom').forEach(p => p.classList.add('d-none'));
+            const btnDash = document.getElementById('btnMenuDash');
+            const panelDash = document.getElementById('panel-dashboard');
+            if (btnDash) btnDash.classList.add('active');
+            if (panelDash) panelDash.classList.remove('d-none');
+            const titulo = document.getElementById('dinamicTitle');
+            if (titulo) titulo.innerText = 'Cumplimiento por Áreas';
+        }
+    }
+    if (mqCelular.addEventListener) mqCelular.addEventListener('change', aplicarVisibilidadCarga);
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             loginOverlay.style.display = 'none';
             appWrapper.style.display = 'flex';
+            aplicarVisibilidadCarga();
             if (userEmailLabel) userEmailLabel.innerText = user.email || '';
             if (badgeTiendaActiva) badgeTiendaActiva.innerText = nombreTiendaCompleto(tiendaSeleccionadaActual);
             if (mobileTiendaLabel) mobileTiendaLabel.innerText = codigoTiendaCorto(tiendaSeleccionadaActual);
@@ -2018,6 +2004,11 @@
     }
 
     async function procesarDatosCompletos(data1, data2, data5, nombreArchivo, esNuevoUpload = false) {
+        // Las áreas exoneradas (Administrativa y Gerencia) quedan fuera de todos los reportes
+        data1 = excluirExoneradas(data1);
+        data2 = excluirExoneradas(data2);
+        data5 = excluirExoneradas(data5);
+
         document.getElementById('btnMenuDash').disabled = false;
         document.getElementById('btnMenuAlm').disabled = false;
         document.getElementById('btnMenuCrit').disabled = false;
@@ -2750,7 +2741,7 @@
         const selectorArea = document.getElementById('selectorAreaGrafico');
         if (!card || !tbody) return;
 
-        const nombresAreas = Object.keys(historico).sort((a, b) => a.localeCompare(b));
+        const nombresAreas = Object.keys(historico).filter(a => !esAreaExonerada(a)).sort((a, b) => a.localeCompare(b));
         if (!nombresAreas.length) { card.style.display = 'none'; return; }
 
         let todosLosPeriodos = new Set();
@@ -3406,6 +3397,28 @@
 
     function normalizarTextoArea(s) {
         return (s || "").toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // ═════════ ÁREAS EXONERADAS (Administrativa y Gerencia) ═════════
+    // Sus filas se descartan al procesar el archivo, por eso no entran en ningún reporte, KPI ni gráfico.
+    // Para exonerar otra área, agrega aquí una parte de su nombre (en mayúsculas y sin tildes).
+    const AREAS_EXONERADAS = ["ADMINISTRATIV", "GERENCIA"];
+    function esAreaExonerada(area) {
+        const a = normalizarTextoArea(area);
+        return AREAS_EXONERADAS.some(x => a.includes(x));
+    }
+    function filaEsExonerada(row) {
+        const areaRaw = String(row["AREA"] || row["AREAS"] || row["Etiquetas de fila"] || "");
+        const seccion = String(row["SECCION2"] || row["SECCION"] || "");
+        const up = areaRaw.toUpperCase();
+        let areaFinal = areaRaw;
+        if ((up.includes("HOME CENTER") || up.includes("PROMART") || areaRaw.length > 25) && seccion.trim() !== "" && !seccion.toUpperCase().includes("TOTAL GENERAL")) {
+            areaFinal = seccion;
+        }
+        return esAreaExonerada(areaRaw) || esAreaExonerada(areaFinal);
+    }
+    function excluirExoneradas(filas) {
+        return (filas || []).filter(r => !filaEsExonerada(r));
     }
 
     const MAPA_DIVISIONES_RAW = {
